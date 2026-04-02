@@ -9,12 +9,11 @@ This file tracks what has been completed, what is in progress, and what is next.
 - [x] Create GitHub repository with .gitignore for Unity
 - [x] Complete Unity beginner tutorial
 - [x] Game Design Document v2.0
-- [ ] Technical Design Document
-- [ ] Art Style Guide with reference examples
-- [ ] Project folder structure scaffold (create the folder structure from CLAUDE.md)
+- [x] Technical Design Document
+- [x] Art Style Guide with reference examples
+- [x] Project folder structure scaffold (create the folder structure from CLAUDE.md)
 
-**Status: IN PROGRESS**
-**Current task: Technical Design Document**
+**Status: COMPLETE**
 
 ---
 
@@ -29,7 +28,8 @@ This file tracks what has been completed, what is in progress, and what is next.
 - [ ] Flanking system — front/side/rear damage with configurable multipliers per unit
 - [ ] Basic targeting AI — nearest, weakest, highest threat priorities
 
-**Status: NOT STARTED**
+**Status: UP NEXT**
+**First task: Layer 1 — Data foundation (GridCoord, UnitInstance, GameConfigData, pure C# battle logic)**
 
 ---
 
