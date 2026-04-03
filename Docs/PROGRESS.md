@@ -18,18 +18,27 @@ This file tracks what has been completed, what is in progress, and what is next.
 ---
 
 ## Phase 1: Core Grid Prototype
-- [ ] Grid system — 10×10 tile generation, coordinate system, tile highlighting
-- [ ] Unit data model — ScriptableObject architecture for unit types
+- [x] Grid system — 10×10 tile generation, coordinate system, tile highlighting
+  - GridCoord.cs, GridMap.cs (pure C#), GridView.cs (Unity MonoBehaviour)
+- [x] Unit data model — ScriptableObject architecture for unit types
+  - UnitStatsSO.cs, UnitInstance.cs, UnitEnums.cs, GameConfigSO.cs, GameConfigData.cs
 - [ ] Unit placement — drag-and-drop units onto deployment zone (rows 1–3)
-- [ ] Auto-battle engine v1 — turn-based resolution (move → attack → resolve)
-- [ ] Battle visualization — units animate movement and attacks on grid
+  - UnitPlacementController.cs needed (David: InputSystem drag handling)
+- [x] Auto-battle engine v1 — turn-based resolution (move → attack → resolve)
+  - BattleEngine.cs, MovementResolver.cs (pure C#)
+- [x] Battle visualization — units animate movement and attacks on grid
+  - BattleVisualizer.cs, BattleController.cs, UnitView.cs
 - [ ] Placeholder art — colored squares or free pixel sprites for 3 unit types
-- [ ] Win/loss detection
-- [ ] Flanking system — front/side/rear damage with configurable multipliers per unit
-- [ ] Basic targeting AI — nearest, weakest, highest threat priorities
+  - Code generates placeholder sprites; David: create proper prefabs in editor
+- [x] Win/loss detection
+  - Built into BattleEngine: all dead, round 30 HP comparison, draw
+- [x] Flanking system — front/side/rear damage with configurable multipliers per unit
+  - FlankingCalculator.cs (pure C#), per-unit multipliers in UnitStatsSO
+- [x] Basic targeting AI — nearest, weakest, highest threat priorities
+  - ITargetingStrategy + 5 implementations + TargetingFactory (pure C#)
 
-**Status: UP NEXT**
-**First task: Layer 1 — Data foundation (GridCoord, UnitInstance, GameConfigData, pure C# battle logic)**
+**Status: IN PROGRESS**
+**Remaining: Unit placement controller (InputSystem drag-and-drop), proper prefabs/SOs in Unity editor**
 
 ---
 
