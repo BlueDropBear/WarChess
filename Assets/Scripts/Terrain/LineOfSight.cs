@@ -20,6 +20,8 @@ namespace WarChess.Terrain
             TerrainMap terrainMap, GridMap gridMap,
             bool attackerOnHill, bool ignoresLoS)
         {
+            if (terrainMap == null || gridMap == null) return true;
+
             // Rocket Battery ignores LoS entirely
             if (ignoresLoS) return true;
 
@@ -63,6 +65,8 @@ namespace WarChess.Terrain
         /// </summary>
         public static bool HasClearPath(GridCoord from, GridCoord to, TerrainMap terrainMap)
         {
+            if (terrainMap == null) return true;
+
             var points = BresenhamLine(from.X, from.Y, to.X, to.Y);
 
             for (int i = 1; i < points.Length - 1; i++)

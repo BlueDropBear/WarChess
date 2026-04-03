@@ -97,13 +97,8 @@ namespace WarChess.Config
             var data = CosmeticDatabase.Get(cosmeticId);
             if (data == null || data.SoftCurrencyPrice <= 0) return false;
 
-            if (wallet.Balance < data.SoftCurrencyPrice) return false;
+            if (!wallet.Spend(data.SoftCurrencyPrice)) return false;
 
-            // Spend ammunition for cosmetic purchase
-            // Uses AddPurchased with negative to deduct, or we track separately
-            // For now, use a direct balance check — actual deduction handled by caller
-            // since AmmunitionSystem doesn't have a generic spend method beyond deploy cost.
-            // Return true to indicate validation passed; caller handles currency transfer.
             _ownedCosmeticIds.Add(cosmeticId);
             return true;
         }

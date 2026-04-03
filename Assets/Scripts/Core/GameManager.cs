@@ -104,7 +104,10 @@ namespace WarChess.Core
             // Dispatch Boxes
             var pendingBoxes = new List<DispatchBoxType>();
             foreach (int boxInt in SaveManager.Data.PendingDispatchBoxes)
-                pendingBoxes.Add((DispatchBoxType)boxInt);
+            {
+                if (System.Enum.IsDefined(typeof(DispatchBoxType), boxInt))
+                    pendingBoxes.Add((DispatchBoxType)boxInt);
+            }
             DispatchBoxSystem = new DispatchBoxSystem(CosmeticShop, pendingBoxes);
 
             // Monetization (depends on CampaignManager, CosmeticShop, DispatchBoxSystem, Analytics)

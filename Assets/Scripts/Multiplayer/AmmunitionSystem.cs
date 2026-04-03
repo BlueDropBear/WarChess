@@ -88,6 +88,17 @@ namespace WarChess.Multiplayer
         }
 
         /// <summary>
+        /// Spends a specified amount of ammunition. Returns false if insufficient balance.
+        /// </summary>
+        public bool Spend(int amount)
+        {
+            if (amount <= 0 || Balance < amount) return false;
+            Balance -= amount;
+            TotalSpent += amount;
+            return true;
+        }
+
+        /// <summary>
         /// Adds purchased ammunition (from IAP). Amount validated server-side.
         /// </summary>
         public void AddPurchased(int amount)

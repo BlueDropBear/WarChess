@@ -33,6 +33,8 @@ namespace WarChess.Units
         /// </summary>
         public void Initialize(UnitInstance unitInstance, GridView gridView)
         {
+            if (unitInstance == null || gridView == null) return;
+
             _unitInstance = unitInstance;
             _gridView = gridView;
             _targetPosition = _gridView.GridToWorld(unitInstance.Position);

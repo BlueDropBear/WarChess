@@ -36,10 +36,10 @@ namespace WarChess.Battle
             int chargeMult = isCharge ? chargeMultiplier : 100;
 
             // Combined = charge * terrainDef * terrainAtk * formation * flank
-            // Each is base-100, so we divide by 100^4 (the 5th base-100 is kept as the final /100)
+            // Each is base-100, so we divide by 100^5 to normalize back to a scalar
             long combined = (long)chargeMult * terrainDefenseMultiplier * terrainAttackMultiplier
                           * formationMultiplier * flankMult;
-            int damage = (int)(baseDamage * combined / 100_00_00_00L);
+            int damage = (int)(baseDamage * combined / 100_00_00_00_00L);
 
             return Math.Max(damage, minimumDamage);
         }
