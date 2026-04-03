@@ -117,8 +117,8 @@ namespace WarChess.Units
             Def = newDef;
             int oldMax = MaxHp;
             MaxHp = newMaxHp;
-            // Scale current HP proportionally
-            CurrentHp = oldMax > 0 ? (CurrentHp * newMaxHp) / oldMax : newMaxHp;
+            // Scale current HP proportionally (rounded to nearest)
+            CurrentHp = oldMax > 0 ? (CurrentHp * newMaxHp + oldMax / 2) / oldMax : newMaxHp;
         }
 
         /// <summary>

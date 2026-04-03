@@ -38,7 +38,7 @@ namespace WarChess.Battle
         /// </summary>
         public void RegisterUnitViews(Dictionary<int, UnitView> unitViews)
         {
-            _unitViews = unitViews;
+            _unitViews = unitViews ?? new Dictionary<int, UnitView>();
         }
 
         /// <summary>

@@ -43,6 +43,8 @@ namespace WarChess.Formations
             int batteryAtkBonus, int cavalryWedgeChargeBonus, int squareDefVsCavalryBonus,
             int skirmishAtkBonus, int skirmishRangeBonus)
         {
+            if (unit == null || grid == null) return FormationBonus.None;
+
             var allies = grid.GetAllUnits(unit.Owner);
 
             // Check each formation type the unit participates in
