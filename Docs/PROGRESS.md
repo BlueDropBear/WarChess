@@ -22,14 +22,15 @@ This file tracks what has been completed, what is in progress, and what is next.
   - GridCoord.cs, GridMap.cs (pure C#), GridView.cs (Unity MonoBehaviour)
 - [x] Unit data model — ScriptableObject architecture for unit types
   - UnitStatsSO.cs, UnitInstance.cs, UnitEnums.cs, GameConfigSO.cs, GameConfigData.cs
-- [ ] Unit placement — drag-and-drop units onto deployment zone (rows 1–3)
-  - UnitPlacementController.cs needed (David: InputSystem drag handling)
+- [x] Unit placement — drag-and-drop units onto deployment zone (rows 1–3)
+  - UnitPlacementController.cs (validation, budget, click-to-place). David: wire InputSystem drag.
 - [x] Auto-battle engine v1 — turn-based resolution (move → attack → resolve)
   - BattleEngine.cs, MovementResolver.cs (pure C#)
 - [x] Battle visualization — units animate movement and attacks on grid
   - BattleVisualizer.cs, BattleController.cs, UnitView.cs
-- [ ] Placeholder art — colored squares or free pixel sprites for 3 unit types
-  - Code generates placeholder sprites; David: create proper prefabs in editor
+- [x] Placeholder art — colored squares or free pixel sprites for 3 unit types
+  - BattleSetupDemo generates distinct shapes per type (square/diamond/circle). David: create proper prefabs later.
+  - UnitFactory.cs creates all 3 prototype units with GDD stats (no SO assets needed to test)
 - [x] Win/loss detection
   - Built into BattleEngine: all dead, round 30 HP comparison, draw
 - [x] Flanking system — front/side/rear damage with configurable multipliers per unit
@@ -37,8 +38,8 @@ This file tracks what has been completed, what is in progress, and what is next.
 - [x] Basic targeting AI — nearest, weakest, highest threat priorities
   - ITargetingStrategy + 5 implementations + TargetingFactory (pure C#)
 
-**Status: IN PROGRESS**
-**Remaining: Unit placement controller (InputSystem drag-and-drop), proper prefabs/SOs in Unity editor**
+**Status: COMPLETE (code-side) — David: create Battle scene, add BattleSetupDemo component, press Play**
+**See Docs/DAVID_TASKS.md for David's remaining Unity editor tasks**
 
 ---
 
