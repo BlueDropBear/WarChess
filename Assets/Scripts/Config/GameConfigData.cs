@@ -80,12 +80,13 @@ namespace WarChess.Config
         }
 
         /// <summary>
-        /// Returns the default config matching GDD values.
+        /// Returns the default config matching GDD campaign values.
+        /// For multiplayer, use GameConfigSO.ToData(isMultiplayer: true) which sets enemy rows 8-10.
         /// </summary>
         public static GameConfigData Default => new GameConfigData(
             gridWidth: 10, gridHeight: 10,
             playerDeployMinRow: 1, playerDeployMaxRow: 3,
-            enemyDeployMinRow: 8, enemyDeployMaxRow: 10,
+            enemyDeployMinRow: 5, enemyDeployMaxRow: 10,
             maxRounds: 30, minimumDamage: 1,
             defaultFlankSideMultiplier: 130, defaultFlankRearMultiplier: 200,
             forestDefenseMultiplier: 75, hillAttackMultiplier: 125,

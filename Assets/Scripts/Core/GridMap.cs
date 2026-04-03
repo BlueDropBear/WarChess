@@ -65,11 +65,17 @@ namespace WarChess.Core
             _grid[coord.X - 1, coord.Y - 1] = null;
         }
 
-        /// <summary>Moves a unit from one coordinate to another.</summary>
+        /// <summary>Moves a unit from one coordinate to another. Destination must be valid and empty.</summary>
         public void MoveUnit(GridCoord from, GridCoord to)
         {
             var unit = GetUnitAt(from);
             if (unit == null) return;
+
+            if (!IsValidCoord(to))
+                throw new System.ArgumentException($"Destination {to} is outside the grid");
+
+            if (GetUnitAt(to) != null && to != from)
+                throw new System.InvalidOperationException($"Destination {to} is already occupied");
 
             _grid[from.X - 1, from.Y - 1] = null;
             _grid[to.X - 1, to.Y - 1] = unit;
