@@ -1,0 +1,457 @@
+# WarChess — UI/UX Wireframes
+
+All wireframes are mobile-first (portrait, ~360px wide). Scale up for tablet/desktop.
+Touch interactions noted per screen. All screens use the pixel-art UI kit.
+
+---
+
+## 1. Main Menu
+
+```
+┌──────────────────────────┐
+│      WarChess             │
+│    [Pixel Art Logo]       │
+│                           │
+│  ┌──────────────────────┐ │
+│  │   ⚔ Campaign         │ │
+│  └──────────────────────┘ │
+│  ┌──────────────────────┐ │
+│  │   🏰 Multiplayer     │ │
+│  └──────────────────────┘ │
+│  ┌──────────────────────┐ │
+│  │   📋 Armory          │ │
+│  └──────────────────────┘ │
+│  ┌──────────────────────┐ │
+│  │   ⚙ Settings         │ │
+│  └──────────────────────┘ │
+│                           │
+│          v1.0.0           │
+└──────────────────────────┘
+```
+
+**Touch:** Tap buttons. No gestures needed.
+**Responsive:** Buttons stretch to fill width, centered on larger screens.
+
+---
+
+## 2. Armory Hub
+
+```
+┌──────────────────────────┐
+│ ← Back         Armory    │
+├──────────────────────────┤
+│ [Campaign] [Multiplayer] │ ← Tab selector
+├──────────────────────────┤
+│                           │
+│  Saved Armies             │
+│  ┌────────────────────┐   │
+│  │ Army 1: "The Line" │   │
+│  │ 38/40 pts  5 units │   │
+│  │ [Edit]  [Delete]   │   │
+│  └────────────────────┘   │
+│  ┌────────────────────┐   │
+│  │ Army 2: "Cavalry"  │   │
+│  │ 35/40 pts  4 units │   │
+│  │ [Edit]  [Delete]   │   │
+│  └────────────────────┘   │
+│                           │
+│  [+ New Army]             │
+│                           │
+│  ─── Officers ───         │
+│  12 owned  3 assigned     │
+│  [View Officers]          │
+│                           │
+└──────────────────────────┘
+```
+
+**Touch:** Tap tabs, tap army cards to expand, swipe to scroll list.
+**Responsive:** Two-column army grid on tablet/desktop.
+
+---
+
+## 3. Army Builder
+
+```
+┌──────────────────────────┐
+│ ← Back    Army Builder   │
+├──────────────────────────┤
+│ Name: [The Iron Line    ]│
+│ Budget: 32/40            │
+│ ████████████░░░░ (80%)   │
+├──────────────────────────┤
+│ Units Available:          │
+│ ┌────┐┌────┐┌────┐┌────┐│
+│ │ LI ││ ML ││ CV ││ AR ││
+│ │ 3pt││ 1pt││ 5pt││ 6pt││
+│ └────┘└────┘└────┘└────┘│
+│ ┌────┐┌────┐┌────┐┌────┐│
+│ │ GR ││ RF ││ HU ││ 🔒 ││
+│ │ 7pt││ 5pt││ 4pt││    ││
+│ └────┘└────┘└────┘└────┘│
+├──────────────────────────┤
+│ Army Composition:         │
+│  Line Infantry ×3    9pt │
+│  Cavalry ×2         10pt │
+│  Artillery ×1        6pt │
+│  Grenadier ×1        7pt │
+│  [-] [+] per unit        │
+├──────────────────────────┤
+│ Officer: [Assign...]      │
+├──────────────────────────┤
+│ [Save Army]               │
+└──────────────────────────┘
+```
+
+**Touch:** Tap unit tile to add, [-][+] to adjust count, tap Officer slot to open picker.
+**Responsive:** Unit palette becomes 2 rows of 7 on tablet.
+
+---
+
+## 4. Campaign Map
+
+```
+┌──────────────────────────┐
+│ ← Back      Campaign     │
+├──────────────────────────┤
+│ [Act I] [Act II🔒] [III🔒]│
+├──────────────────────────┤
+│                           │
+│  ●───●───●───●───●       │
+│  1★★★ 2★★  3★   4       │
+│        ●───●───●         │
+│        5   6   7         │
+│            ●───●───●     │
+│            8   9   10    │
+│                           │
+│ ┌────────────────────┐   │
+│ │ Battle 5: Austerlitz│   │
+│ │ Budget: 18 pts      │   │
+│ │ "The enemy holds    │   │
+│ │  the high ground..."│   │
+│ │ Unlocks: Artillery  │   │
+│ │ ★★★ Best: 2 stars   │   │
+│ │                     │   │
+│ │ [Select Army] [Play]│   │
+│ └────────────────────┘   │
+│                           │
+│ Difficulty: [▼ Veteran]   │
+└──────────────────────────┘
+```
+
+**Touch:** Tap node to select, scroll/pan map, tap Play to start.
+**Responsive:** Larger map with more visible nodes on tablet.
+
+---
+
+## 5. Deployment Screen
+
+```
+┌──────────────────────────┐
+│ ← Back     Deploy        │
+├──────────────────────────┤
+│ Battle 5: Austerlitz      │
+│                           │
+│ 10 9 8 7 6 5 4 3 2 1  ← │
+│ ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐  │
+│ │ │ │E│E│ │ │E│ │ │ │10 │
+│ ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤  │
+│ │ │ │ │E│E│E│ │ │ │ │ 9 │
+│ ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤  │
+│ │ │ │ │ │E│ │ │ │ │ │ 8 │
+│ ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤  │
+│ │~│~│~│ │B│ │~│~│~│~│ 7 │
+│ ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤  │
+│ │ │F│F│ │ │ │ │H│ │ │ 6 │
+│ ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤  │
+│ │ │ │ │ │ │ │ │ │ │ │ 5 │
+│ ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤  │
+│ │░│░│░│░│░│░│░│░│░│░│ 4 │
+│ ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤  │
+│ │▓│░│░│▓│░│░│░│▓│░│░│ 3 │
+│ ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤  │
+│ │ │▓│░│ │▓│░│ │ │▓│░│ 2 │
+│ ├─┼─┼─┼─┼─┼─┼─┼─┼─┼─┤  │
+│ │ │ │▓│ │ │▓│ │ │ │▓│ 1 │
+│ └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘  │
+│                           │
+│ ░ = deploy zone  ▓ = unit │
+│ E = enemy  F = forest     │
+│ H = hill  ~ = river       │
+│ B = bridge                │
+│                           │
+│ Tap unit, then tap tile   │
+│ to place. Drag to move.   │
+│                           │
+│ [Auto-Place]  [GO!]       │
+└──────────────────────────┘
+```
+
+**Touch:** Tap unit from palette, tap grid tile to place. Drag placed units to reposition. Pinch to zoom.
+**Responsive:** Grid tiles scale larger on tablet/desktop.
+
+---
+
+## 6. Battle Screen
+
+```
+┌──────────────────────────┐
+│ Round: 5/30    ⏸ Pause   │
+├──────────────────────────┤
+│                           │
+│  ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐ │
+│  │ │ │ │ │ │ │ │ │ │ │ │ 10
+│  │ │ │ │e│ │e│ │ │ │ │ │  9
+│  │ │ │ │ │e│ │ │ │ │ │ │  8
+│  │ │ │ │ │ │ │ │ │ │ │ │  7
+│  │ │ │ │ │ │ │ │ │ │ │ │  6
+│  │ │ │ │ │ │ │ │ │ │ │ │  5
+│  │ │ │p│ │ │ │ │p│ │ │ │  4
+│  │ │ │ │p│ │p│ │ │ │ │ │  3
+│  │ │p│ │ │p│ │ │ │p│ │ │  2
+│  │ │ │ │ │ │ │ │ │ │ │ │  1
+│  └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘ │
+│                           │
+│  p = player  e = enemy    │
+│                           │
+│  HP bars shown above each │
+│  unit sprite on the grid  │
+│                           │
+├──────────────────────────┤
+│ Speed: [1x] [2x] [4x]    │
+│                           │
+│ Event Log:                │
+│ > Cavalry charges Militia │
+│ > Artillery bombards (3,8)│
+│ > Line Infantry attacks   │
+└──────────────────────────┘
+```
+
+**Touch:** Tap unit for info popup. Tap speed buttons. No interaction during auto-battle.
+**Responsive:** Larger grid on desktop, event log on side panel instead of bottom.
+
+---
+
+## 7. Battle Results
+
+```
+┌──────────────────────────┐
+│                           │
+│       ⚔ VICTORY! ⚔       │
+│                           │
+│        ★ ★ ☆              │
+│       2 / 3 Stars         │
+│                           │
+├──────────────────────────┤
+│ Survived: 4/6 units       │
+│ Rounds: 12                │
+│ Damage dealt: 156         │
+│ Damage taken: 89          │
+├──────────────────────────┤
+│                           │
+│ 🔓 Unlocked: Cavalry!    │
+│                           │
+│ 📦 Earned: Bronze         │
+│    Dispatch Box           │
+│                           │
+├──────────────────────────┤
+│                           │
+│ [Retry]  [Next Battle]    │
+│                           │
+│ [Campaign Map]            │
+└──────────────────────────┘
+```
+
+**Touch:** Tap buttons. Stars animate in sequence.
+**Responsive:** Wider layout with stats in columns on desktop.
+
+---
+
+## 8. Multiplayer Hub
+
+```
+┌──────────────────────────┐
+│ ← Back    Multiplayer    │
+├──────────────────────────┤
+│ Tier: ★★ Major General   │
+│ Elo: 1247 (Sergeant)     │
+│ Ammo: 15 🔵              │
+├──────────────────────────┤
+│ [Deploy] [History] [Board]│
+├──────────────────────────┤
+│                           │
+│ Active Deployments:       │
+│ ┌────────────────────┐   │
+│ │ "Cavalry Rush"     │   │
+│ │ Standard 40pt      │   │
+│ │ Status: Waiting... │   │
+│ │ [Withdraw]         │   │
+│ └────────────────────┘   │
+│ ┌────────────────────┐   │
+│ │ "The Wall"         │   │
+│ │ Skirmish 25pt      │   │
+│ │ Status: MATCHED!   │   │
+│ │ [View Replay]      │   │
+│ └────────────────────┘   │
+│                           │
+│ [+ Deploy New Army]       │
+│  (costs 1 Ammunition)     │
+│                           │
+│ Format: [Skirmish|Std|Grand]
+│ Tier:   [1|2★|3|4|5]     │
+└──────────────────────────┘
+```
+
+**Touch:** Tap deploy for army picker, tap replay to watch, swipe between tabs.
+**Responsive:** Side-by-side panels on desktop (deployments left, leaderboard right).
+
+---
+
+## 9. Settings
+
+```
+┌──────────────────────────┐
+│ ← Back      Settings     │
+├──────────────────────────┤
+│                           │
+│ Music Volume              │
+│ ■■■■■■■□□□  70%          │
+│                           │
+│ SFX Volume                │
+│ ■■■■■■■■□□  80%          │
+│                           │
+│ Battle Speed              │
+│ [1x] [2x] [4x]           │
+│                           │
+│ ─── Accessibility ───     │
+│                           │
+│ Colorblind Mode  [OFF]    │
+│ Palette: [Normal ▼]      │
+│   Normal / Deuteranopia   │
+│   / Tritanopia            │
+│                           │
+│ Text Size                 │
+│ [Small] [Medium] [Large]  │
+│                           │
+│ Screen Shake   [ON]       │
+│                           │
+│ ─── Game ───              │
+│                           │
+│ Difficulty: [Veteran ▼]   │
+│ Language:   [English ▼]   │
+│                           │
+│ [Credits]  [Privacy]      │
+└──────────────────────────┘
+```
+
+**Touch:** Drag sliders, tap toggles, tap dropdowns.
+**Responsive:** Two-column layout on desktop.
+
+---
+
+## 10. Cosmetic Shop
+
+```
+┌──────────────────────────┐
+│ ← Back    Cosmetic Shop  │
+├──────────────────────────┤
+│ New items in: 14h 32m     │
+├──────────────────────────┤
+│                           │
+│ ┌──────┐ ┌──────┐        │
+│ │[img] │ │[img] │        │
+│ │Blue  │ │Winter│        │
+│ │Hussar│ │Grid  │        │
+│ │10 🔵 │ │15 🔵 │        │
+│ │[Buy] │ │[Buy] │        │
+│ └──────┘ └──────┘        │
+│ ┌──────┐ ┌──────┐        │
+│ │[img] │ │[img] │        │
+│ │Bearskin│ │Night│        │
+│ │Gren. │ │Battle│        │
+│ │$0.99 │ │$1.99 │        │
+│ │[Buy] │ │[Buy] │        │
+│ └──────┘ └──────┘        │
+│ ┌──────┐ ┌──────┐        │
+│ │[img] │ │[img] │        │
+│ │Cannon│ │Union │        │
+│ │Salute│ │Jack  │        │
+│ │$1.99 │ │5 🔵  │        │
+│ │[Buy] │ │OWNED │        │
+│ └──────┘ └──────┘        │
+│                           │
+│ ─── Equipped ───          │
+│ Skin: Blue Hussar         │
+│ Grid: Classic             │
+│ Banner: None              │
+│ Victory: Standard         │
+│                           │
+│ [View Collection]         │
+└──────────────────────────┘
+```
+
+**Touch:** Tap item to preview, tap Buy to purchase, tap equipped slots to change.
+**Responsive:** 3-column grid on tablet, 4 on desktop.
+
+---
+
+## 11. Dispatch Box Opening
+
+```
+┌──────────────────────────┐
+│                           │
+│                           │
+│                           │
+│      ┌──────────┐        │
+│      │          │        │
+│      │  SILVER  │        │
+│      │ DISPATCH │        │
+│      │   BOX    │        │
+│      │          │        │
+│      │  [glow]  │        │
+│      └──────────┘        │
+│                           │
+│    Tap to open!           │
+│                           │
+│                           │
+│                           │
+│  ← After tap: ─────────  │
+│                           │
+│     Item 1: Blue Hussar   │
+│     ★ Uncommon            │
+│     [NEW!]                │
+│                           │
+│     Item 2: Union Jack    │
+│     Already owned         │
+│     +1 Ammunition         │
+│                           │
+│  [Continue]               │
+└──────────────────────────┘
+```
+
+**Touch:** Tap box to open (triggers animation placeholder). Tap continue to dismiss.
+**Animation notes:** Box shakes, opens with light burst, items reveal one at a time.
+**Responsive:** Centered on all screen sizes, larger box graphic on tablet.
+
+---
+
+## Design Notes
+
+### Pixel Art UI Kit Components
+- **Buttons:** Rounded rectangle with 2px border, pressed state (darker shade)
+- **Panels:** Parchment-textured background with dark border
+- **Sliders:** Track with draggable knob
+- **Tabs:** Underlined active tab, gray inactive
+- **Cards:** Rounded corners, subtle shadow, tap state
+- **Fonts:** Pixel font for headings, readable pixel font for body (minimum 14px equivalent)
+
+### Color Scheme
+- Primary: Deep blue (#2C3E6B)
+- Secondary: Gold (#D4A843)
+- Background: Parchment (#F5E6C8)
+- Text: Dark brown (#3C2415)
+- Accent: Crimson (#C0392B)
+
+### Screen Transitions
+- Slide left/right for navigation depth
+- Fade for scene changes (Menu → Battle)
+- Pop-up for modals (confirm dialogs, unit info)

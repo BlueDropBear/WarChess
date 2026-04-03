@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using WarChess.Army;
+using WarChess.Config;
 
 namespace WarChess.Save
 {
@@ -26,13 +27,43 @@ namespace WarChess.Save
         /// <summary>When this save was last written (UTC ticks).</summary>
         public long LastSavedTicks;
 
+        /// <summary>Cosmetic ownership and equipped items.</summary>
+        public CosmeticSaveData Cosmetics;
+
+        /// <summary>Pending unopened Dispatch Boxes (stored as (int)DispatchBoxType).</summary>
+        public List<int> PendingDispatchBoxes;
+
+        /// <summary>Offline analytics events waiting to be sent.</summary>
+        public List<AnalyticsEvent> PendingAnalyticsEvents;
+
         public SaveData()
         {
-            Version = 1;
+            Version = 2;
             Campaign = new CampaignSaveData();
             Armies = new List<SavedArmy>();
             Settings = new PlayerSettings();
+            Cosmetics = new CosmeticSaveData();
+            PendingDispatchBoxes = new List<int>();
+            PendingAnalyticsEvents = new List<AnalyticsEvent>();
             LastSavedTicks = DateTime.UtcNow.Ticks;
+        }
+
+        /// <summary>
+        /// Migrates save data from older versions. Call after deserialization.
+        /// </summary>
+        public void Migrate()
+        {
+            if (Version < 2)
+            {
+                if (Cosmetics == null) Cosmetics = new CosmeticSaveData();
+                if (PendingDispatchBoxes == null) PendingDispatchBoxes = new List<int>();
+                if (PendingAnalyticsEvents == null) PendingAnalyticsEvents = new List<AnalyticsEvent>();
+                if (Settings != null)
+                {
+                    if (Settings.Language == null) Settings.Language = "en";
+                }
+                Version = 2;
+            }
         }
     }
 
@@ -84,6 +115,12 @@ namespace WarChess.Save
         public int TextSize; // 0=small, 1=medium, 2=large
         public float BattleSpeed; // 1=normal, 2=fast, 4=fastest
 
+        /// <summary>Language code for localization (e.g., "en", "fr", "de").</summary>
+        public string Language;
+
+        /// <summary>Colorblind palette index. 0=Normal, 1=Deuteranopia, 2=Tritanopia.</summary>
+        public int ColorblindPaletteIndex;
+
         public PlayerSettings()
         {
             MusicVolume = 0.7f;
@@ -92,6 +129,31 @@ namespace WarChess.Save
             ColorblindMode = false;
             TextSize = 1;
             BattleSpeed = 1f;
+            Language = "en";
+            ColorblindPaletteIndex = 0;
+        }
+    }
+
+    /// <summary>
+    /// Cosmetic ownership and equipped items.
+    /// </summary>
+    [Serializable]
+    public class CosmeticSaveData
+    {
+        /// <summary>IDs of all owned cosmetic items.</summary>
+        public List<string> OwnedCosmeticIds;
+
+        /// <summary>Currently equipped cosmetic per type. Key = (int)CosmeticType, Value = cosmetic ID.</summary>
+        public Dictionary<int, string> EquippedByType;
+
+        /// <summary>Last shop refresh date (YYYYMMDD).</summary>
+        public int LastShopRefreshDate;
+
+        public CosmeticSaveData()
+        {
+            OwnedCosmeticIds = new List<string>();
+            EquippedByType = new Dictionary<int, string>();
+            LastShopRefreshDate = 0;
         }
     }
 }
