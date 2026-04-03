@@ -120,12 +120,16 @@ namespace WarChess.Battle
             foreach (var u in _playerUnits) if (u.IsAlive) all.Add(u);
             foreach (var u in _enemyUnits) if (u.IsAlive) all.Add(u);
 
-            // Sort by SPD descending, then by Id descending for deterministic tie-break
+            // Sort by SPD descending, then by seeded random for tie-break (GDD Section 2.4)
+            // Assign random tiebreakers before sorting to keep sort deterministic
+            var tieBreakers = new Dictionary<int, int>();
+            foreach (var u in all)
+                tieBreakers[u.Id] = _rng.Next();
             all.Sort((a, b) =>
             {
                 int cmp = b.Spd.CompareTo(a.Spd);
                 if (cmp != 0) return cmp;
-                return b.Id.CompareTo(a.Id);
+                return tieBreakers[b.Id].CompareTo(tieBreakers[a.Id]);
             });
 
             return all;
@@ -180,10 +184,10 @@ namespace WarChess.Battle
                 var flankDir = FlankingCalculator.GetFlankDirection(
                     unit.Position, target.Position, target.Facing);
 
-                // Check for charge (moved 3+ tiles this round, has Charge ability)
+                // Check for charge (moved 3+ tiles this round, has Charge ability, hasn't charged yet this round)
                 bool isCharge = unit.TilesMovedThisRound >= _config.ChargeMinTilesMoved
                     && (unit.Ability == AbilityType.Charge || unit.Ability == AbilityType.ArmoredCharge)
-                    && !unit.HasChargedThisBattle;
+                    && !unit.HasChargedThisRound;
 
                 // Calculate damage
                 int damage = DamageCalculator.Calculate(
@@ -195,7 +199,7 @@ namespace WarChess.Battle
                 unit.HasAttackedThisRound = true;
 
                 if (isCharge)
-                    unit.HasChargedThisBattle = true;
+                    unit.HasChargedThisRound = true;
 
                 _events.Add(new UnitAttackedEvent(
                     _currentRound, unit.Id, target.Id,
@@ -207,13 +211,8 @@ namespace WarChess.Battle
                 }
 
                 // Handle Artillery Bombardment AoE
-                if (unit.Ability == AbilityType.Bombardment && target.IsAlive)
+                if (unit.Ability == AbilityType.Bombardment)
                 {
-                    ApplyBombardmentAoE(unit, target.Position, damage);
-                }
-                else if (unit.Ability == AbilityType.Bombardment && !target.IsAlive)
-                {
-                    // Still apply AoE even if primary target died
                     ApplyBombardmentAoE(unit, target.Position, damage);
                 }
 
@@ -233,7 +232,8 @@ namespace WarChess.Battle
             foreach (var coord in adjacent)
             {
                 var splashTarget = _grid.GetUnitAt(coord);
-                if (splashTarget != null && splashTarget.IsAlive && splashTarget.Id != attacker.Id)
+                if (splashTarget != null && splashTarget.IsAlive && splashTarget.Id != attacker.Id
+                    && splashTarget.Owner != attacker.Owner)
                 {
                     splashTarget.TakeDamage(splashDamage);
 

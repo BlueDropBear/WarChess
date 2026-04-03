@@ -40,6 +40,9 @@ namespace WarChess.Officers
         // Negative trait values
         public OfficerStatMod NegativeMod;
 
+        /// <summary>Optional second positive mod for officers with compound bonuses (e.g., Fearless Major: immune to morale + ATK when flanked).</summary>
+        public OfficerStatMod PositiveMod2;
+
         /// <summary>Optional second negative mod for officers with compound penalties (e.g., Scout Master: -10% ATK and -10% DEF).</summary>
         public OfficerStatMod NegativeMod2;
     }
@@ -87,6 +90,8 @@ namespace WarChess.Officers
         FriendlyFireChance,     // Base 100: 15 = 15% friendly fire
         LowHpDefBonus,         // Base 100: 130 = +30% DEF when HP < 50%
         RevealRange,            // Flat: reveal hidden units within N tiles
+        AtkWhenFlankedMultiplier, // Base 100: 110 = +10% ATK when unit is being flanked
+        DamageReceivedMultiplier, // Base 100: 125 = takes +25% damage from all sources
     }
 
     /// <summary>
@@ -172,6 +177,7 @@ namespace WarChess.Officers
                         NegativeTrait = "Always targets nearest (overrides unit AI)",
                         BestOn = "Aggressive front-line units",
                         PositiveMod = new OfficerStatMod { Type = OfficerModType.IgnoresMorale, Value = 1 },
+                        PositiveMod2 = new OfficerStatMod { Type = OfficerModType.AtkWhenFlankedMultiplier, Value = 110 },
                         NegativeMod = new OfficerStatMod { Type = OfficerModType.OverrideTargeting, Value = 1 }
                     }
                 },
@@ -196,7 +202,7 @@ namespace WarChess.Officers
                         NegativeTrait = "Takes +25% damage from all sources",
                         BestOn = "Cavalry glass cannon builds",
                         PositiveMod = new OfficerStatMod { Type = OfficerModType.ChargeDamageMultiplier, Value = 140 },
-                        NegativeMod = new OfficerStatMod { Type = OfficerModType.DefMultiplier, Value = 80 }
+                        NegativeMod = new OfficerStatMod { Type = OfficerModType.DamageReceivedMultiplier, Value = 125 }
                     }
                 },
                 {

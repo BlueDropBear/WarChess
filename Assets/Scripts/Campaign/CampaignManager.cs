@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using WarChess.Save;
 
@@ -90,6 +91,9 @@ namespace WarChess.Campaign
         /// </summary>
         public BattleCompletionResult CompleteBattle(int battleNumber, int stars)
         {
+            // Clamp stars to valid range (1-3)
+            stars = Math.Max(1, Math.Min(stars, 3));
+
             var result = new BattleCompletionResult();
             result.BattleNumber = battleNumber;
             result.Stars = stars;

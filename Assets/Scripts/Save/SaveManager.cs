@@ -71,13 +71,19 @@ namespace WarChess.Save
             try
             {
                 _currentData.LastSavedTicks = DateTime.UtcNow.Ticks;
+
+                // Sync runtime dictionaries to serializable lists before saving
+                _currentData.Campaign?.PrepareForSave();
+                _currentData.Cosmetics?.PrepareForSave();
+
                 string json = JsonUtility.ToJson(_currentData, true);
 
                 // Write to temp file first, then move (atomic write)
                 string tempPath = _savePath + ".tmp";
                 File.WriteAllText(tempPath, json);
-                File.Copy(tempPath, _savePath, overwrite: true);
-                File.Delete(tempPath);
+                if (File.Exists(_savePath))
+                    File.Delete(_savePath);
+                File.Move(tempPath, _savePath);
 
                 Debug.Log("Game saved.");
                 return true;

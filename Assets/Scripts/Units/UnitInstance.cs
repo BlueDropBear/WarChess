@@ -44,8 +44,9 @@ namespace WarChess.Units
         public bool HasMovedThisRound { get; set; }
         public bool HasAttackedThisRound { get; set; }
         public int TilesMovedThisRound { get; set; }
+        public bool HasChargedThisRound { get; set; }
 
-        // Persistent battle tracking
+        // Persistent battle tracking (kept for backwards compat, no longer used for charge)
         public bool HasChargedThisBattle { get; set; }
         public bool IsDismounted { get; set; }
 
@@ -105,6 +106,7 @@ namespace WarChess.Units
             HasMovedThisRound = false;
             HasAttackedThisRound = false;
             TilesMovedThisRound = 0;
+            HasChargedThisRound = false;
         }
 
         /// <summary>
@@ -129,7 +131,7 @@ namespace WarChess.Units
         {
             Mov = Math.Max(Mov + movDelta, 1);
             Rng = Math.Max(Rng + rngDelta, 0);
-            Spd = Spd + spdDelta;
+            Spd = Math.Max(Spd + spdDelta, 1);
         }
 
         /// <summary>

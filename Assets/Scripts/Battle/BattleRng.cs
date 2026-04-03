@@ -33,5 +33,13 @@ namespace WarChess.Battle
         {
             return _rng.Next(maxExclusive);
         }
+
+        /// <summary>
+        /// Returns a non-negative random integer.
+        /// </summary>
+        public int Next()
+        {
+            return _rng.Next();
+        }
     }
 }

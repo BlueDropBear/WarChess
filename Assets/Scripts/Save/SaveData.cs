@@ -1,10 +1,32 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using WarChess.Army;
 using WarChess.Config;
 
 namespace WarChess.Save
 {
+    /// <summary>
+    /// Serializable key-value pair for int→int dictionaries.
+    /// Unity's JsonUtility cannot serialize Dictionary, so we use lists of these.
+    /// </summary>
+    [Serializable]
+    public class SerializableIntPair
+    {
+        public int Key;
+        public int Value;
+    }
+
+    /// <summary>
+    /// Serializable key-value pair for int→string dictionaries.
+    /// </summary>
+    [Serializable]
+    public class SerializableIntStringPair
+    {
+        public int Key;
+        public string Value;
+    }
+
     /// <summary>
     /// Root save data structure. Serialized to/from JSON.
     /// Contains all persistent player state.
@@ -66,8 +88,8 @@ namespace WarChess.Save
             }
             if (Version < 3)
             {
-                if (Campaign != null && Campaign.BattleAttemptCounts == null)
-                    Campaign.BattleAttemptCounts = new Dictionary<int, int>();
+                if (Campaign != null && Campaign.BattleAttemptCountsList == null)
+                    Campaign.BattleAttemptCountsList = new List<SerializableIntPair>();
                 Version = 3;
             }
         }
@@ -85,8 +107,8 @@ namespace WarChess.Save
         /// <summary>Highest completed battle number (0 = none).</summary>
         public int HighestBattleCompleted;
 
-        /// <summary>Stars earned per battle. Key = battle number (1-30), Value = stars (0-3).</summary>
-        public Dictionary<int, int> BattleStars;
+        /// <summary>Stars earned per battle (serializable list). Key = battle number (1-30), Value = stars (0-3).</summary>
+        public List<SerializableIntPair> BattleStarsList;
 
         /// <summary>Unit types unlocked by campaign progress (string IDs).</summary>
         public List<string> UnlockedUnits;
@@ -97,18 +119,53 @@ namespace WarChess.Save
         /// <summary>Whether the full campaign has been purchased (Acts 2-3).</summary>
         public bool FullCampaignPurchased;
 
-        /// <summary>Number of attempts per battle, used for deterministic seed generation.</summary>
-        public Dictionary<int, int> BattleAttemptCounts;
+        /// <summary>Number of attempts per battle (serializable list).</summary>
+        public List<SerializableIntPair> BattleAttemptCountsList;
+
+        // Runtime dictionaries rebuilt from serialized lists
+        [NonSerialized] private Dictionary<int, int> _battleStars;
+        [NonSerialized] private Dictionary<int, int> _battleAttemptCounts;
+
+        /// <summary>Stars dictionary, lazily built from serialized list.</summary>
+        public Dictionary<int, int> BattleStars
+        {
+            get
+            {
+                if (_battleStars == null)
+                    _battleStars = FromPairList(BattleStarsList);
+                return _battleStars;
+            }
+        }
+
+        /// <summary>Attempt counts dictionary, lazily built from serialized list.</summary>
+        public Dictionary<int, int> BattleAttemptCounts
+        {
+            get
+            {
+                if (_battleAttemptCounts == null)
+                    _battleAttemptCounts = FromPairList(BattleAttemptCountsList);
+                return _battleAttemptCounts;
+            }
+        }
 
         public CampaignSaveData()
         {
             Difficulty = 0;
             HighestBattleCompleted = 0;
-            BattleStars = new Dictionary<int, int>();
+            BattleStarsList = new List<SerializableIntPair>();
             UnlockedUnits = new List<string> { "LineInfantry", "Militia" };
             UnlockedCommanders = new List<string> { "Wellington", "Napoleon" };
             FullCampaignPurchased = false;
-            BattleAttemptCounts = new Dictionary<int, int>();
+            BattleAttemptCountsList = new List<SerializableIntPair>();
+        }
+
+        /// <summary>Syncs runtime dictionaries back into serializable lists. Call before saving.</summary>
+        public void PrepareForSave()
+        {
+            if (_battleStars != null)
+                BattleStarsList = ToPairList(_battleStars);
+            if (_battleAttemptCounts != null)
+                BattleAttemptCountsList = ToPairList(_battleAttemptCounts);
         }
 
         /// <summary>Returns the number of attempts for a given battle.</summary>
@@ -123,6 +180,23 @@ namespace WarChess.Save
             if (!BattleAttemptCounts.ContainsKey(battleNumber))
                 BattleAttemptCounts[battleNumber] = 0;
             BattleAttemptCounts[battleNumber]++;
+        }
+
+        private static Dictionary<int, int> FromPairList(List<SerializableIntPair> list)
+        {
+            var dict = new Dictionary<int, int>();
+            if (list != null)
+                foreach (var pair in list)
+                    dict[pair.Key] = pair.Value;
+            return dict;
+        }
+
+        private static List<SerializableIntPair> ToPairList(Dictionary<int, int> dict)
+        {
+            var list = new List<SerializableIntPair>();
+            foreach (var kvp in dict)
+                list.Add(new SerializableIntPair { Key = kvp.Key, Value = kvp.Value });
+            return list;
         }
     }
 
@@ -167,17 +241,46 @@ namespace WarChess.Save
         /// <summary>IDs of all owned cosmetic items.</summary>
         public List<string> OwnedCosmeticIds;
 
-        /// <summary>Currently equipped cosmetic per type. Key = (int)CosmeticType, Value = cosmetic ID.</summary>
-        public Dictionary<int, string> EquippedByType;
+        /// <summary>Currently equipped cosmetic per type (serializable list). Key = (int)CosmeticType, Value = cosmetic ID.</summary>
+        public List<SerializableIntStringPair> EquippedByTypeList;
 
         /// <summary>Last shop refresh date (YYYYMMDD).</summary>
         public int LastShopRefreshDate;
 
+        [NonSerialized] private Dictionary<int, string> _equippedByType;
+
+        /// <summary>Equipped dictionary, lazily built from serialized list.</summary>
+        public Dictionary<int, string> EquippedByType
+        {
+            get
+            {
+                if (_equippedByType == null)
+                {
+                    _equippedByType = new Dictionary<int, string>();
+                    if (EquippedByTypeList != null)
+                        foreach (var pair in EquippedByTypeList)
+                            _equippedByType[pair.Key] = pair.Value;
+                }
+                return _equippedByType;
+            }
+        }
+
         public CosmeticSaveData()
         {
             OwnedCosmeticIds = new List<string>();
-            EquippedByType = new Dictionary<int, string>();
+            EquippedByTypeList = new List<SerializableIntStringPair>();
             LastShopRefreshDate = 0;
+        }
+
+        /// <summary>Syncs runtime dictionary back into serializable list. Call before saving.</summary>
+        public void PrepareForSave()
+        {
+            if (_equippedByType != null)
+            {
+                EquippedByTypeList = new List<SerializableIntStringPair>();
+                foreach (var kvp in _equippedByType)
+                    EquippedByTypeList.Add(new SerializableIntStringPair { Key = kvp.Key, Value = kvp.Value });
+            }
         }
     }
 }

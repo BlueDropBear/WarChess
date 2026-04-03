@@ -52,6 +52,22 @@ namespace WarChess.Formations
             // Check each formation type the unit participates in
             var effectiveType = unit.CountsAsType;
 
+            // Square: 4 infantry in 2x2 block (GDD: "4 Infantry", includes all infantry types)
+            // Checked before Battle Line since Square is more specific
+            if (effectiveType == UnitType.LineInfantry || unit.Type == UnitType.Militia)
+            {
+                if (CheckSquare(unit, allies, squareMinUnits))
+                    return new FormationBonus
+                    {
+                        Type = FormationType.Square,
+                        AtkMultiplier = 100,
+                        DefMultiplier = squareDefVsCavalryBonus,
+                        ChargeMultiplier = 100,
+                        RangeBonus = 0,
+                        CannotBeFlanked = true
+                    };
+            }
+
             // Battle Line: 3+ LineInfantry (or counts-as) in a horizontal row
             if (effectiveType == UnitType.LineInfantry)
             {
@@ -64,18 +80,6 @@ namespace WarChess.Formations
                         ChargeMultiplier = 100,
                         RangeBonus = 0,
                         CannotBeFlanked = false
-                    };
-
-                // Square: 4 infantry in 2x2 block
-                if (CheckSquare(unit, allies, squareMinUnits))
-                    return new FormationBonus
-                    {
-                        Type = FormationType.Square,
-                        AtkMultiplier = 100,
-                        DefMultiplier = squareDefVsCavalryBonus,
-                        ChargeMultiplier = 100,
-                        RangeBonus = 0,
-                        CannotBeFlanked = true
                     };
             }
 
@@ -165,7 +169,8 @@ namespace WarChess.Formations
                     var checkPos = new GridCoord(x + off[i], y + off[i + 1]);
                     foreach (var ally in allies)
                     {
-                        if (ally.IsAlive && ally.CountsAsType == UnitType.LineInfantry &&
+                        if (ally.IsAlive &&
+                            (ally.CountsAsType == UnitType.LineInfantry || ally.Type == UnitType.Militia) &&
                             ally.Position == checkPos)
                         {
                             count++;
@@ -253,8 +258,8 @@ namespace WarChess.Formations
 
         private static bool CheckSkirmishScreen(UnitInstance unit, List<UnitInstance> allies)
         {
-            // No adjacent friendly units
-            var neighbors = unit.Position.GetOrthogonalNeighbors();
+            // No adjacent friendly units (all 8 directions including diagonals)
+            var neighbors = unit.Position.GetAllNeighbors();
             foreach (var neighbor in neighbors)
             {
                 foreach (var ally in allies)
