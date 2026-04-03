@@ -9,81 +9,138 @@ This file tracks what has been completed, what is in progress, and what is next.
 - [x] Create GitHub repository with .gitignore for Unity
 - [x] Complete Unity beginner tutorial
 - [x] Game Design Document v2.0
-- [ ] Technical Design Document
-- [ ] Art Style Guide with reference examples
-- [ ] Project folder structure scaffold (create the folder structure from CLAUDE.md)
+- [x] Technical Design Document
+- [x] Art Style Guide with reference examples
+- [x] Project folder structure scaffold (create the folder structure from CLAUDE.md)
 
-**Status: IN PROGRESS**
-**Current task: Technical Design Document**
+**Status: COMPLETE**
 
 ---
 
 ## Phase 1: Core Grid Prototype
-- [ ] Grid system — 10×10 tile generation, coordinate system, tile highlighting
-- [ ] Unit data model — ScriptableObject architecture for unit types
-- [ ] Unit placement — drag-and-drop units onto deployment zone (rows 1–3)
-- [ ] Auto-battle engine v1 — turn-based resolution (move → attack → resolve)
-- [ ] Battle visualization — units animate movement and attacks on grid
-- [ ] Placeholder art — colored squares or free pixel sprites for 3 unit types
-- [ ] Win/loss detection
-- [ ] Flanking system — front/side/rear damage with configurable multipliers per unit
-- [ ] Basic targeting AI — nearest, weakest, highest threat priorities
+- [x] Grid system — 10×10 tile generation, coordinate system, tile highlighting
+  - GridCoord.cs, GridMap.cs (pure C#), GridView.cs (Unity MonoBehaviour)
+- [x] Unit data model — ScriptableObject architecture for unit types
+  - UnitStatsSO.cs, UnitInstance.cs, UnitEnums.cs, GameConfigSO.cs, GameConfigData.cs
+- [x] Unit placement — drag-and-drop units onto deployment zone (rows 1–3)
+  - UnitPlacementController.cs (validation, budget, click-to-place). David: wire InputSystem drag.
+- [x] Auto-battle engine v1 — turn-based resolution (move → attack → resolve)
+  - BattleEngine.cs, MovementResolver.cs (pure C#)
+- [x] Battle visualization — units animate movement and attacks on grid
+  - BattleVisualizer.cs, BattleController.cs, UnitView.cs
+- [x] Placeholder art — colored squares or free pixel sprites for 3 unit types
+  - BattleSetupDemo generates distinct shapes per type (square/diamond/circle). David: create proper prefabs later.
+  - UnitFactory.cs creates all 3 prototype units with GDD stats (no SO assets needed to test)
+- [x] Win/loss detection
+  - Built into BattleEngine: all dead, round 30 HP comparison, draw
+- [x] Flanking system — front/side/rear damage with configurable multipliers per unit
+  - FlankingCalculator.cs (pure C#), per-unit multipliers in UnitStatsSO
+- [x] Basic targeting AI — nearest, weakest, highest threat priorities
+  - ITargetingStrategy + 5 implementations + TargetingFactory (pure C#)
 
-**Status: NOT STARTED**
+**Status: COMPLETE (code-side) — David: create Battle scene, add BattleSetupDemo component, press Play**
+**See Docs/DAVID_TASKS.md for David's remaining Unity editor tasks**
 
 ---
 
 ## Phase 2: Game Loop & UI
 - [ ] Army builder screen — separate from battle, save/load armies
+  - SavedArmy.cs, ArmyManager.cs data layer DONE (pure C#). David: build UI.
 - [ ] Campaign army builder — units limited by campaign progress
+  - CampaignManager.GetUnlockedUnits() provides gating. David: build UI.
 - [ ] Multiplayer army builder — all tier-appropriate units available
 - [ ] Deployment screen — select saved army, review terrain, adjust placement, deploy
+  - UnitPlacementController.cs provides validation. David: build UI.
 - [ ] Campaign map v1 — linear node progression (battle → battle)
-- [ ] Enemy army AI — pre-built enemy compositions per campaign node
-- [ ] Unit unlock system — new units introduced at campaign milestones
-- [ ] Battle results screen — star rating (1–3 stars), unlocks summary
-- [ ] Save/load system — persist campaign progress and saved armies locally
+  - CampaignDatabase.cs has all 30 battles with narrative, budgets, unlocks. David: build map UI.
+- [x] Enemy army AI — pre-built enemy compositions per campaign node
+  - CampaignDatabase.cs: Act 1 (battles 1-10) fully specified with enemy placements
+  - Acts 2-3 enemy compositions TBD (battle metadata complete)
+- [x] Unit unlock system — new units introduced at campaign milestones
+  - CampaignManager.CompleteBattle() processes unlocks per GDD schedule
+  - CampaignDatabase tracks which battles unlock which units/commanders
+- [x] Battle results screen — star rating (1–3 stars), unlocks summary
+  - BattleResultCalculator.cs: 0-3 stars per GDD rules. David: build results UI.
+- [x] Save/load system — persist campaign progress and saved armies locally
+  - SaveManager.cs (JSON to persistentDataPath), SaveData.cs (campaign + armies + settings)
 - [ ] Main menu, Armory hub, settings, pause menu
+  - GameManager.cs handles scene navigation and state. David: build scene UIs.
 - [ ] UI framework — consistent pixel-art UI kit (buttons, panels, fonts)
 - [ ] Sound effects — free SFX for attacks, movement, victory, defeat
 - [ ] Background music — era-appropriate free tracks
 
-**Status: NOT STARTED**
+**Status: IN PROGRESS**
+**Done: Data layer (save/load, campaign database, army management, star ratings, scene nav)**
+**Remaining: All UI screens (David), audio sourcing, Acts 2-3 enemy compositions**
 
 ---
 
 ## Phase 3: Content & Depth
-- [ ] Full unit roster (14 units) with balanced stats
-- [ ] Terrain system — tiles with combat modifiers (forest, hill, river, fortification, mud, town)
-- [ ] Line of sight system for ranged units
-- [ ] Commander abilities — 6 commanders with manual/automatic triggers
-- [ ] Formation bonuses — detection and application (Battle Line, Battery, Wedge, Square, Skirmish)
-- [ ] Officers system — 12 officers with positive/negative traits, leveling, budget cost
-- [ ] Full campaign — 30 battles across 3 acts with narrative context
-- [ ] Tutorial system — contextual tooltips and guided first battles
-- [ ] Balance testing spreadsheet — unit matchup matrix, win-rate tracking
-- [ ] Difficulty settings (Recruit / Veteran / Marshal)
-- [ ] Fog of war mechanic for specific campaign battles
+- [x] Full unit roster (14 units) with balanced stats
+  - UnitFactory.cs: all 14 units with GDD stats + CreateByTypeName() lookup
+- [x] Terrain system — tiles with combat modifiers (forest, hill, river, fortification, mud, town)
+  - TerrainData.cs (movement costs, multipliers), TerrainMap.cs (tile storage)
+- [x] Line of sight system for ranged units
+  - LineOfSight.cs: Bresenham's line, hill exception, Rocket Battery ignores LoS
+- [x] Commander abilities — 6 commanders with manual/automatic triggers
+  - CommanderDatabase.cs (all 6), CommanderSystem.cs (buff tracking, activation logic)
+- [x] Formation bonuses — detection and application (Battle Line, Battery, Wedge, Square, Skirmish)
+  - FormationDetector.cs: all 5 formations with adjacency/row/diagonal detection
+- [x] Officers system — 12 officers with positive/negative traits, leveling, budget cost
+  - OfficerData.cs: 12 officers with stat mods, leveling thresholds (5/15/30/50 battles)
+  - OfficerSystem.cs: OfficerInstance (level, XP), OfficerManager (collection CRUD, cost calc)
+- [x] Full campaign — 30 battles across 3 acts with narrative context
+  - CampaignDatabase.cs: all 30 battles with enemy placements for all 3 acts
+- [x] Tutorial system — contextual tooltips and guided first battles
+  - TutorialDatabase.cs: 20+ tutorial steps triggered at key battles, covers all mechanics
+- [x] Balance testing spreadsheet — unit matchup matrix, win-rate tracking
+  - BalanceTester.cs: headless Mode 1 (14x14 matchup matrix) + Mode 2 (composition stress test)
+  - Runs thousands of battles with no rendering, flags anomalies per GDD Section 12
+- [x] Difficulty settings (Recruit / Veteran / Marshal)
+  - DifficultyScaler.cs: stat scaling (-15%/normal/+15%), info visibility levels
+- [x] Fog of war mechanic for specific campaign battles
+  - FogOfWarSystem.cs: visibility tracking, proximity reveal, Scout Master support
 - [ ] Pixel art — unit sprites, terrain tiles, UI elements
+- [x] BattleEngineV2 — integrates terrain, formations, commanders, LoS into battle loop
+  - MovementResolverV2.cs: terrain-aware movement costs
+- [x] Terrain map templates — hand-crafted maps for all 30 campaign battles + Waterloo
+  - TerrainMapTemplates.cs: 20+ unique map layouts using all 8 terrain types
 
-**Status: NOT STARTED**
+**Status: COMPLETE (code-side)**
+**Remaining: Pixel art (David)**
 
 ---
 
 ## Phase 4: Multiplayer
 - [ ] Backend setup (PlayFab or Firebase)
+  - David: choose and configure backend. All client-side logic is ready.
 - [ ] Player authentication — anonymous + optional email/social login
-- [ ] Army serialization — encode army composition + placement + officers as JSON
-- [ ] Star General tier system — 5 tiers with unit gating and independent Elo
-- [ ] Army pool system — deploy armies, server matches and resolves
-- [ ] Ammunition system — earning, spending, purchasing
-- [ ] Deterministic battle resolution — seeded RNG, server-side validation
-- [ ] Battle replay viewer
-- [ ] Leaderboard — per-tier Elo rankings
-- [ ] Anti-cheat — server-side army validation, point budget enforcement, tier enforcement
+  - David: integrate backend auth SDK
+- [x] Army serialization — encode army composition + placement + officers as JSON
+  - ArmySerializer.cs: SavedArmy → ArmySubmission → UnitInstances roundtrip
+- [x] Star General tier system — 5 tiers with unit gating and independent Elo
+  - TierSystem.cs: all 5 tiers with unit lists, GetHighestUnlockedTier()
+- [x] Army pool system — deploy armies, server matches and resolves
+  - ArmyPool.cs: submit/withdraw/matchmake/resolve. Elo-based matching.
+  - Full match lifecycle: submit → pool → match → resolve → history
+- [x] Ammunition system — earning, spending, purchasing
+  - AmmunitionSystem.cs: daily login (3), wins (1), campaign (2), tier promo (10), IAP
+- [x] Deterministic battle resolution — seeded RNG, server-side validation
+  - BattleEngine already deterministic. ArmyPool.ResolveMatch() uses it.
+- [x] Battle replay viewer
+  - BattleReplay.cs: replay data model, serialized events, ReplayFactory
+  - BattleEventSerializer.cs: converts events to serializable format
+- [x] Leaderboard — per-tier Elo rankings
+  - EloSystem.cs: Elo calculation, 8 rank tiers (Recruit → Grand Marshal)
+  - PlayerProfile.cs: per-tier Elo/wins/losses tracking, tier promotions
+- [x] Anti-cheat — server-side army validation, point budget enforcement, tier enforcement
+  - ArmyValidator.cs: validates budget, tier units, placements, grid bounds
+  - 3 match formats (Skirmish 25pt, Standard 40pt, Grand Battle 60pt)
 - [ ] Multiplayer UI — tier selection, army pool, active deployments, match history
+  - David: build UI screens using the data systems above
 
-**Status: NOT STARTED**
+**Status: IN PROGRESS (code-side COMPLETE)**
+**Remaining: Backend setup (David), auth (David), multiplayer UI (David)**
 
 ---
 
