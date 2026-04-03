@@ -45,20 +45,33 @@ This file tracks what has been completed, what is in progress, and what is next.
 
 ## Phase 2: Game Loop & UI
 - [ ] Army builder screen — separate from battle, save/load armies
+  - SavedArmy.cs, ArmyManager.cs data layer DONE (pure C#). David: build UI.
 - [ ] Campaign army builder — units limited by campaign progress
+  - CampaignManager.GetUnlockedUnits() provides gating. David: build UI.
 - [ ] Multiplayer army builder — all tier-appropriate units available
 - [ ] Deployment screen — select saved army, review terrain, adjust placement, deploy
+  - UnitPlacementController.cs provides validation. David: build UI.
 - [ ] Campaign map v1 — linear node progression (battle → battle)
-- [ ] Enemy army AI — pre-built enemy compositions per campaign node
-- [ ] Unit unlock system — new units introduced at campaign milestones
-- [ ] Battle results screen — star rating (1–3 stars), unlocks summary
-- [ ] Save/load system — persist campaign progress and saved armies locally
+  - CampaignDatabase.cs has all 30 battles with narrative, budgets, unlocks. David: build map UI.
+- [x] Enemy army AI — pre-built enemy compositions per campaign node
+  - CampaignDatabase.cs: Act 1 (battles 1-10) fully specified with enemy placements
+  - Acts 2-3 enemy compositions TBD (battle metadata complete)
+- [x] Unit unlock system — new units introduced at campaign milestones
+  - CampaignManager.CompleteBattle() processes unlocks per GDD schedule
+  - CampaignDatabase tracks which battles unlock which units/commanders
+- [x] Battle results screen — star rating (1–3 stars), unlocks summary
+  - BattleResultCalculator.cs: 0-3 stars per GDD rules. David: build results UI.
+- [x] Save/load system — persist campaign progress and saved armies locally
+  - SaveManager.cs (JSON to persistentDataPath), SaveData.cs (campaign + armies + settings)
 - [ ] Main menu, Armory hub, settings, pause menu
+  - GameManager.cs handles scene navigation and state. David: build scene UIs.
 - [ ] UI framework — consistent pixel-art UI kit (buttons, panels, fonts)
 - [ ] Sound effects — free SFX for attacks, movement, victory, defeat
 - [ ] Background music — era-appropriate free tracks
 
-**Status: NOT STARTED**
+**Status: IN PROGRESS**
+**Done: Data layer (save/load, campaign database, army management, star ratings, scene nav)**
+**Remaining: All UI screens (David), audio sourcing, Acts 2-3 enemy compositions**
 
 ---
 

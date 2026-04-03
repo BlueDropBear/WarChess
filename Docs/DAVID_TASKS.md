@@ -72,6 +72,44 @@ Claude will add new tasks here as they arise. David should check `[ ]` to `[x]` 
 
 ---
 
+## Phase 2 (continued): Game Loop UI
+
+Claude has built all the data-layer systems. These UI tasks require Unity editor work:
+
+### Campaign Map Screen
+- [ ] **Build campaign map UI** — In Campaign scene, create a scrollable/pannable map with 30 battle nodes. Use `CampaignDatabase.AllBattles` to populate names and lock/unlock states. Wire to `CampaignManager.CanPlayBattle()` for gating.
+  - Act 1 nodes (1-10): always accessible
+  - Act 2-3 nodes (11-30): grayed out with purchase prompt if `!IsFullCampaignUnlocked`
+  - Completed battles show star count from `CampaignManager.GetStars()`
+  - Tapping a node shows: battle name, narrative intro, point budget, terrain type
+
+### Army Builder Screen
+- [ ] **Build army builder UI** — In Armory scene, create a two-panel layout:
+  - Left panel: scrollable list of available units (filtered by `CampaignManager.GetUnlockedUnits()` for campaign mode)
+  - Right panel: 10x3 grid (deployment zone) where units are placed
+  - Show unit stats on hover/tap (HP, ATK, DEF, SPD, RNG, MOV, COST)
+  - Budget bar showing points spent / budget
+  - Save/Load/Delete army buttons — wire to `ArmyManager`
+
+### Battle Results Screen
+- [ ] **Build results screen UI** — After battle ends, show:
+  - Star rating (1-3 stars) from `BattleResultCalculator`
+  - Units surviving count
+  - Rounds played
+  - Any new unlocks (units/commanders) from `BattleCompletionResult`
+  - "Continue" button returns to campaign map
+
+### Main Menu
+- [ ] **Build main menu** — Buttons: Campaign, Armory, Multiplayer (grayed out), Settings
+  - Wire to `GameManager.GoToCampaign()`, `GameManager.GoToArmory()`
+  - Settings panel: music/SFX volume sliders, screen shake toggle, battle speed
+
+### Scene Wiring
+- [ ] **Add scenes to Build Settings** — File → Build Settings → add all 5 scenes:
+  - MainMenu (index 0), Armory, Campaign, Battle, Multiplayer
+
+---
+
 ## Phase 3+ (FUTURE — Claude will populate as we get closer)
 
 _Tasks will be added here as Phase 2 nears completion._
