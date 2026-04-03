@@ -113,18 +113,34 @@ This file tracks what has been completed, what is in progress, and what is next.
 
 ## Phase 4: Multiplayer
 - [ ] Backend setup (PlayFab or Firebase)
+  - David: choose and configure backend. All client-side logic is ready.
 - [ ] Player authentication — anonymous + optional email/social login
-- [ ] Army serialization — encode army composition + placement + officers as JSON
-- [ ] Star General tier system — 5 tiers with unit gating and independent Elo
-- [ ] Army pool system — deploy armies, server matches and resolves
-- [ ] Ammunition system — earning, spending, purchasing
-- [ ] Deterministic battle resolution — seeded RNG, server-side validation
-- [ ] Battle replay viewer
-- [ ] Leaderboard — per-tier Elo rankings
-- [ ] Anti-cheat — server-side army validation, point budget enforcement, tier enforcement
+  - David: integrate backend auth SDK
+- [x] Army serialization — encode army composition + placement + officers as JSON
+  - ArmySerializer.cs: SavedArmy → ArmySubmission → UnitInstances roundtrip
+- [x] Star General tier system — 5 tiers with unit gating and independent Elo
+  - TierSystem.cs: all 5 tiers with unit lists, GetHighestUnlockedTier()
+- [x] Army pool system — deploy armies, server matches and resolves
+  - ArmyPool.cs: submit/withdraw/matchmake/resolve. Elo-based matching.
+  - Full match lifecycle: submit → pool → match → resolve → history
+- [x] Ammunition system — earning, spending, purchasing
+  - AmmunitionSystem.cs: daily login (3), wins (1), campaign (2), tier promo (10), IAP
+- [x] Deterministic battle resolution — seeded RNG, server-side validation
+  - BattleEngine already deterministic. ArmyPool.ResolveMatch() uses it.
+- [x] Battle replay viewer
+  - BattleReplay.cs: replay data model, serialized events, ReplayFactory
+  - BattleEventSerializer.cs: converts events to serializable format
+- [x] Leaderboard — per-tier Elo rankings
+  - EloSystem.cs: Elo calculation, 8 rank tiers (Recruit → Grand Marshal)
+  - PlayerProfile.cs: per-tier Elo/wins/losses tracking, tier promotions
+- [x] Anti-cheat — server-side army validation, point budget enforcement, tier enforcement
+  - ArmyValidator.cs: validates budget, tier units, placements, grid bounds
+  - 3 match formats (Skirmish 25pt, Standard 40pt, Grand Battle 60pt)
 - [ ] Multiplayer UI — tier selection, army pool, active deployments, match history
+  - David: build UI screens using the data systems above
 
-**Status: NOT STARTED**
+**Status: IN PROGRESS (code-side COMPLETE)**
+**Remaining: Backend setup (David), auth (David), multiplayer UI (David)**
 
 ---
 

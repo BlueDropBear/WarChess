@@ -110,7 +110,33 @@ Claude has built all the data-layer systems. These UI tasks require Unity editor
 
 ---
 
-## Phase 3+ (FUTURE — Claude will populate as we get closer)
+## Phase 4: Multiplayer
+
+Claude has built all the multiplayer game logic. These tasks require backend and UI work:
+
+### Backend Setup
+- [ ] **Choose backend** — PlayFab (recommended, free tier) or Firebase. Both support auth, leaderboards, cloud data, and cloud functions.
+- [ ] **Integrate SDK** — Install PlayFab/Firebase Unity SDK. Set up project in their dashboard.
+- [ ] **Player auth** — Anonymous login on first launch, optional email/social. Store PlayerId.
+- [ ] **Cloud functions** — Deploy server-side logic:
+  - Army submission endpoint (calls `ArmyValidator.Validate()` then adds to pool)
+  - Matchmaking cron job (calls `ArmyPool.RunMatchmaking()` periodically)
+  - Battle resolution (calls `ArmyPool.ResolveMatch()` for each match)
+  - Elo update + replay storage
+
+### Multiplayer UI
+- [ ] **Build Multiplayer scene** — Save to `Assets/Scenes/Multiplayer.unity`
+- [ ] **Tier selection screen** — Show player's tier badges, current Elo/rank per tier, wins needed for next tier. Use `TierSystem` and `PlayerProfile` data.
+- [ ] **Army pool screen** — Show:
+  - "Deploy Army" button (spends 1 ammo via `AmmunitionSystem.SpendForDeployment()`)
+  - Active deployments list from `ArmyPool.GetPlayerSubmissions()`
+  - Withdraw button per deployment
+  - Ammunition balance + purchase button
+- [ ] **Match history** — List from `ArmyPool.GetMatchHistory()`. Show: opponent, outcome, Elo change, replay button.
+- [ ] **Replay viewer** — Load `BattleReplay` data, create units from submissions, feed serialized events to `BattleVisualizer`. Add speed controls (1x, 2x, 4x).
+- [ ] **Leaderboard** — Per-tier Elo rankings. Use backend leaderboard API. Show rank icon from `EloSystem.GetRank()`.
+
+## Phase 5+ (FUTURE — Claude will populate as we get closer)
 
 _Tasks will be added here as Phase 2 nears completion._
 
