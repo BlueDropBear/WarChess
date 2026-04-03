@@ -91,18 +91,23 @@ This file tracks what has been completed, what is in progress, and what is next.
   - OfficerSystem.cs: OfficerInstance (level, XP), OfficerManager (collection CRUD, cost calc)
 - [x] Full campaign — 30 battles across 3 acts with narrative context
   - CampaignDatabase.cs: all 30 battles with enemy placements for all 3 acts
-- [ ] Tutorial system — contextual tooltips and guided first battles
-- [ ] Balance testing spreadsheet — unit matchup matrix, win-rate tracking
+- [x] Tutorial system — contextual tooltips and guided first battles
+  - TutorialDatabase.cs: 20+ tutorial steps triggered at key battles, covers all mechanics
+- [x] Balance testing spreadsheet — unit matchup matrix, win-rate tracking
+  - BalanceTester.cs: headless Mode 1 (14x14 matchup matrix) + Mode 2 (composition stress test)
+  - Runs thousands of battles with no rendering, flags anomalies per GDD Section 12
 - [x] Difficulty settings (Recruit / Veteran / Marshal)
   - DifficultyScaler.cs: stat scaling (-15%/normal/+15%), info visibility levels
-- [ ] Fog of war mechanic for specific campaign battles
+- [x] Fog of war mechanic for specific campaign battles
+  - FogOfWarSystem.cs: visibility tracking, proximity reveal, Scout Master support
 - [ ] Pixel art — unit sprites, terrain tiles, UI elements
 - [x] BattleEngineV2 — integrates terrain, formations, commanders, LoS into battle loop
   - MovementResolverV2.cs: terrain-aware movement costs
+- [x] Terrain map templates — hand-crafted maps for all 30 campaign battles + Waterloo
+  - TerrainMapTemplates.cs: 20+ unique map layouts using all 8 terrain types
 
-**Status: IN PROGRESS**
-**Done: 14 units, terrain, LoS, commanders, formations, officers, difficulty, engine v2, all 30 battle compositions**
-**Remaining: Tutorial, balance testing, fog of war, pixel art (David)**
+**Status: COMPLETE (code-side)**
+**Remaining: Pixel art (David)**
 
 ---
 
