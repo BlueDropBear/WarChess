@@ -52,7 +52,8 @@ namespace WarChess.Multiplayer
         /// <summary>Returns tier data by tier number (1-5).</summary>
         public static TierData GetTier(int tier)
         {
-            if (tier < 1 || tier > Tiers.Length) return Tiers[0];
+            if (tier < 1) return Tiers[0];
+            if (tier > Tiers.Length) return Tiers[Tiers.Length - 1];
             return Tiers[tier - 1];
         }
 
