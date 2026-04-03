@@ -45,6 +45,25 @@ namespace WarChess.Core
             };
         }
 
+        /// <summary>
+        /// Returns all 8 neighbors (orthogonal + diagonal).
+        /// Does not filter for grid bounds — caller should check IsValid.
+        /// </summary>
+        public GridCoord[] GetAllNeighbors()
+        {
+            return new[]
+            {
+                new GridCoord(X, Y + 1),
+                new GridCoord(X, Y - 1),
+                new GridCoord(X + 1, Y),
+                new GridCoord(X - 1, Y),
+                new GridCoord(X + 1, Y + 1),
+                new GridCoord(X + 1, Y - 1),
+                new GridCoord(X - 1, Y + 1),
+                new GridCoord(X - 1, Y - 1)
+            };
+        }
+
         public bool Equals(GridCoord other) => X == other.X && Y == other.Y;
         public override bool Equals(object obj) => obj is GridCoord other && Equals(other);
         public override int GetHashCode() => X * 31 + Y;

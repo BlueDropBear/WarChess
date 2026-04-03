@@ -258,8 +258,8 @@ namespace WarChess.Formations
 
         private static bool CheckSkirmishScreen(UnitInstance unit, List<UnitInstance> allies)
         {
-            // No adjacent friendly units
-            var neighbors = unit.Position.GetOrthogonalNeighbors();
+            // No adjacent friendly units (all 8 directions including diagonals)
+            var neighbors = unit.Position.GetAllNeighbors();
             foreach (var neighbor in neighbors)
             {
                 foreach (var ally in allies)

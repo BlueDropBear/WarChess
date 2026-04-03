@@ -239,7 +239,7 @@ namespace WarChess.Battle
             // Charge check
             bool isCharge = unit.TilesMovedThisRound >= _config.ChargeMinTilesMoved
                 && (unit.Ability == AbilityType.Charge || unit.Ability == AbilityType.ArmoredCharge)
-                && !unit.HasChargedThisBattle
+                && !unit.HasChargedThisRound
                 && !TerrainData.BlocksCharge(_terrainMap.GetTerrain(target.Position));
 
             // Terrain modifiers
@@ -283,7 +283,7 @@ namespace WarChess.Battle
 
             target.TakeDamage(damage);
             unit.HasAttackedThisRound = true;
-            if (isCharge) unit.HasChargedThisBattle = true;
+            if (isCharge) unit.HasChargedThisRound = true;
 
             _events.Add(new UnitAttackedEvent(
                 _currentRound, unit.Id, target.Id, damage, flankDir, isCharge, false));

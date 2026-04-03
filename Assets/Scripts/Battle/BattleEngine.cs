@@ -184,10 +184,10 @@ namespace WarChess.Battle
                 var flankDir = FlankingCalculator.GetFlankDirection(
                     unit.Position, target.Position, target.Facing);
 
-                // Check for charge (moved 3+ tiles this round, has Charge ability)
+                // Check for charge (moved 3+ tiles this round, has Charge ability, hasn't charged yet this round)
                 bool isCharge = unit.TilesMovedThisRound >= _config.ChargeMinTilesMoved
                     && (unit.Ability == AbilityType.Charge || unit.Ability == AbilityType.ArmoredCharge)
-                    && !unit.HasChargedThisBattle;
+                    && !unit.HasChargedThisRound;
 
                 // Calculate damage
                 int damage = DamageCalculator.Calculate(
@@ -199,7 +199,7 @@ namespace WarChess.Battle
                 unit.HasAttackedThisRound = true;
 
                 if (isCharge)
-                    unit.HasChargedThisBattle = true;
+                    unit.HasChargedThisRound = true;
 
                 _events.Add(new UnitAttackedEvent(
                     _currentRound, unit.Id, target.Id,

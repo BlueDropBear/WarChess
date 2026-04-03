@@ -84,7 +84,7 @@ namespace WarChess.Multiplayer
         public void RefundDeployment()
         {
             Balance += DeployCost;
-            TotalSpent -= DeployCost;
+            TotalSpent = Math.Max(TotalSpent - DeployCost, 0);
         }
 
         /// <summary>
