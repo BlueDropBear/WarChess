@@ -49,6 +49,8 @@ namespace WarChess.Save
                     return false;
                 }
 
+                _currentData.Migrate();
+
                 Debug.Log($"Save loaded: Battle {_currentData.Campaign.HighestBattleCompleted} completed, " +
                           $"{_currentData.Armies.Count} armies saved.");
                 return true;
