@@ -134,14 +134,15 @@ namespace WarChess.Units
 
         /// <summary>
         /// Applies Dragoon dismount: reduces MOV, increases DEF and ATK permanently.
+        /// Values are configurable via GameConfigData.
         /// </summary>
-        public void ApplyDismount()
+        public void ApplyDismount(int dismountMov = 2, int dismountDefBonus = 3, int dismountAtkBonus = 2)
         {
             if (IsDismounted) return;
             IsDismounted = true;
-            Mov = 2;
-            Def += 3;
-            Atk += 2;
+            Mov = dismountMov;
+            Def += dismountDefBonus;
+            Atk += dismountAtkBonus;
         }
 
         /// <summary>

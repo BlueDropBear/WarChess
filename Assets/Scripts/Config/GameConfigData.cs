@@ -47,6 +47,17 @@ namespace WarChess.Config
         // AoE
         public readonly int BombardmentSplashPercentage;
 
+        // Dragoon dismount
+        public readonly int DismountMov;
+        public readonly int DismountDefBonus;
+        public readonly int DismountAtkBonus;
+
+        // Formation thresholds
+        public readonly int BattleLineMinUnits;
+        public readonly int SquareMinUnits;
+        public readonly int CavalryWedgeMinUnits;
+        public readonly int CavalryWedgeMaxStep;
+
         public GameConfigData(
             int gridWidth, int gridHeight,
             int playerDeployMinRow, int playerDeployMaxRow,
@@ -59,7 +70,10 @@ namespace WarChess.Config
             int cavalryWedgeChargeBonus, int squareDefVsCavalryBonus,
             int skirmishAtkBonus, int skirmishRangeBonus,
             int chargeMinTilesMoved, int chargeMultiplier,
-            int bombardmentSplashPercentage = 50)
+            int bombardmentSplashPercentage = 50,
+            int dismountMov = 2, int dismountDefBonus = 3, int dismountAtkBonus = 2,
+            int battleLineMinUnits = 3, int squareMinUnits = 4,
+            int cavalryWedgeMinUnits = 3, int cavalryWedgeMaxStep = 2)
         {
             GridWidth = gridWidth;
             GridHeight = gridHeight;
@@ -84,6 +98,13 @@ namespace WarChess.Config
             ChargeMinTilesMoved = chargeMinTilesMoved;
             ChargeMultiplier = chargeMultiplier;
             BombardmentSplashPercentage = bombardmentSplashPercentage;
+            DismountMov = dismountMov;
+            DismountDefBonus = dismountDefBonus;
+            DismountAtkBonus = dismountAtkBonus;
+            BattleLineMinUnits = battleLineMinUnits;
+            SquareMinUnits = squareMinUnits;
+            CavalryWedgeMinUnits = cavalryWedgeMinUnits;
+            CavalryWedgeMaxStep = cavalryWedgeMaxStep;
         }
 
         /// <summary>

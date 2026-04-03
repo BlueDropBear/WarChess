@@ -38,7 +38,7 @@ namespace WarChess.Save
 
         public SaveData()
         {
-            Version = 2;
+            Version = 3;
             Campaign = new CampaignSaveData();
             Armies = new List<SavedArmy>();
             Settings = new PlayerSettings();
@@ -63,6 +63,12 @@ namespace WarChess.Save
                     if (Settings.Language == null) Settings.Language = "en";
                 }
                 Version = 2;
+            }
+            if (Version < 3)
+            {
+                if (Campaign != null && Campaign.BattleAttemptCounts == null)
+                    Campaign.BattleAttemptCounts = new Dictionary<int, int>();
+                Version = 3;
             }
         }
     }
@@ -91,6 +97,9 @@ namespace WarChess.Save
         /// <summary>Whether the full campaign has been purchased (Acts 2-3).</summary>
         public bool FullCampaignPurchased;
 
+        /// <summary>Number of attempts per battle, used for deterministic seed generation.</summary>
+        public Dictionary<int, int> BattleAttemptCounts;
+
         public CampaignSaveData()
         {
             Difficulty = 0;
@@ -99,6 +108,21 @@ namespace WarChess.Save
             UnlockedUnits = new List<string> { "LineInfantry", "Militia" };
             UnlockedCommanders = new List<string> { "Wellington", "Napoleon" };
             FullCampaignPurchased = false;
+            BattleAttemptCounts = new Dictionary<int, int>();
+        }
+
+        /// <summary>Returns the number of attempts for a given battle.</summary>
+        public int GetBattleAttemptCount(int battleNumber)
+        {
+            return BattleAttemptCounts.TryGetValue(battleNumber, out int count) ? count : 0;
+        }
+
+        /// <summary>Increments the attempt counter for a given battle.</summary>
+        public void IncrementBattleAttemptCount(int battleNumber)
+        {
+            if (!BattleAttemptCounts.ContainsKey(battleNumber))
+                BattleAttemptCounts[battleNumber] = 0;
+            BattleAttemptCounts[battleNumber]++;
         }
     }
 

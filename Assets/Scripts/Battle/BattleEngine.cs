@@ -220,7 +220,7 @@ namespace WarChess.Battle
                 // Handle Dragoon dismount
                 if (unit.Ability == AbilityType.Dismount && !unit.IsDismounted && unit.Rng == 1)
                 {
-                    unit.ApplyDismount();
+                    unit.ApplyDismount(_config.DismountMov, _config.DismountDefBonus, _config.DismountAtkBonus);
                 }
             }
         }

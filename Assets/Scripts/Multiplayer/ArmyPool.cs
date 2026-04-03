@@ -100,7 +100,7 @@ namespace WarChess.Multiplayer
                         SubmissionA = a,
                         SubmissionB = b,
                         Tier = a.Tier,
-                        Seed = Environment.TickCount ^ a.SubmissionId.GetHashCode()
+                        Seed = GenerateDeterministicSeed(a.SubmissionId, b.SubmissionId)
                     });
 
                     break;
@@ -207,6 +207,26 @@ namespace WarChess.Multiplayer
                 if (tiers.TryGetValue(tier, out int elo))
                     return elo;
             return EloSystem.GetDefaultRating();
+        }
+
+        /// <summary>
+        /// Generates a deterministic seed from two submission IDs.
+        /// Uses a stable string hash (FNV-1a) to avoid .NET's non-deterministic GetHashCode().
+        /// </summary>
+        private static int GenerateDeterministicSeed(string idA, string idB)
+        {
+            string combined = idA + ":" + idB;
+            unchecked
+            {
+                // FNV-1a hash — deterministic across all .NET runtimes
+                int hash = (int)2166136261;
+                for (int i = 0; i < combined.Length; i++)
+                {
+                    hash ^= combined[i];
+                    hash *= 16777619;
+                }
+                return hash;
+            }
         }
 
         private void AddToHistory(string playerId, MatchResolveResult result)

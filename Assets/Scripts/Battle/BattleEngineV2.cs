@@ -124,7 +124,9 @@ namespace WarChess.Battle
                 var bonus = FormationDetector.DetectFormation(unit, _grid,
                     _config.BattleLineDefBonus, _config.BatteryAtkBonus,
                     _config.CavalryWedgeChargeBonus, _config.SquareDefVsCavalryBonus,
-                    _config.SkirmishAtkBonus, _config.SkirmishRangeBonus);
+                    _config.SkirmishAtkBonus, _config.SkirmishRangeBonus,
+                    _config.BattleLineMinUnits, _config.SquareMinUnits,
+                    _config.CavalryWedgeMinUnits, _config.CavalryWedgeMaxStep);
 
                 _formationBonuses[unit.Id] = bonus;
             }
@@ -260,7 +262,7 @@ namespace WarChess.Battle
             int damage = DamageCalculator.Calculate(
                 unit, target, flankDir,
                 terrainDef, terrainAtk,
-                (formationMult * cmdAtk * aimedShotBonus) / (100 * 100),
+                (formationMult * cmdAtk * aimedShotBonus) / (100 * 100), // 3 base-100 values → 1 base-100: divide by 100^2
                 isCharge, chargeMultiplier > 100 ? chargeMultiplier : (isCharge ? _config.ChargeMultiplier : 100),
                 _config.MinimumDamage);
 
@@ -291,7 +293,7 @@ namespace WarChess.Battle
 
             // Dragoon dismount
             if (unit.Ability == AbilityType.Dismount && !unit.IsDismounted && unit.Rng == 1)
-                unit.ApplyDismount();
+                unit.ApplyDismount(_config.DismountMov, _config.DismountDefBonus, _config.DismountAtkBonus);
         }
 
         private void ApplyBombardmentAoE(UnitInstance attacker, GridCoord center, int primaryDmg)
