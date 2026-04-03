@@ -51,15 +51,7 @@ namespace WarChess.Config
                 int scaledAtk = (unit.Atk * multiplier) / 100;
                 int scaledDef = (unit.Def * multiplier) / 100;
 
-                // We need to create a new unit with scaled stats since MaxHp is readonly.
-                // Instead, we apply the difference as healing/damage.
-                int hpDiff = scaledHp - unit.MaxHp;
-                if (hpDiff > 0)
-                    unit.Heal(hpDiff); // This won't exceed MaxHp, so we also need stat modification
-                else if (hpDiff < 0)
-                    unit.TakeDamage(-hpDiff);
-
-                // ATK and DEF are modifiable via the ApplyStatModifier method
+                // ApplyStatScale sets ATK, DEF, MaxHp and adjusts CurrentHp proportionally
                 unit.ApplyStatScale(scaledAtk, scaledDef, scaledHp);
             }
         }

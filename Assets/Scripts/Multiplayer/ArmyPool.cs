@@ -142,16 +142,15 @@ namespace WarChess.Multiplayer
             // Map battle outcome to match result
             var matchResult = battleResult.Outcome switch
             {
-                BattleOutcome.PlayerWin => Battle.MatchResult.PlayerAWins,
-                BattleOutcome.EnemyWin => Battle.MatchResult.PlayerBWins,
-                _ => Battle.MatchResult.Draw
+                BattleOutcome.PlayerWin => MatchResult.PlayerAWins,
+                BattleOutcome.EnemyWin => MatchResult.PlayerBWins,
+                _ => MatchResult.Draw
             };
 
             // Calculate Elo changes
             int eloA = GetElo(playerElos, match.SubmissionA.PlayerId, match.Tier);
             int eloB = GetElo(playerElos, match.SubmissionB.PlayerId, match.Tier);
-            var (newEloA, newEloB) = EloSystem.CalculateNewRatings(eloA, eloB,
-                (Multiplayer.MatchResult)(int)matchResult);
+            var (newEloA, newEloB) = EloSystem.CalculateNewRatings(eloA, eloB, matchResult);
 
             // Update statuses
             match.SubmissionA.Status = SubmissionStatus.Resolved;

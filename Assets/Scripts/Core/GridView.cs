@@ -22,6 +22,7 @@ namespace WarChess.Core
         private SpriteRenderer[,] _tileRenderers;
         private int _width;
         private int _height;
+        private Sprite _cachedSquareSprite;
 
         /// <summary>Fired when a tile is clicked. Provides the grid coordinate.</summary>
         public event Action<GridCoord> OnTileClicked;
@@ -116,7 +117,7 @@ namespace WarChess.Core
                         tile.transform.SetParent(transform);
                         tile.transform.position = worldPos;
                         var sr = tile.AddComponent<SpriteRenderer>();
-                        sr.sprite = CreateSquareSprite();
+                        sr.sprite = GetSquareSprite();
                         sr.color = _defaultTileColor;
                     }
 
@@ -130,19 +131,22 @@ namespace WarChess.Core
             }
         }
 
-        private Sprite CreateSquareSprite()
+        private Sprite GetSquareSprite()
         {
-            // Create a simple 1x1 white texture for colored tiles
-            var tex = new Texture2D(1, 1);
-            tex.SetPixel(0, 0, Color.white);
-            tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+            if (_cachedSquareSprite == null)
+            {
+                var tex = new Texture2D(1, 1);
+                tex.SetPixel(0, 0, Color.white);
+                tex.Apply();
+                _cachedSquareSprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+            }
+            return _cachedSquareSprite;
         }
 
         private void Update()
         {
             // Handle mouse/touch input for tile clicking
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && Camera.main != null)
             {
                 var worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 var coord = WorldToGrid(worldPos);

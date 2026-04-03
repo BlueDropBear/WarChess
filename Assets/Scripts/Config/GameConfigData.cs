@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace WarChess.Config
 {
     /// <summary>
@@ -80,12 +82,13 @@ namespace WarChess.Config
         }
 
         /// <summary>
-        /// Returns the default config matching GDD values.
+        /// Returns the default config matching GDD campaign values.
+        /// For multiplayer, use GameConfigSO.ToData(isMultiplayer: true) which sets enemy rows 8-10.
         /// </summary>
         public static GameConfigData Default => new GameConfigData(
             gridWidth: 10, gridHeight: 10,
             playerDeployMinRow: 1, playerDeployMaxRow: 3,
-            enemyDeployMinRow: 8, enemyDeployMaxRow: 10,
+            enemyDeployMinRow: 5, enemyDeployMaxRow: 10,
             maxRounds: 30, minimumDamage: 1,
             defaultFlankSideMultiplier: 130, defaultFlankRearMultiplier: 200,
             forestDefenseMultiplier: 75, hillAttackMultiplier: 125,
@@ -95,5 +98,20 @@ namespace WarChess.Config
             skirmishAtkBonus: 120, skirmishRangeBonus: 1,
             chargeMinTilesMoved: 3, chargeMultiplier: 200
         );
+
+        /// <summary>
+        /// Returns the canonical unit cost dictionary from GDD Section 3.2.
+        /// Single source of truth — all systems should use this instead of local copies.
+        /// </summary>
+        public static Dictionary<string, int> GetUnitCosts()
+        {
+            return new Dictionary<string, int>
+            {
+                {"LineInfantry", 3}, {"Militia", 1}, {"Cavalry", 5}, {"Artillery", 6},
+                {"Grenadier", 7}, {"Rifleman", 5}, {"Hussar", 4}, {"Cuirassier", 8},
+                {"HorseArtillery", 6}, {"Sapper", 4}, {"OldGuard", 10}, {"RocketBattery", 7},
+                {"Lancer", 5}, {"Dragoon", 6}
+            };
+        }
     }
 }

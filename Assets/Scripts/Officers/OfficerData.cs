@@ -39,6 +39,9 @@ namespace WarChess.Officers
 
         // Negative trait values
         public OfficerStatMod NegativeMod;
+
+        /// <summary>Optional second negative mod for officers with compound penalties (e.g., Scout Master: -10% ATK and -10% DEF).</summary>
+        public OfficerStatMod NegativeMod2;
     }
 
     /// <summary>
@@ -217,7 +220,8 @@ namespace WarChess.Officers
                         NegativeTrait = "-10% ATK, -10% DEF",
                         BestOn = "Hussars and light cavalry",
                         PositiveMod = new OfficerStatMod { Type = OfficerModType.RevealRange, Value = 3 },
-                        NegativeMod = new OfficerStatMod { Type = OfficerModType.AtkMultiplier, Value = 90 }
+                        NegativeMod = new OfficerStatMod { Type = OfficerModType.AtkMultiplier, Value = 90 },
+                        NegativeMod2 = new OfficerStatMod { Type = OfficerModType.DefMultiplier, Value = 90 }
                     }
                 },
                 {
