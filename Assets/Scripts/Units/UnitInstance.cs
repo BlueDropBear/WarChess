@@ -17,7 +17,7 @@ namespace WarChess.Units
         public Owner Owner { get; }
 
         // Base stats (copied from SO, may be modified by officers/difficulty)
-        public int MaxHp { get; }
+        public int MaxHp { get; private set; }
         public int Atk { get; private set; }
         public int Def { get; private set; }
         public int Spd { get; }
@@ -105,6 +105,20 @@ namespace WarChess.Units
             HasMovedThisRound = false;
             HasAttackedThisRound = false;
             TilesMovedThisRound = 0;
+        }
+
+        /// <summary>
+        /// Applies difficulty scaling or officer modifiers to base stats.
+        /// Sets ATK, DEF, and MaxHp (also adjusts CurrentHp proportionally).
+        /// </summary>
+        public void ApplyStatScale(int newAtk, int newDef, int newMaxHp)
+        {
+            Atk = newAtk;
+            Def = newDef;
+            int oldMax = MaxHp;
+            MaxHp = newMaxHp;
+            // Scale current HP proportionally
+            CurrentHp = oldMax > 0 ? (CurrentHp * newMaxHp) / oldMax : newMaxHp;
         }
 
         /// <summary>

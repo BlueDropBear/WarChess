@@ -93,6 +93,202 @@ namespace WarChess.Units
         }
 
         /// <summary>
+        /// Creates a Grenadier unit. HP:40 ATK:12 DEF:8 SPD:2 RNG:1 MOV:2 COST:7
+        /// </summary>
+        public static UnitInstance CreateGrenadier(Owner owner, GridCoord position)
+        {
+            return new UnitInstance(
+                id: _nextId++, name: "Grenadier", type: UnitType.Grenadier, owner: owner,
+                hp: 40, atk: 12, def: 8, spd: 2, rng: 1, mov: 2, cost: 7,
+                flankSideMultiplier: 130, flankRearMultiplier: 200,
+                targetingPriority: TargetingPriority.Nearest,
+                ability: AbilityType.Grenade,
+                formationType: FormationType.BattleLine,
+                countsAsType: UnitType.LineInfantry,
+                position: position,
+                facing: owner == Owner.Player ? FacingDirection.North : FacingDirection.South);
+        }
+
+        /// <summary>
+        /// Creates a Rifleman unit. HP:20 ATK:11 DEF:3 SPD:5 RNG:3 MOV:2 COST:5
+        /// </summary>
+        public static UnitInstance CreateRifleman(Owner owner, GridCoord position)
+        {
+            return new UnitInstance(
+                id: _nextId++, name: "Rifleman", type: UnitType.Rifleman, owner: owner,
+                hp: 20, atk: 11, def: 3, spd: 5, rng: 3, mov: 2, cost: 5,
+                flankSideMultiplier: 130, flankRearMultiplier: 200,
+                targetingPriority: TargetingPriority.Weakest,
+                ability: AbilityType.AimedShot,
+                formationType: FormationType.SkirmishScreen,
+                countsAsType: UnitType.Rifleman,
+                position: position,
+                facing: owner == Owner.Player ? FacingDirection.North : FacingDirection.South);
+        }
+
+        /// <summary>
+        /// Creates a Hussar unit. HP:20 ATK:7 DEF:3 SPD:8 RNG:1 MOV:5 COST:4
+        /// </summary>
+        public static UnitInstance CreateHussar(Owner owner, GridCoord position)
+        {
+            return new UnitInstance(
+                id: _nextId++, name: "Hussar", type: UnitType.Hussar, owner: owner,
+                hp: 20, atk: 7, def: 3, spd: 8, rng: 1, mov: 5, cost: 4,
+                flankSideMultiplier: 130, flankRearMultiplier: 200,
+                targetingPriority: TargetingPriority.Weakest,
+                ability: AbilityType.HitAndRun,
+                formationType: FormationType.CavalryWedge,
+                countsAsType: UnitType.Cavalry,
+                position: position,
+                facing: owner == Owner.Player ? FacingDirection.North : FacingDirection.South);
+        }
+
+        /// <summary>
+        /// Creates a Cuirassier unit. HP:35 ATK:13 DEF:7 SPD:4 RNG:1 MOV:3 COST:8
+        /// </summary>
+        public static UnitInstance CreateCuirassier(Owner owner, GridCoord position)
+        {
+            return new UnitInstance(
+                id: _nextId++, name: "Cuirassier", type: UnitType.Cuirassier, owner: owner,
+                hp: 35, atk: 13, def: 7, spd: 4, rng: 1, mov: 3, cost: 8,
+                flankSideMultiplier: 130, flankRearMultiplier: 200,
+                targetingPriority: TargetingPriority.HighestThreat,
+                ability: AbilityType.ArmoredCharge,
+                formationType: FormationType.CavalryWedge,
+                countsAsType: UnitType.Cavalry,
+                position: position,
+                facing: owner == Owner.Player ? FacingDirection.North : FacingDirection.South);
+        }
+
+        /// <summary>
+        /// Creates a Horse Artillery unit. HP:12 ATK:10 DEF:2 SPD:5 RNG:3 MOV:3 COST:6
+        /// </summary>
+        public static UnitInstance CreateHorseArtillery(Owner owner, GridCoord position)
+        {
+            return new UnitInstance(
+                id: _nextId++, name: "Horse Artillery", type: UnitType.HorseArtillery, owner: owner,
+                hp: 12, atk: 10, def: 2, spd: 5, rng: 3, mov: 3, cost: 6,
+                flankSideMultiplier: 130, flankRearMultiplier: 200,
+                targetingPriority: TargetingPriority.Nearest,
+                ability: AbilityType.LimberedUp,
+                formationType: FormationType.Battery,
+                countsAsType: UnitType.Artillery,
+                position: position,
+                facing: owner == Owner.Player ? FacingDirection.North : FacingDirection.South);
+        }
+
+        /// <summary>
+        /// Creates a Sapper unit. HP:22 ATK:6 DEF:5 SPD:3 RNG:1 MOV:2 COST:4
+        /// </summary>
+        public static UnitInstance CreateSapper(Owner owner, GridCoord position)
+        {
+            return new UnitInstance(
+                id: _nextId++, name: "Sapper", type: UnitType.Sapper, owner: owner,
+                hp: 22, atk: 6, def: 5, spd: 3, rng: 1, mov: 2, cost: 4,
+                flankSideMultiplier: 130, flankRearMultiplier: 200,
+                targetingPriority: TargetingPriority.Nearest,
+                ability: AbilityType.Entrench,
+                formationType: FormationType.None,
+                countsAsType: UnitType.Sapper,
+                position: position,
+                facing: owner == Owner.Player ? FacingDirection.North : FacingDirection.South);
+        }
+
+        /// <summary>
+        /// Creates an Old Guard unit. HP:45 ATK:14 DEF:10 SPD:3 RNG:1 MOV:2 COST:10
+        /// </summary>
+        public static UnitInstance CreateOldGuard(Owner owner, GridCoord position)
+        {
+            return new UnitInstance(
+                id: _nextId++, name: "Old Guard", type: UnitType.OldGuard, owner: owner,
+                hp: 45, atk: 14, def: 10, spd: 3, rng: 1, mov: 2, cost: 10,
+                flankSideMultiplier: 130, flankRearMultiplier: 150, // Reduced rear vulnerability per GDD
+                targetingPriority: TargetingPriority.Nearest,
+                ability: AbilityType.Unbreakable,
+                formationType: FormationType.BattleLine,
+                countsAsType: UnitType.LineInfantry,
+                position: position,
+                facing: owner == Owner.Player ? FacingDirection.North : FacingDirection.South);
+        }
+
+        /// <summary>
+        /// Creates a Rocket Battery unit. HP:10 ATK:16 DEF:1 SPD:2 RNG:5 MOV:1 COST:7
+        /// </summary>
+        public static UnitInstance CreateRocketBattery(Owner owner, GridCoord position)
+        {
+            return new UnitInstance(
+                id: _nextId++, name: "Rocket Battery", type: UnitType.RocketBattery, owner: owner,
+                hp: 10, atk: 16, def: 1, spd: 2, rng: 5, mov: 1, cost: 7,
+                flankSideMultiplier: 130, flankRearMultiplier: 250, // Extra fragile from behind per GDD
+                targetingPriority: TargetingPriority.Random,
+                ability: AbilityType.CongreveBarrage,
+                formationType: FormationType.None,
+                countsAsType: UnitType.RocketBattery,
+                position: position,
+                facing: owner == Owner.Player ? FacingDirection.North : FacingDirection.South);
+        }
+
+        /// <summary>
+        /// Creates a Lancer unit. HP:28 ATK:11 DEF:5 SPD:5 RNG:1 MOV:3 COST:5
+        /// </summary>
+        public static UnitInstance CreateLancer(Owner owner, GridCoord position)
+        {
+            return new UnitInstance(
+                id: _nextId++, name: "Lancer", type: UnitType.Lancer, owner: owner,
+                hp: 28, atk: 11, def: 5, spd: 5, rng: 1, mov: 3, cost: 5,
+                flankSideMultiplier: 130, flankRearMultiplier: 200,
+                targetingPriority: TargetingPriority.HighestThreat,
+                ability: AbilityType.Brace,
+                formationType: FormationType.CavalryWedge,
+                countsAsType: UnitType.Cavalry,
+                position: position,
+                facing: owner == Owner.Player ? FacingDirection.North : FacingDirection.South);
+        }
+
+        /// <summary>
+        /// Creates a Dragoon unit. HP:28 ATK:9 DEF:5 SPD:5 RNG:1 MOV:4 COST:6
+        /// </summary>
+        public static UnitInstance CreateDragoon(Owner owner, GridCoord position)
+        {
+            return new UnitInstance(
+                id: _nextId++, name: "Dragoon", type: UnitType.Dragoon, owner: owner,
+                hp: 28, atk: 9, def: 5, spd: 5, rng: 1, mov: 4, cost: 6,
+                flankSideMultiplier: 130, flankRearMultiplier: 200,
+                targetingPriority: TargetingPriority.ArtilleryFirst,
+                ability: AbilityType.Dismount,
+                formationType: FormationType.CavalryWedge,
+                countsAsType: UnitType.Cavalry,
+                position: position,
+                facing: owner == Owner.Player ? FacingDirection.North : FacingDirection.South);
+        }
+
+        /// <summary>
+        /// Creates a unit by type name string. Used by campaign system and save/load.
+        /// Returns null if the type is unknown.
+        /// </summary>
+        public static UnitInstance CreateByTypeName(string typeName, Owner owner, GridCoord position)
+        {
+            return typeName switch
+            {
+                "LineInfantry" => CreateLineInfantry(owner, position),
+                "Militia" => CreateMilitia(owner, position),
+                "Cavalry" => CreateCavalry(owner, position),
+                "Artillery" => CreateArtillery(owner, position),
+                "Grenadier" => CreateGrenadier(owner, position),
+                "Rifleman" => CreateRifleman(owner, position),
+                "Hussar" => CreateHussar(owner, position),
+                "Cuirassier" => CreateCuirassier(owner, position),
+                "HorseArtillery" => CreateHorseArtillery(owner, position),
+                "Sapper" => CreateSapper(owner, position),
+                "OldGuard" => CreateOldGuard(owner, position),
+                "RocketBattery" => CreateRocketBattery(owner, position),
+                "Lancer" => CreateLancer(owner, position),
+                "Dragoon" => CreateDragoon(owner, position),
+                _ => null
+            };
+        }
+
+        /// <summary>
         /// Creates a predefined player army for testing. 3 Infantry + 1 Cavalry + 1 Artillery = 20 points.
         /// </summary>
         public static List<UnitInstance> CreateTestPlayerArmy()

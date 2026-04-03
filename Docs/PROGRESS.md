@@ -76,20 +76,31 @@ This file tracks what has been completed, what is in progress, and what is next.
 ---
 
 ## Phase 3: Content & Depth
-- [ ] Full unit roster (14 units) with balanced stats
-- [ ] Terrain system — tiles with combat modifiers (forest, hill, river, fortification, mud, town)
-- [ ] Line of sight system for ranged units
-- [ ] Commander abilities — 6 commanders with manual/automatic triggers
-- [ ] Formation bonuses — detection and application (Battle Line, Battery, Wedge, Square, Skirmish)
+- [x] Full unit roster (14 units) with balanced stats
+  - UnitFactory.cs: all 14 units with GDD stats + CreateByTypeName() lookup
+- [x] Terrain system — tiles with combat modifiers (forest, hill, river, fortification, mud, town)
+  - TerrainData.cs (movement costs, multipliers), TerrainMap.cs (tile storage)
+- [x] Line of sight system for ranged units
+  - LineOfSight.cs: Bresenham's line, hill exception, Rocket Battery ignores LoS
+- [x] Commander abilities — 6 commanders with manual/automatic triggers
+  - CommanderDatabase.cs (all 6), CommanderSystem.cs (buff tracking, activation logic)
+- [x] Formation bonuses — detection and application (Battle Line, Battery, Wedge, Square, Skirmish)
+  - FormationDetector.cs: all 5 formations with adjacency/row/diagonal detection
 - [ ] Officers system — 12 officers with positive/negative traits, leveling, budget cost
-- [ ] Full campaign — 30 battles across 3 acts with narrative context
+- [x] Full campaign — 30 battles across 3 acts with narrative context
+  - CampaignDatabase.cs: all 30 battles, Act 1 enemy placements complete
 - [ ] Tutorial system — contextual tooltips and guided first battles
 - [ ] Balance testing spreadsheet — unit matchup matrix, win-rate tracking
-- [ ] Difficulty settings (Recruit / Veteran / Marshal)
+- [x] Difficulty settings (Recruit / Veteran / Marshal)
+  - DifficultyScaler.cs: stat scaling (-15%/normal/+15%), info visibility levels
 - [ ] Fog of war mechanic for specific campaign battles
 - [ ] Pixel art — unit sprites, terrain tiles, UI elements
+- [x] BattleEngineV2 — integrates terrain, formations, commanders, LoS into battle loop
+  - MovementResolverV2.cs: terrain-aware movement costs
 
-**Status: NOT STARTED**
+**Status: IN PROGRESS**
+**Done: 14 unit roster, terrain, LoS, commanders, formations, difficulty, battle engine v2**
+**Remaining: Officers system, tutorial, balance testing, fog of war, pixel art (David)**
 
 ---
 
