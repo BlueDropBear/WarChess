@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using WarChess.Army;
 using WarChess.Campaign;
+using WarChess.Config;
 using WarChess.Save;
 
 namespace WarChess.Core
@@ -58,25 +59,7 @@ namespace WarChess.Core
 
             CampaignManager = new CampaignManager(SaveManager.Data.Campaign);
 
-            // Unit costs for army validation (from GDD Section 3.2)
-            var unitCosts = new System.Collections.Generic.Dictionary<string, int>
-            {
-                { "LineInfantry", 3 },
-                { "Militia", 1 },
-                { "Cavalry", 5 },
-                { "Artillery", 6 },
-                { "Grenadier", 7 },
-                { "Rifleman", 5 },
-                { "Hussar", 4 },
-                { "Cuirassier", 8 },
-                { "HorseArtillery", 6 },
-                { "Sapper", 4 },
-                { "OldGuard", 10 },
-                { "RocketBattery", 7 },
-                { "Lancer", 5 },
-                { "Dragoon", 6 }
-            };
-            ArmyManager = new ArmyManager(unitCosts);
+            ArmyManager = new ArmyManager(GameConfigData.GetUnitCosts());
             ArmyManager.LoadArmies(SaveManager.Data.Armies);
         }
 

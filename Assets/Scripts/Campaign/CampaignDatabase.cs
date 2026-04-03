@@ -260,7 +260,7 @@ namespace WarChess.Campaign
                 TeachingFocus = "Hit-and-run, cavalry rush",
                 NarrativeIntro = "Blücher's hussars ride at the vanguard. Their speed is unmatched — strike fast, strike hard, and vanish before the enemy can respond.",
                 UnlocksUnitTypes = new List<string> { "Hussar" },
-                UnlocksCommander = "Blücher",
+                UnlocksCommander = "Blucher",
                 EnemyArmy = new List<EnemyUnitPlacement>
                 {
                     new EnemyUnitPlacement("Cavalry", 2, 7), new EnemyUnitPlacement("Cavalry", 9, 7),

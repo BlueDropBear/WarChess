@@ -30,25 +30,16 @@ namespace WarChess.Battle
             int baseDamage = attacker.Atk - (defender.Def / 2);
             baseDamage = Math.Max(baseDamage, 1);
 
-            // Step 2: Apply modifiers in GDD Section 2.6 order
-            int damage = baseDamage;
-
-            // 1. Charge bonus
-            if (isCharge)
-                damage = (damage * chargeMultiplier) / 100;
-
-            // 2. Terrain defense (applied to damage — lower multiplier = less damage taken)
-            damage = (damage * terrainDefenseMultiplier) / 100;
-
-            // 3. Terrain elevation (attacker on hill)
-            damage = (damage * terrainAttackMultiplier) / 100;
-
-            // 4. Formation bonus
-            damage = (damage * formationMultiplier) / 100;
-
-            // 5. Flanking multiplier (uses defender's per-unit values)
+            // Step 2: Combine all multipliers then apply in a single division
+            // to minimize integer rounding loss from sequential divisions.
             int flankMult = FlankingCalculator.GetMultiplier(flankDir, defender);
-            damage = (damage * flankMult) / 100;
+            int chargeMult = isCharge ? chargeMultiplier : 100;
+
+            // Combined = charge * terrainDef * terrainAtk * formation * flank
+            // Each is base-100, so we divide by 100^4 (the 5th base-100 is kept as the final /100)
+            long combined = (long)chargeMult * terrainDefenseMultiplier * terrainAttackMultiplier
+                          * formationMultiplier * flankMult;
+            int damage = (int)(baseDamage * combined / 100_00_00_00L);
 
             return Math.Max(damage, minimumDamage);
         }

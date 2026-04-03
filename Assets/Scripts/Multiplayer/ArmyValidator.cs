@@ -93,13 +93,7 @@ namespace WarChess.Multiplayer
 
         private static Dictionary<string, int> GetUnitCosts()
         {
-            return new Dictionary<string, int>
-            {
-                {"LineInfantry", 3}, {"Militia", 1}, {"Cavalry", 5}, {"Artillery", 6},
-                {"Grenadier", 7}, {"Rifleman", 5}, {"Hussar", 4}, {"Cuirassier", 8},
-                {"HorseArtillery", 6}, {"Sapper", 4}, {"OldGuard", 10}, {"RocketBattery", 7},
-                {"Lancer", 5}, {"Dragoon", 6}
-            };
+            return GameConfigData.GetUnitCosts();
         }
     }
 
