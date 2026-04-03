@@ -138,10 +138,14 @@ namespace WarChess.Battle
             foreach (var u in _playerUnits) if (u.IsAlive) all.Add(u);
             foreach (var u in _enemyUnits) if (u.IsAlive) all.Add(u);
 
+            // Sort by SPD descending, then by seeded random for tie-break (GDD Section 2.4)
+            var tieBreakers = new Dictionary<int, int>();
+            foreach (var u in all)
+                tieBreakers[u.Id] = _rng.Next();
             all.Sort((a, b) =>
             {
                 int cmp = b.Spd.CompareTo(a.Spd);
-                return cmp != 0 ? cmp : b.Id.CompareTo(a.Id);
+                return cmp != 0 ? cmp : tieBreakers[b.Id].CompareTo(tieBreakers[a.Id]);
             });
 
             return all;
@@ -240,7 +244,7 @@ namespace WarChess.Battle
 
             // Terrain modifiers
             int terrainDef = _terrainMap.GetDefenseMultiplier(target.Position);
-            int terrainAtk = unit.Rng > 1 ? _terrainMap.GetAttackMultiplier(unit.Position) : 100;
+            int terrainAtk = _terrainMap.GetAttackMultiplier(unit.Position);
 
             // Formation modifier
             var unitFormation = GetFormationBonus(unit);
@@ -304,7 +308,8 @@ namespace WarChess.Battle
             foreach (var coord in adjacent)
             {
                 var victim = _grid.GetUnitAt(coord);
-                if (victim != null && victim.IsAlive && victim.Id != attacker.Id)
+                if (victim != null && victim.IsAlive && victim.Id != attacker.Id
+                    && victim.Owner != attacker.Owner)
                 {
                     victim.TakeDamage(splash);
                     _events.Add(new UnitAttackedEvent(

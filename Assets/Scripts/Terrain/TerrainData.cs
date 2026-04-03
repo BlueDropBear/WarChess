@@ -49,7 +49,7 @@ namespace WarChess.Terrain
             return terrain switch
             {
                 TerrainType.Forest => 75,         // 25% less damage taken
-                TerrainType.Fortification => 70,   // 30% less damage taken
+                TerrainType.Fortification => 75,   // 25% less damage taken (GDD: x0.75)
                 TerrainType.Town => 80,            // 20% less damage taken
                 _ => 100
             };

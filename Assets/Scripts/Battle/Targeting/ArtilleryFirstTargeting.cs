@@ -31,7 +31,8 @@ namespace WarChess.Battle.Targeting
                     foundRanged = true;
                     int dist = attacker.Position.ManhattanDistance(enemy.Position);
 
-                    if (enemy.Rng > bestRng || (enemy.Rng == bestRng && dist < bestDist))
+                    if (enemy.Rng > bestRng || (enemy.Rng == bestRng && dist < bestDist)
+                        || (enemy.Rng == bestRng && dist == bestDist && enemy.Id < best.Id))
                     {
                         best = enemy;
                         bestRng = enemy.Rng;

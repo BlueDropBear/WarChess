@@ -129,7 +129,7 @@ namespace WarChess.Units
         {
             Mov = Math.Max(Mov + movDelta, 1);
             Rng = Math.Max(Rng + rngDelta, 0);
-            Spd = Spd + spdDelta;
+            Spd = Math.Max(Spd + spdDelta, 1);
         }
 
         /// <summary>
