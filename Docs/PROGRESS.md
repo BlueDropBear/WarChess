@@ -86,9 +86,11 @@ This file tracks what has been completed, what is in progress, and what is next.
   - CommanderDatabase.cs (all 6), CommanderSystem.cs (buff tracking, activation logic)
 - [x] Formation bonuses — detection and application (Battle Line, Battery, Wedge, Square, Skirmish)
   - FormationDetector.cs: all 5 formations with adjacency/row/diagonal detection
-- [ ] Officers system — 12 officers with positive/negative traits, leveling, budget cost
+- [x] Officers system — 12 officers with positive/negative traits, leveling, budget cost
+  - OfficerData.cs: 12 officers with stat mods, leveling thresholds (5/15/30/50 battles)
+  - OfficerSystem.cs: OfficerInstance (level, XP), OfficerManager (collection CRUD, cost calc)
 - [x] Full campaign — 30 battles across 3 acts with narrative context
-  - CampaignDatabase.cs: all 30 battles, Act 1 enemy placements complete
+  - CampaignDatabase.cs: all 30 battles with enemy placements for all 3 acts
 - [ ] Tutorial system — contextual tooltips and guided first battles
 - [ ] Balance testing spreadsheet — unit matchup matrix, win-rate tracking
 - [x] Difficulty settings (Recruit / Veteran / Marshal)
@@ -99,8 +101,8 @@ This file tracks what has been completed, what is in progress, and what is next.
   - MovementResolverV2.cs: terrain-aware movement costs
 
 **Status: IN PROGRESS**
-**Done: 14 unit roster, terrain, LoS, commanders, formations, difficulty, battle engine v2**
-**Remaining: Officers system, tutorial, balance testing, fog of war, pixel art (David)**
+**Done: 14 units, terrain, LoS, commanders, formations, officers, difficulty, engine v2, all 30 battle compositions**
+**Remaining: Tutorial, balance testing, fog of war, pixel art (David)**
 
 ---
 

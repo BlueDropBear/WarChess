@@ -242,7 +242,15 @@ namespace WarChess.Campaign
                 BattleNumber = 11, Name = "Open Plains", Act = 2, PointBudget = 24,
                 TerrainType = "Wide Open",
                 TeachingFocus = "Large-scale combined arms",
-                NarrativeIntro = "The grand campaign begins. Open plains stretch in every direction — no terrain advantage for either side. Only tactics and composition will decide this fight."
+                NarrativeIntro = "The grand campaign begins. Open plains stretch in every direction — no terrain advantage for either side. Only tactics and composition will decide this fight.",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("LineInfantry", 3, 8), new EnemyUnitPlacement("LineInfantry", 4, 8),
+                    new EnemyUnitPlacement("LineInfantry", 5, 8), new EnemyUnitPlacement("LineInfantry", 6, 8),
+                    new EnemyUnitPlacement("Grenadier", 5, 9),
+                    new EnemyUnitPlacement("Cavalry", 2, 9), new EnemyUnitPlacement("Cavalry", 8, 9),
+                    new EnemyUnitPlacement("Artillery", 5, 10), new EnemyUnitPlacement("Rifleman", 7, 10),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -252,7 +260,16 @@ namespace WarChess.Campaign
                 TeachingFocus = "Hit-and-run, cavalry rush",
                 NarrativeIntro = "Blücher's hussars ride at the vanguard. Their speed is unmatched — strike fast, strike hard, and vanish before the enemy can respond.",
                 UnlocksUnitTypes = new List<string> { "Hussar" },
-                UnlocksCommander = "Blücher"
+                UnlocksCommander = "Blücher",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("Cavalry", 2, 7), new EnemyUnitPlacement("Cavalry", 9, 7),
+                    new EnemyUnitPlacement("Cavalry", 3, 8), new EnemyUnitPlacement("Cavalry", 8, 8),
+                    new EnemyUnitPlacement("LineInfantry", 5, 9), new EnemyUnitPlacement("LineInfantry", 6, 9),
+                    new EnemyUnitPlacement("LineInfantry", 4, 9),
+                    new EnemyUnitPlacement("Artillery", 5, 10),
+                    new EnemyUnitPlacement("Militia", 3, 10), new EnemyUnitPlacement("Militia", 7, 10),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -260,7 +277,15 @@ namespace WarChess.Campaign
                 BattleNumber = 13, Name = "Siege of the Fort", Act = 2, PointBudget = 26,
                 TerrainType = "Heavy Fortification",
                 TeachingFocus = "Breaking entrenched defenders",
-                NarrativeIntro = "The fortress must fall. Stone walls and earthworks protect the garrison. Your artillery will need to soften them before the infantry goes in."
+                NarrativeIntro = "The fortress must fall. Stone walls and earthworks protect the garrison. Your artillery will need to soften them before the infantry goes in.",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("LineInfantry", 4, 7), new EnemyUnitPlacement("LineInfantry", 5, 7),
+                    new EnemyUnitPlacement("LineInfantry", 6, 7), new EnemyUnitPlacement("LineInfantry", 7, 7),
+                    new EnemyUnitPlacement("Grenadier", 5, 8), new EnemyUnitPlacement("Grenadier", 6, 8),
+                    new EnemyUnitPlacement("Artillery", 4, 9), new EnemyUnitPlacement("Artillery", 7, 9),
+                    new EnemyUnitPlacement("Rifleman", 3, 8),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -269,7 +294,16 @@ namespace WarChess.Campaign
                 TerrainType = "Forest + River",
                 TeachingFocus = "Fog of war: hidden enemy placement",
                 NarrativeIntro = "Scouts report enemy movement in the mist, but their numbers and disposition are unknown. Build an army that can handle anything.",
-                FogOfWar = true
+                FogOfWar = true,
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("LineInfantry", 3, 7), new EnemyUnitPlacement("LineInfantry", 7, 7),
+                    new EnemyUnitPlacement("Grenadier", 5, 8),
+                    new EnemyUnitPlacement("Cavalry", 2, 8), new EnemyUnitPlacement("Cavalry", 9, 8),
+                    new EnemyUnitPlacement("Rifleman", 4, 9), new EnemyUnitPlacement("Rifleman", 6, 9),
+                    new EnemyUnitPlacement("Artillery", 5, 10),
+                    new EnemyUnitPlacement("Militia", 3, 10), new EnemyUnitPlacement("Militia", 7, 10),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -278,7 +312,15 @@ namespace WarChess.Campaign
                 TerrainType = "Open + Hill",
                 TeachingFocus = "Armored charge, heavy cavalry tactics",
                 NarrativeIntro = "The ground shakes beneath iron-shod hooves. The Cuirassiers are the hammer — find the anvil, and nothing will survive between them.",
-                UnlocksUnitTypes = new List<string> { "Cuirassier" }
+                UnlocksUnitTypes = new List<string> { "Cuirassier" },
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("Cavalry", 2, 7), new EnemyUnitPlacement("Cavalry", 9, 7),
+                    new EnemyUnitPlacement("Cavalry", 3, 8), new EnemyUnitPlacement("Cavalry", 8, 8),
+                    new EnemyUnitPlacement("LineInfantry", 5, 9), new EnemyUnitPlacement("LineInfantry", 6, 9),
+                    new EnemyUnitPlacement("Grenadier", 4, 9), new EnemyUnitPlacement("Grenadier", 7, 9),
+                    new EnemyUnitPlacement("Artillery", 5, 10),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -286,7 +328,17 @@ namespace WarChess.Campaign
                 BattleNumber = 16, Name = "Town Fight", Act = 2, PointBudget = 30,
                 TerrainType = "Dense Town",
                 TeachingFocus = "Urban combat, close quarters",
-                NarrativeIntro = "Street by street, house by house. The town must be taken. Range means nothing in these narrow lanes — this will be decided at bayonet point."
+                NarrativeIntro = "Street by street, house by house. The town must be taken. Range means nothing in these narrow lanes — this will be decided at bayonet point.",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("LineInfantry", 3, 7), new EnemyUnitPlacement("LineInfantry", 5, 7),
+                    new EnemyUnitPlacement("LineInfantry", 7, 7),
+                    new EnemyUnitPlacement("Grenadier", 4, 8), new EnemyUnitPlacement("Grenadier", 6, 8),
+                    new EnemyUnitPlacement("Grenadier", 5, 9),
+                    new EnemyUnitPlacement("Militia", 2, 8), new EnemyUnitPlacement("Militia", 8, 8),
+                    new EnemyUnitPlacement("Militia", 3, 9), new EnemyUnitPlacement("Militia", 7, 9),
+                    new EnemyUnitPlacement("Rifleman", 5, 10),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -295,7 +347,16 @@ namespace WarChess.Campaign
                 TerrainType = "Varied",
                 TeachingFocus = "Mobile artillery repositioning",
                 NarrativeIntro = "The Horse Artillery gallops into position, fires, and moves before the enemy can respond. Mobile firepower changes everything.",
-                UnlocksUnitTypes = new List<string> { "HorseArtillery" }
+                UnlocksUnitTypes = new List<string> { "HorseArtillery" },
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("HorseArtillery", 3, 7), new EnemyUnitPlacement("HorseArtillery", 7, 7),
+                    new EnemyUnitPlacement("Cavalry", 2, 8), new EnemyUnitPlacement("Cavalry", 8, 8),
+                    new EnemyUnitPlacement("LineInfantry", 4, 9), new EnemyUnitPlacement("LineInfantry", 5, 9),
+                    new EnemyUnitPlacement("LineInfantry", 6, 9),
+                    new EnemyUnitPlacement("Hussar", 1, 7), new EnemyUnitPlacement("Hussar", 10, 7),
+                    new EnemyUnitPlacement("Artillery", 5, 10),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -304,7 +365,18 @@ namespace WarChess.Campaign
                 TerrainType = "River + Bridge + Forest",
                 TeachingFocus = "Comeback mechanic, fighting outnumbered",
                 NarrativeIntro = "The retreat is on. You command the rearguard — fewer troops, against a larger force. Moore's strategy is simple: the more you lose, the harder you fight.",
-                UnlocksCommander = "Moore"
+                UnlocksCommander = "Moore",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("LineInfantry", 3, 6), new EnemyUnitPlacement("LineInfantry", 5, 6),
+                    new EnemyUnitPlacement("LineInfantry", 7, 6),
+                    new EnemyUnitPlacement("Grenadier", 4, 7), new EnemyUnitPlacement("Grenadier", 6, 7),
+                    new EnemyUnitPlacement("Cavalry", 2, 7), new EnemyUnitPlacement("Cavalry", 8, 7),
+                    new EnemyUnitPlacement("Cavalry", 1, 8), new EnemyUnitPlacement("Cavalry", 9, 8),
+                    new EnemyUnitPlacement("Artillery", 5, 9), new EnemyUnitPlacement("Artillery", 6, 9),
+                    new EnemyUnitPlacement("Hussar", 3, 8), new EnemyUnitPlacement("Hussar", 7, 8),
+                },
+                EnemyDeployMinRow = 6
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -313,7 +385,16 @@ namespace WarChess.Campaign
                 TerrainType = "Open + River",
                 TeachingFocus = "Creating fortifications mid-battle",
                 NarrativeIntro = "Your Sappers can reshape the battlefield itself. Earthworks rise where there were none — turn open ground into a fortress.",
-                UnlocksUnitTypes = new List<string> { "Sapper" }
+                UnlocksUnitTypes = new List<string> { "Sapper" },
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("LineInfantry", 3, 7), new EnemyUnitPlacement("LineInfantry", 4, 7),
+                    new EnemyUnitPlacement("LineInfantry", 6, 7), new EnemyUnitPlacement("LineInfantry", 7, 7),
+                    new EnemyUnitPlacement("Grenadier", 5, 8),
+                    new EnemyUnitPlacement("Cavalry", 2, 8), new EnemyUnitPlacement("Cavalry", 9, 8),
+                    new EnemyUnitPlacement("Artillery", 4, 9), new EnemyUnitPlacement("Artillery", 6, 9),
+                    new EnemyUnitPlacement("Rifleman", 5, 10), new EnemyUnitPlacement("Rifleman", 8, 10),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -321,7 +402,17 @@ namespace WarChess.Campaign
                 BattleNumber = 20, Name = "The Grand Battery", Act = 2, PointBudget = 35,
                 TerrainType = "Hill + Open",
                 TeachingFocus = "Massive artillery duel, counter-battery",
-                NarrativeIntro = "Sixty guns line the ridge. The enemy has matched you cannon for cannon. This will be the greatest artillery duel of the war."
+                NarrativeIntro = "Sixty guns line the ridge. The enemy has matched you cannon for cannon. This will be the greatest artillery duel of the war.",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("Artillery", 3, 9), new EnemyUnitPlacement("Artillery", 5, 9),
+                    new EnemyUnitPlacement("Artillery", 7, 9),
+                    new EnemyUnitPlacement("HorseArtillery", 2, 8), new EnemyUnitPlacement("HorseArtillery", 8, 8),
+                    new EnemyUnitPlacement("LineInfantry", 4, 7), new EnemyUnitPlacement("LineInfantry", 5, 7),
+                    new EnemyUnitPlacement("LineInfantry", 6, 7),
+                    new EnemyUnitPlacement("Grenadier", 3, 8), new EnemyUnitPlacement("Grenadier", 7, 8),
+                    new EnemyUnitPlacement("Cavalry", 1, 7), new EnemyUnitPlacement("Cavalry", 10, 7),
+                }
             });
 
             // ===== ACT 3: The Final Act (Battles 21-30) =====
@@ -331,7 +422,16 @@ namespace WarChess.Campaign
                 BattleNumber = 21, Name = "Winter March", Act = 3, PointBudget = 35,
                 TerrainType = "Mud + River",
                 TeachingFocus = "Terrain penalty gauntlet",
-                NarrativeIntro = "The roads have turned to rivers of mud. Every step costs double. The enemy knows it too — they've chosen this ground to slow your advance."
+                NarrativeIntro = "The roads have turned to rivers of mud. Every step costs double. The enemy knows it too — they've chosen this ground to slow your advance.",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("LineInfantry", 3, 7), new EnemyUnitPlacement("LineInfantry", 5, 7),
+                    new EnemyUnitPlacement("LineInfantry", 7, 7),
+                    new EnemyUnitPlacement("Grenadier", 4, 8), new EnemyUnitPlacement("Grenadier", 6, 8),
+                    new EnemyUnitPlacement("Cuirassier", 2, 7), new EnemyUnitPlacement("Cuirassier", 9, 7),
+                    new EnemyUnitPlacement("Artillery", 5, 9), new EnemyUnitPlacement("HorseArtillery", 3, 9),
+                    new EnemyUnitPlacement("Sapper", 5, 8), new EnemyUnitPlacement("Rifleman", 8, 9),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -340,7 +440,16 @@ namespace WarChess.Campaign
                 TerrainType = "Open + Hill",
                 TeachingFocus = "Elite infantry, last stand mechanic",
                 NarrativeIntro = "The Old Guard has never been defeated. These veterans of a hundred battles will not break, will not retreat, and will fight harder as they fall.",
-                UnlocksUnitTypes = new List<string> { "OldGuard" }
+                UnlocksUnitTypes = new List<string> { "OldGuard" },
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("OldGuard", 4, 8), new EnemyUnitPlacement("OldGuard", 5, 8),
+                    new EnemyUnitPlacement("OldGuard", 6, 8),
+                    new EnemyUnitPlacement("Grenadier", 3, 9), new EnemyUnitPlacement("Grenadier", 7, 9),
+                    new EnemyUnitPlacement("Artillery", 5, 10),
+                    new EnemyUnitPlacement("Cavalry", 2, 7), new EnemyUnitPlacement("Cavalry", 8, 7),
+                    new EnemyUnitPlacement("LineInfantry", 4, 9), new EnemyUnitPlacement("LineInfantry", 6, 9),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -348,7 +457,19 @@ namespace WarChess.Campaign
                 BattleNumber = 23, Name = "Desperate Defense", Act = 3, PointBudget = 38,
                 TerrainType = "Fortification",
                 TeachingFocus = "Outnumbered survival",
-                NarrativeIntro = "They outnumber you three to one. The fortifications are your only hope. Hold until reinforcements arrive — or until there is no one left to hold."
+                NarrativeIntro = "They outnumber you three to one. The fortifications are your only hope. Hold until reinforcements arrive — or until there is no one left to hold.",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("LineInfantry", 2, 6), new EnemyUnitPlacement("LineInfantry", 4, 6),
+                    new EnemyUnitPlacement("LineInfantry", 6, 6), new EnemyUnitPlacement("LineInfantry", 8, 6),
+                    new EnemyUnitPlacement("Grenadier", 3, 7), new EnemyUnitPlacement("Grenadier", 5, 7),
+                    new EnemyUnitPlacement("Grenadier", 7, 7),
+                    new EnemyUnitPlacement("Cavalry", 1, 7), new EnemyUnitPlacement("Cavalry", 9, 7),
+                    new EnemyUnitPlacement("Cuirassier", 2, 8), new EnemyUnitPlacement("Cuirassier", 8, 8),
+                    new EnemyUnitPlacement("Artillery", 4, 9), new EnemyUnitPlacement("Artillery", 6, 9),
+                    new EnemyUnitPlacement("HorseArtillery", 5, 8),
+                },
+                EnemyDeployMinRow = 6
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -358,7 +479,17 @@ namespace WarChess.Campaign
                 TeachingFocus = "Unpredictable AoE, surgical strikes",
                 NarrativeIntro = "The Congreve rockets are as terrifying as they are unreliable. They might devastate the enemy — or your own men. Ney's precision can balance the chaos.",
                 UnlocksUnitTypes = new List<string> { "RocketBattery" },
-                UnlocksCommander = "Ney"
+                UnlocksCommander = "Ney",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("RocketBattery", 3, 10), new EnemyUnitPlacement("RocketBattery", 7, 10),
+                    new EnemyUnitPlacement("Artillery", 5, 10),
+                    new EnemyUnitPlacement("LineInfantry", 3, 8), new EnemyUnitPlacement("LineInfantry", 5, 8),
+                    new EnemyUnitPlacement("LineInfantry", 7, 8),
+                    new EnemyUnitPlacement("Grenadier", 4, 9), new EnemyUnitPlacement("Grenadier", 6, 9),
+                    new EnemyUnitPlacement("Hussar", 1, 7), new EnemyUnitPlacement("Hussar", 10, 7),
+                    new EnemyUnitPlacement("Cavalry", 2, 8), new EnemyUnitPlacement("Cavalry", 8, 8),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -366,7 +497,17 @@ namespace WarChess.Campaign
                 BattleNumber = 25, Name = "The Hornet's Nest", Act = 3, PointBudget = 40,
                 TerrainType = "Dense Forest + Town",
                 TeachingFocus = "Complex terrain puzzle",
-                NarrativeIntro = "Forest and town intertwine in a maze of cover and chokepoints. The enemy knows every alley and thicket. You'll need every trick you've learned."
+                NarrativeIntro = "Forest and town intertwine in a maze of cover and chokepoints. The enemy knows every alley and thicket. You'll need every trick you've learned.",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("Rifleman", 3, 7), new EnemyUnitPlacement("Rifleman", 7, 7),
+                    new EnemyUnitPlacement("Rifleman", 5, 8),
+                    new EnemyUnitPlacement("Grenadier", 4, 8), new EnemyUnitPlacement("Grenadier", 6, 8),
+                    new EnemyUnitPlacement("LineInfantry", 3, 9), new EnemyUnitPlacement("LineInfantry", 5, 9),
+                    new EnemyUnitPlacement("LineInfantry", 7, 9),
+                    new EnemyUnitPlacement("Hussar", 2, 7), new EnemyUnitPlacement("Hussar", 8, 7),
+                    new EnemyUnitPlacement("Sapper", 4, 10), new EnemyUnitPlacement("Sapper", 6, 10),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -375,7 +516,17 @@ namespace WarChess.Campaign
                 TerrainType = "Open + Mud",
                 TeachingFocus = "Anti-cavalry tactics",
                 NarrativeIntro = "The Polish Lancers ride to war. Their lances brace against the charge — cavalry that kills cavalry. The rock-paper-scissors grows sharper.",
-                UnlocksUnitTypes = new List<string> { "Lancer" }
+                UnlocksUnitTypes = new List<string> { "Lancer" },
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("Lancer", 3, 7), new EnemyUnitPlacement("Lancer", 7, 7),
+                    new EnemyUnitPlacement("Cavalry", 2, 7), new EnemyUnitPlacement("Cavalry", 8, 7),
+                    new EnemyUnitPlacement("Cuirassier", 5, 8),
+                    new EnemyUnitPlacement("LineInfantry", 4, 9), new EnemyUnitPlacement("LineInfantry", 5, 9),
+                    new EnemyUnitPlacement("LineInfantry", 6, 9),
+                    new EnemyUnitPlacement("Artillery", 4, 10), new EnemyUnitPlacement("Artillery", 6, 10),
+                    new EnemyUnitPlacement("Hussar", 1, 8), new EnemyUnitPlacement("Hussar", 10, 8),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -383,7 +534,17 @@ namespace WarChess.Campaign
                 BattleNumber = 27, Name = "All Guns Blazing", Act = 3, PointBudget = 42,
                 TerrainType = "Hill + Fortification",
                 TeachingFocus = "Full roster mastery",
-                NarrativeIntro = "Every weapon in your arsenal will be needed. The enemy has matched you unit for unit, formation for formation. Only superior generalship will prevail."
+                NarrativeIntro = "Every weapon in your arsenal will be needed. The enemy has matched you unit for unit, formation for formation. Only superior generalship will prevail.",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("OldGuard", 5, 8),
+                    new EnemyUnitPlacement("Grenadier", 4, 8), new EnemyUnitPlacement("Grenadier", 6, 8),
+                    new EnemyUnitPlacement("LineInfantry", 3, 8), new EnemyUnitPlacement("LineInfantry", 7, 8),
+                    new EnemyUnitPlacement("Cuirassier", 2, 7), new EnemyUnitPlacement("Cuirassier", 8, 7),
+                    new EnemyUnitPlacement("Artillery", 4, 10), new EnemyUnitPlacement("Artillery", 6, 10),
+                    new EnemyUnitPlacement("HorseArtillery", 3, 9), new EnemyUnitPlacement("HorseArtillery", 7, 9),
+                    new EnemyUnitPlacement("Rifleman", 5, 9), new EnemyUnitPlacement("Lancer", 5, 7),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -392,7 +553,18 @@ namespace WarChess.Campaign
                 TerrainType = "Varied",
                 TeachingFocus = "Multi-role units, adaptability",
                 NarrativeIntro = "The Dragoons can fight mounted or on foot — they adapt to any situation. Versatility is the key to this battle's shifting landscape.",
-                UnlocksUnitTypes = new List<string> { "Dragoon" }
+                UnlocksUnitTypes = new List<string> { "Dragoon" },
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("Dragoon", 3, 7), new EnemyUnitPlacement("Dragoon", 7, 7),
+                    new EnemyUnitPlacement("Dragoon", 5, 7),
+                    new EnemyUnitPlacement("Cavalry", 2, 8), new EnemyUnitPlacement("Cavalry", 8, 8),
+                    new EnemyUnitPlacement("OldGuard", 5, 9),
+                    new EnemyUnitPlacement("Grenadier", 4, 9), new EnemyUnitPlacement("Grenadier", 6, 9),
+                    new EnemyUnitPlacement("Artillery", 4, 10), new EnemyUnitPlacement("Artillery", 6, 10),
+                    new EnemyUnitPlacement("Rifleman", 3, 10), new EnemyUnitPlacement("Rifleman", 7, 10),
+                    new EnemyUnitPlacement("Hussar", 1, 7), new EnemyUnitPlacement("Hussar", 10, 7),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -400,7 +572,19 @@ namespace WarChess.Campaign
                 BattleNumber = 29, Name = "Eve of Battle", Act = 3, PointBudget = 48,
                 TerrainType = "Complex (most terrain types)",
                 TeachingFocus = "Everything combined",
-                NarrativeIntro = "Tomorrow, the war ends. Tonight, you prepare. Every lesson, every loss, every hard-won victory has led to this moment. One more battle remains."
+                NarrativeIntro = "Tomorrow, the war ends. Tonight, you prepare. Every lesson, every loss, every hard-won victory has led to this moment. One more battle remains.",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("OldGuard", 5, 8), new EnemyUnitPlacement("OldGuard", 6, 8),
+                    new EnemyUnitPlacement("Grenadier", 3, 8), new EnemyUnitPlacement("Grenadier", 7, 8),
+                    new EnemyUnitPlacement("LineInfantry", 4, 7), new EnemyUnitPlacement("LineInfantry", 6, 7),
+                    new EnemyUnitPlacement("Cuirassier", 2, 7), new EnemyUnitPlacement("Cuirassier", 8, 7),
+                    new EnemyUnitPlacement("Lancer", 3, 7), new EnemyUnitPlacement("Lancer", 7, 7),
+                    new EnemyUnitPlacement("Artillery", 4, 10), new EnemyUnitPlacement("Artillery", 6, 10),
+                    new EnemyUnitPlacement("RocketBattery", 5, 10),
+                    new EnemyUnitPlacement("HorseArtillery", 3, 9), new EnemyUnitPlacement("HorseArtillery", 7, 9),
+                    new EnemyUnitPlacement("Rifleman", 5, 9), new EnemyUnitPlacement("Sapper", 4, 9),
+                }
             });
 
             _allBattles.Add(new CampaignBattleData
@@ -408,7 +592,22 @@ namespace WarChess.Campaign
                 BattleNumber = 30, Name = "Waterloo", Act = 3, PointBudget = 50,
                 TerrainType = "Iconic recreation",
                 TeachingFocus = "Final exam — the ultimate battle",
-                NarrativeIntro = "Waterloo. The name that will echo through history. Massed infantry, thundering cavalry, roaring cannon — everything converges on this field. Command your finest army. Win the war."
+                NarrativeIntro = "Waterloo. The name that will echo through history. Massed infantry, thundering cavalry, roaring cannon — everything converges on this field. Command your finest army. Win the war.",
+                EnemyArmy = new List<EnemyUnitPlacement>
+                {
+                    new EnemyUnitPlacement("OldGuard", 4, 8), new EnemyUnitPlacement("OldGuard", 5, 8),
+                    new EnemyUnitPlacement("OldGuard", 6, 8),
+                    new EnemyUnitPlacement("Grenadier", 3, 8), new EnemyUnitPlacement("Grenadier", 7, 8),
+                    new EnemyUnitPlacement("Cuirassier", 2, 7), new EnemyUnitPlacement("Cuirassier", 9, 7),
+                    new EnemyUnitPlacement("Lancer", 3, 7), new EnemyUnitPlacement("Lancer", 8, 7),
+                    new EnemyUnitPlacement("Dragoon", 1, 7), new EnemyUnitPlacement("Dragoon", 10, 7),
+                    new EnemyUnitPlacement("LineInfantry", 4, 9), new EnemyUnitPlacement("LineInfantry", 5, 9),
+                    new EnemyUnitPlacement("LineInfantry", 6, 9),
+                    new EnemyUnitPlacement("Artillery", 3, 10), new EnemyUnitPlacement("Artillery", 5, 10),
+                    new EnemyUnitPlacement("Artillery", 7, 10),
+                    new EnemyUnitPlacement("RocketBattery", 4, 10), new EnemyUnitPlacement("RocketBattery", 6, 10),
+                    new EnemyUnitPlacement("Rifleman", 4, 7), new EnemyUnitPlacement("Rifleman", 6, 7),
+                }
             });
         }
     }
