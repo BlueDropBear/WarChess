@@ -153,13 +153,26 @@ namespace WarChess.Core
         {
             CurrentBattleNumber = battleNumber;
             SelectedArmy = army;
-            BattleSeed = System.Environment.TickCount;
+            BattleSeed = GenerateDeterministicSeed(battleNumber);
             GoToScene("Battle");
         }
 
         public void GoToMainMenu() => GoToScene("MainMenu");
         public void GoToArmory() => GoToScene("Armory");
         public void GoToCampaign() => GoToScene("Campaign");
+
+        /// <summary>
+        /// Generates a deterministic seed from battle number and attempt count.
+        /// Ensures same battle + same attempt = same seed for replay consistency,
+        /// while different attempts produce different seeds.
+        /// </summary>
+        private int GenerateDeterministicSeed(int battleNumber)
+        {
+            int attemptCount = SaveManager.Data.Campaign.GetBattleAttemptCount(battleNumber);
+            SaveManager.Data.Campaign.IncrementBattleAttemptCount(battleNumber);
+            // Combine battle number and attempt using a simple hash
+            return battleNumber * 31 + attemptCount * 7919;
+        }
 
         private void OnApplicationPause(bool pauseStatus)
         {

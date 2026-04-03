@@ -41,7 +41,9 @@ namespace WarChess.Formations
         /// </summary>
         public static FormationBonus DetectFormation(UnitInstance unit, GridMap grid, int battleLineDefBonus,
             int batteryAtkBonus, int cavalryWedgeChargeBonus, int squareDefVsCavalryBonus,
-            int skirmishAtkBonus, int skirmishRangeBonus)
+            int skirmishAtkBonus, int skirmishRangeBonus,
+            int battleLineMinUnits = 3, int squareMinUnits = 4,
+            int cavalryWedgeMinUnits = 3, int cavalryWedgeMaxStep = 2)
         {
             if (unit == null || grid == null) return FormationBonus.None;
 
@@ -53,7 +55,7 @@ namespace WarChess.Formations
             // Battle Line: 3+ LineInfantry (or counts-as) in a horizontal row
             if (effectiveType == UnitType.LineInfantry)
             {
-                if (CheckBattleLine(unit, allies))
+                if (CheckBattleLine(unit, allies, battleLineMinUnits))
                     return new FormationBonus
                     {
                         Type = FormationType.BattleLine,
@@ -65,7 +67,7 @@ namespace WarChess.Formations
                     };
 
                 // Square: 4 infantry in 2x2 block
-                if (CheckSquare(unit, allies))
+                if (CheckSquare(unit, allies, squareMinUnits))
                     return new FormationBonus
                     {
                         Type = FormationType.Square,
@@ -95,7 +97,7 @@ namespace WarChess.Formations
             // Cavalry Wedge: 3+ cavalry in diagonal
             if (effectiveType == UnitType.Cavalry)
             {
-                if (CheckCavalryWedge(unit, allies))
+                if (CheckCavalryWedge(unit, allies, cavalryWedgeMinUnits, cavalryWedgeMaxStep))
                     return new FormationBonus
                     {
                         Type = FormationType.CavalryWedge,
@@ -125,7 +127,7 @@ namespace WarChess.Formations
             return FormationBonus.None;
         }
 
-        private static bool CheckBattleLine(UnitInstance unit, List<UnitInstance> allies)
+        private static bool CheckBattleLine(UnitInstance unit, List<UnitInstance> allies, int minUnits)
         {
             // Count infantry (or counts-as) on the same row
             int row = unit.Position.Y;
@@ -138,10 +140,10 @@ namespace WarChess.Formations
                     countOnRow++;
             }
 
-            return countOnRow >= 3;
+            return countOnRow >= minUnits;
         }
 
-        private static bool CheckSquare(UnitInstance unit, List<UnitInstance> allies)
+        private static bool CheckSquare(UnitInstance unit, List<UnitInstance> allies, int minUnits)
         {
             // Check all 4 possible 2x2 blocks this unit could be part of
             int x = unit.Position.X;
@@ -171,7 +173,7 @@ namespace WarChess.Formations
                         }
                     }
                 }
-                if (count >= 4) return true;
+                if (count >= minUnits) return true;
             }
 
             return false;
@@ -194,7 +196,8 @@ namespace WarChess.Formations
             return false;
         }
 
-        private static bool CheckCavalryWedge(UnitInstance unit, List<UnitInstance> allies)
+        private static bool CheckCavalryWedge(UnitInstance unit, List<UnitInstance> allies,
+            int minUnits, int maxStep)
         {
             // 3+ cavalry in a diagonal line
             // Check 4 diagonal directions
@@ -205,7 +208,7 @@ namespace WarChess.Formations
                 int count = 1; // Count self
 
                 // Check forward along diagonal
-                for (int step = 1; step <= 2; step++)
+                for (int step = 1; step <= maxStep; step++)
                 {
                     var check = new GridCoord(
                         unit.Position.X + dir[0] * step,
@@ -218,7 +221,7 @@ namespace WarChess.Formations
                 }
 
                 // Check backward along diagonal
-                for (int step = 1; step <= 2; step++)
+                for (int step = 1; step <= maxStep; step++)
                 {
                     var check = new GridCoord(
                         unit.Position.X - dir[0] * step,
@@ -230,7 +233,7 @@ namespace WarChess.Formations
                         break;
                 }
 
-                if (count >= 3) return true;
+                if (count >= minUnits) return true;
             }
 
             return false;
