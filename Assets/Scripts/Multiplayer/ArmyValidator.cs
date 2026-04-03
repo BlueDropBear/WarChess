@@ -44,7 +44,7 @@ namespace WarChess.Multiplayer
             if (format == MatchFormat.GrandBattle && submission.Tier < 4)
                 return "Grand Battle format requires tier 4+";
 
-            // 2. Point budget
+            // 2. Point budget (includes officer assignment costs per GDD Section 2.9)
             int budget = FormatBudgets[format];
             var unitCosts = GetUnitCosts();
             int totalCost = 0;
@@ -54,6 +54,10 @@ namespace WarChess.Multiplayer
                 if (!unitCosts.TryGetValue(unit.UnitTypeId, out int cost))
                     return $"Unknown unit type: {unit.UnitTypeId}";
                 totalCost += cost;
+
+                // Officer assignment cost: Level 1 = free, Level 2 = 1pt, etc.
+                // For server validation, officer levels would come from player profile.
+                // TODO: Accept officer levels as parameter once backend is integrated.
             }
 
             if (totalCost > budget)

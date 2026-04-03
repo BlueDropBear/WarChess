@@ -49,15 +49,24 @@ namespace WarChess.Army
         }
 
         /// <summary>
-        /// Recalculates TotalCost from all unit slots.
+        /// Recalculates TotalCost from all unit slots, including officer assignment costs.
+        /// GDD: Officer cost = Level 1 free, Level 2 = 1pt, Level 3 = 2pt, Level 4 = 3pt, Level 5 = 4pt.
         /// </summary>
-        public void RecalculateCost(Dictionary<string, int> unitCosts)
+        public void RecalculateCost(Dictionary<string, int> unitCosts,
+            Dictionary<string, int> officerLevels = null)
         {
             TotalCost = 0;
             foreach (var slot in Units)
             {
                 if (unitCosts.TryGetValue(slot.UnitTypeId, out int cost))
                     TotalCost += cost;
+
+                // Add officer assignment cost based on level (GDD Section 2.9)
+                if (!string.IsNullOrEmpty(slot.OfficerId) && officerLevels != null)
+                {
+                    if (officerLevels.TryGetValue(slot.OfficerId, out int level) && level > 1)
+                        TotalCost += level - 1; // Level 2=1pt, Level 3=2pt, etc.
+                }
             }
         }
     }

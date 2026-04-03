@@ -275,22 +275,22 @@ namespace WarChess.Config
             // === Commander Names and Abilities ===
             s["commander.Wellington.name"] = "Wellington";
             s["commander.Wellington.ability"] = "Hold the Line";
-            s["commander.Wellington.desc"] = "All infantry gain +20% DEF for 3 rounds.";
+            s["commander.Wellington.desc"] = "All infantry gain +30% DEF for 2 rounds.";
             s["commander.Napoleon.name"] = "Napoleon";
             s["commander.Napoleon.ability"] = "Vive l'Empereur";
-            s["commander.Napoleon.desc"] = "All units gain +25% ATK for 2 rounds.";
+            s["commander.Napoleon.desc"] = "All units gain +20% ATK and +1 MOV for 2 rounds.";
             s["commander.Kutuzov.name"] = "Kutuzov";
             s["commander.Kutuzov.ability"] = "Strategic Patience";
-            s["commander.Kutuzov.desc"] = "At round 8, all units heal 30% of max HP.";
+            s["commander.Kutuzov.desc"] = "At round 8, all units heal 25% of max HP.";
             s["commander.Blucher.name"] = "Blücher";
             s["commander.Blucher.ability"] = "Forward, March!";
             s["commander.Blucher.desc"] = "Round 1: all cavalry gain +2 MOV and guaranteed charge.";
             s["commander.Moore.name"] = "Moore";
             s["commander.Moore.ability"] = "Rearguard Action";
-            s["commander.Moore.desc"] = "When 50% units lost, survivors gain +30% DEF.";
+            s["commander.Moore.desc"] = "When 50% units lost, survivors gain +40% ATK and +20% DEF.";
             s["commander.Ney.name"] = "Ney";
             s["commander.Ney.ability"] = "The Bravest of the Brave";
-            s["commander.Ney.desc"] = "Selected unit gains +50% ATK and -25% DEF for 3 rounds.";
+            s["commander.Ney.desc"] = "One unit takes two actions this round (double attack or double move+attack).";
 
             // === Officer Names and Traits ===
             s["officer.VeteranSergeant.name"] = "Veteran Sergeant";

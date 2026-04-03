@@ -52,10 +52,14 @@ namespace WarChess.Multiplayer
         /// <summary>
         /// Converts a submission back into UnitInstances for battle resolution.
         /// </summary>
+        /// <summary>
+        /// Converts a submission back into UnitInstances for battle resolution.
+        /// Caller is responsible for calling UnitFactory.ResetIds() before the first call.
+        /// Do NOT reset IDs between multiple armies in the same battle.
+        /// </summary>
         public static List<UnitInstance> ToUnitInstances(
             ArmySubmission submission, Owner owner)
         {
-            UnitFactory.ResetIds();
             var units = new List<UnitInstance>();
 
             foreach (var su in submission.Units)
