@@ -167,9 +167,9 @@ namespace WarChess.Battle
 
         private Sprite CreateUnitSprite(UnitType type)
         {
-            int size = 28;
-            var tex = new Texture2D(32, 32);
-            var pixels = new Color[32 * 32];
+            int size = 112;
+            var tex = new Texture2D(128, 128);
+            var pixels = new Color[128 * 128];
 
             // Clear to transparent
             for (int i = 0; i < pixels.Length; i++)
@@ -180,51 +180,51 @@ namespace WarChess.Battle
             {
                 case UnitType.LineInfantry:
                     // Square — solid frontline
-                    FillRect(pixels, 4, 4, 28, 28, Color.white);
+                    FillRect(pixels, 16, 16, 112, 112, Color.white);
                     break;
 
                 case UnitType.Cavalry:
                     // Diamond — fast flanker
-                    for (int y = 0; y < 32; y++)
+                    for (int y = 0; y < 128; y++)
                     {
-                        for (int x = 0; x < 32; x++)
+                        for (int x = 0; x < 128; x++)
                         {
-                            int cx = x - 16, cy = y - 16;
-                            if (Mathf.Abs(cx) + Mathf.Abs(cy) <= 14)
-                                pixels[y * 32 + x] = Color.white;
+                            int cx = x - 64, cy = y - 64;
+                            if (Mathf.Abs(cx) + Mathf.Abs(cy) <= 56)
+                                pixels[y * 128 + x] = Color.white;
                         }
                     }
                     break;
 
                 case UnitType.Artillery:
                     // Circle — ranged bombardment
-                    for (int y = 0; y < 32; y++)
+                    for (int y = 0; y < 128; y++)
                     {
-                        for (int x = 0; x < 32; x++)
+                        for (int x = 0; x < 128; x++)
                         {
-                            int cx = x - 16, cy = y - 16;
-                            if (cx * cx + cy * cy <= 14 * 14)
-                                pixels[y * 32 + x] = Color.white;
+                            int cx = x - 64, cy = y - 64;
+                            if (cx * cx + cy * cy <= 56 * 56)
+                                pixels[y * 128 + x] = Color.white;
                         }
                     }
                     break;
 
                 default:
-                    FillRect(pixels, 2, 2, 30, 30, Color.white);
+                    FillRect(pixels, 8, 8, 120, 120, Color.white);
                     break;
             }
 
             tex.SetPixels(pixels);
             tex.filterMode = FilterMode.Point;
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f), 32f);
+            return Sprite.Create(tex, new Rect(0, 0, 128, 128), new Vector2(0.5f, 0.5f), 128f);
         }
 
         private void FillRect(Color[] pixels, int x0, int y0, int x1, int y1, Color color)
         {
             for (int y = y0; y < y1; y++)
                 for (int x = x0; x < x1; x++)
-                    pixels[y * 32 + x] = color;
+                    pixels[y * 128 + x] = color;
         }
 
         private void SetupCamera()

@@ -173,14 +173,14 @@ namespace WarChess.Battle
 
         private Sprite CreatePlaceholderSprite()
         {
-            var tex = new Texture2D(32, 32);
-            var pixels = new Color[32 * 32];
+            var tex = new Texture2D(128, 128);
+            var pixels = new Color[128 * 128];
             for (int i = 0; i < pixels.Length; i++)
                 pixels[i] = Color.white;
             tex.SetPixels(pixels);
             tex.filterMode = FilterMode.Point;
             tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f), 32f);
+            return Sprite.Create(tex, new Rect(0, 0, 128, 128), new Vector2(0.5f, 0.5f), 128f);
         }
 
         private int CountAlive(List<UnitInstance> units)

@@ -14,19 +14,40 @@ WarChess uses a **pixel art** style inspired by the Napoleonic era (1790s–1815
 
 | Property | Value |
 |----------|-------|
-| Tile size | 32×32 pixels |
-| Pixels per unit (Unity) | 32 |
+| Tile size | 128×128 pixels |
+| Pixels per unit (Unity) | 128 |
 | Filter mode | Point (no filtering) |
 | Compression | None |
 
 ### 2.2 Unit Sprites
 
+Each unit sprite depicts a **multi-soldier formation** (not a single figure). The number of soldiers varies by unit type to reflect squad composition.
+
 | Property | Value |
 |----------|-------|
-| Sprite size | 32×32 pixels (fits within one tile) |
+| Sprite size | 128×128 pixels (fits within one tile) |
 | Animation frames | 4 per action (idle: 2, attack: 4, move: 4, death: 4) |
 | Sprite sheet layout | Horizontal strip per animation |
 | Facing | All sprites face right; flip horizontally for left-facing |
+
+#### Soldiers Per Unit Type
+
+| Unit Type | Soldiers | Formation |
+|-----------|----------|-----------|
+| Line Infantry | 8 | 2 ranks of 4, shoulder-to-shoulder |
+| Militia | 6 | Loose irregular cluster |
+| Cavalry | 4 mounted | Staggered line |
+| Artillery | 3 crew + cannon | Cannon center, crew around it |
+| Grenadier | 6 | Tight two-rank formation |
+| Rifleman | 4 | Spread skirmish line |
+| Hussar | 3 mounted | Light staggered formation |
+| Cuirassier | 3 mounted | Tight wedge |
+| Horse Artillery | 2 mounted + cannon | Mobile formation |
+| Sapper | 4 | Working group with tools |
+| Old Guard | 8 | Perfect two-rank formation |
+| Rocket Battery | 3 crew + launcher | Crew around launcher |
+| Lancer | 4 mounted | Chevron formation |
+| Dragoon | 4 mounted | Line formation |
 
 ### 2.3 UI Elements
 
@@ -75,7 +96,7 @@ A muted, earthy palette with strong accent colors for unit identification.
 
 ### 3.4 Unit Type Silhouette Colors (Placeholder Phase)
 
-During Phase 1, units are colored squares with distinct shapes:
+During Phase 1, units are 128×128 colored shapes with distinct silhouettes:
 
 | Unit | Color | Shape Hint |
 |------|-------|------------|
@@ -89,11 +110,11 @@ During Phase 1, units are colored squares with distinct shapes:
 
 ### 4.1 Readability First
 
-- Each unit type must have a **distinct silhouette** recognizable at 32×32 pixels
+- Each unit type must have a **distinct silhouette** recognizable at 128×128 pixels (and when scaled down on mobile)
 - Units must be distinguishable even without color (for colorblind accessibility)
-- Infantry: standing upright, musket visible
-- Cavalry: mounted figure, taller than infantry
-- Artillery: cannon/wheel profile, low and wide
+- Infantry: formation of soldiers standing upright, muskets visible
+- Cavalry: mounted figures in formation, taller than infantry
+- Artillery: cannon with crew, low and wide profile
 
 ### 4.2 Animation Guidelines
 
