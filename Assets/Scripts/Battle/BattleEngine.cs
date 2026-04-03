@@ -227,7 +227,7 @@ namespace WarChess.Battle
 
         private void ApplyBombardmentAoE(UnitInstance attacker, GridCoord targetPos, int primaryDamage)
         {
-            int splashDamage = DamageCalculator.CalculateSplashDamage(primaryDamage, 50);
+            int splashDamage = DamageCalculator.CalculateSplashDamage(primaryDamage, _config.BombardmentSplashPercentage);
             var adjacent = _grid.GetAdjacentCoords(targetPos);
 
             foreach (var coord in adjacent)

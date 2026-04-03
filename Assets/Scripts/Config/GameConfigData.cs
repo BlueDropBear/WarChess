@@ -44,6 +44,9 @@ namespace WarChess.Config
         public readonly int ChargeMinTilesMoved;
         public readonly int ChargeMultiplier;
 
+        // AoE
+        public readonly int BombardmentSplashPercentage;
+
         public GameConfigData(
             int gridWidth, int gridHeight,
             int playerDeployMinRow, int playerDeployMaxRow,
@@ -55,7 +58,8 @@ namespace WarChess.Config
             int battleLineDefBonus, int batteryAtkBonus,
             int cavalryWedgeChargeBonus, int squareDefVsCavalryBonus,
             int skirmishAtkBonus, int skirmishRangeBonus,
-            int chargeMinTilesMoved, int chargeMultiplier)
+            int chargeMinTilesMoved, int chargeMultiplier,
+            int bombardmentSplashPercentage = 50)
         {
             GridWidth = gridWidth;
             GridHeight = gridHeight;
@@ -79,6 +83,7 @@ namespace WarChess.Config
             SkirmishRangeBonus = skirmishRangeBonus;
             ChargeMinTilesMoved = chargeMinTilesMoved;
             ChargeMultiplier = chargeMultiplier;
+            BombardmentSplashPercentage = bombardmentSplashPercentage;
         }
 
         /// <summary>
@@ -96,7 +101,8 @@ namespace WarChess.Config
             battleLineDefBonus: 115, batteryAtkBonus: 120,
             cavalryWedgeChargeBonus: 125, squareDefVsCavalryBonus: 130,
             skirmishAtkBonus: 120, skirmishRangeBonus: 1,
-            chargeMinTilesMoved: 3, chargeMultiplier: 200
+            chargeMinTilesMoved: 3, chargeMultiplier: 200,
+            bombardmentSplashPercentage: 50
         );
 
         /// <summary>

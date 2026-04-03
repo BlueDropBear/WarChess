@@ -49,6 +49,9 @@ namespace WarChess.Config
         public int chargeMinTilesMoved = 3;
         public int chargeMultiplier = 200;
 
+        [Header("AoE")]
+        public int bombardmentSplashPercentage = 50;
+
         /// <summary>
         /// Converts this SO into a plain C# struct for the Logic Layer.
         /// Call with isMultiplayer to select the correct enemy deployment zone.
@@ -77,7 +80,8 @@ namespace WarChess.Config
                 skirmishAtkBonus: skirmishAtkBonus,
                 skirmishRangeBonus: skirmishRangeBonus,
                 chargeMinTilesMoved: chargeMinTilesMoved,
-                chargeMultiplier: chargeMultiplier
+                chargeMultiplier: chargeMultiplier,
+                bombardmentSplashPercentage: bombardmentSplashPercentage
             );
         }
     }

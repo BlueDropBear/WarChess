@@ -92,9 +92,9 @@ namespace WarChess.Commanders
                     return round == cmd.TriggerParam;
 
                 case CommanderId.Moore:
+                    // Triggers when 50% or more units have been lost
                     int alive = CountAlive(units);
-                    int threshold = (initialCount + 1) / 2; // Ceiling half
-                    return alive <= initialCount - threshold;
+                    return alive * 2 <= initialCount;
 
                 default:
                     return false;
@@ -173,7 +173,8 @@ namespace WarChess.Commanders
                     }
                     if (best != null)
                     {
-                        _activeBuffs.Add(new ActiveBuff(best.Id, BuffType.DoubleAction, 1, round));
+                        // Expires next round so it lasts through this round's combat phase
+                        _activeBuffs.Add(new ActiveBuff(best.Id, BuffType.DoubleAction, 1, round + 1));
                     }
                     break;
             }
