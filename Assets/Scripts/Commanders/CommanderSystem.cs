@@ -236,7 +236,7 @@ namespace WarChess.Commanders
 
         private void ExpireBuffs(int round, List<UnitInstance> playerUnits, List<UnitInstance> enemyUnits)
         {
-            _activeBuffs.RemoveAll(b => b.ExpiryRound >= 0 && round > b.ExpiryRound);
+            _activeBuffs.RemoveAll(b => b.ExpiryRound >= 0 && round >= b.ExpiryRound);
         }
 
         private int CountAlive(List<UnitInstance> units)
