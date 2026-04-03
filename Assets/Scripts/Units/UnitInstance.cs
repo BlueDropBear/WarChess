@@ -20,7 +20,7 @@ namespace WarChess.Units
         public int MaxHp { get; private set; }
         public int Atk { get; private set; }
         public int Def { get; private set; }
-        public int Spd { get; }
+        public int Spd { get; private set; }
         public int Rng { get; private set; }
         public int Mov { get; private set; }
         public int Cost { get; }
@@ -119,6 +119,17 @@ namespace WarChess.Units
             MaxHp = newMaxHp;
             // Scale current HP proportionally
             CurrentHp = oldMax > 0 ? (CurrentHp * newMaxHp) / oldMax : newMaxHp;
+        }
+
+        /// <summary>
+        /// Applies flat stat modifications for officers or testing.
+        /// MOV clamped to minimum 1, RNG to minimum 0.
+        /// </summary>
+        public void ApplyFlatMods(int movDelta, int rngDelta, int spdDelta)
+        {
+            Mov = Math.Max(Mov + movDelta, 1);
+            Rng = Math.Max(Rng + rngDelta, 0);
+            Spd = Spd + spdDelta;
         }
 
         /// <summary>

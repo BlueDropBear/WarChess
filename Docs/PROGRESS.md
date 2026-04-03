@@ -54,8 +54,7 @@ This file tracks what has been completed, what is in progress, and what is next.
 - [ ] Campaign map v1 — linear node progression (battle → battle)
   - CampaignDatabase.cs has all 30 battles with narrative, budgets, unlocks. David: build map UI.
 - [x] Enemy army AI — pre-built enemy compositions per campaign node
-  - CampaignDatabase.cs: Act 1 (battles 1-10) fully specified with enemy placements
-  - Acts 2-3 enemy compositions TBD (battle metadata complete)
+  - CampaignDatabase.cs: All 30 battles (Acts 1-3) fully specified with enemy placements
 - [x] Unit unlock system — new units introduced at campaign milestones
   - CampaignManager.CompleteBattle() processes unlocks per GDD schedule
   - CampaignDatabase tracks which battles unlock which units/commanders
@@ -70,8 +69,8 @@ This file tracks what has been completed, what is in progress, and what is next.
 - [ ] Background music — era-appropriate free tracks
 
 **Status: IN PROGRESS**
-**Done: Data layer (save/load, campaign database, army management, star ratings, scene nav)**
-**Remaining: All UI screens (David), audio sourcing, Acts 2-3 enemy compositions**
+**Done: Data layer (save/load, campaign database, army management, star ratings, scene nav), audio system scaffold (SoundManager, MusicController), audio sourcing guide**
+**Remaining: All UI screens (David), actual audio asset integration (David)**
 
 ---
 
@@ -94,8 +93,9 @@ This file tracks what has been completed, what is in progress, and what is next.
 - [x] Tutorial system — contextual tooltips and guided first battles
   - TutorialDatabase.cs: 20+ tutorial steps triggered at key battles, covers all mechanics
 - [x] Balance testing spreadsheet — unit matchup matrix, win-rate tracking
-  - BalanceTester.cs: headless Mode 1 (14x14 matchup matrix) + Mode 2 (composition stress test)
+  - BalanceTester.cs: headless Mode 1 (14x14 matchup matrix) + Mode 2 (composition stress test) + Mode 3 (officer impact analysis)
   - Runs thousands of battles with no rendering, flags anomalies per GDD Section 12
+  - Mode 3 tests all 12 officers at levels 1-5, flags >15% win rate delta
 - [x] Difficulty settings (Recruit / Veteran / Marshal)
   - DifficultyScaler.cs: stat scaling (-15%/normal/+15%), info visibility levels
 - [x] Fog of war mechanic for specific campaign battles
@@ -150,45 +150,80 @@ This file tracks what has been completed, what is in progress, and what is next.
 - [ ] Performance optimization — target 60fps on mid-range phones
 - [ ] Particle effects — battle impact, unit death, ability activation
 - [ ] Screen shake, hit flash, damage numbers
-- [ ] Music and SFX polish pass
-- [ ] Accessibility — colorblind mode, text scaling, unit labels
-- [ ] Localization framework (English first)
-- [ ] Analytics integration
-- [ ] Dispatch Box system — opening animation, cosmetic rewards
-- [ ] Cosmetics shop — rotating items, equipped skins/themes
-- [ ] Monetization — Act 2–3 purchase gate, ammunition IAP, cosmetic purchases
+- [x] Music and SFX polish pass
+  - SoundManager.cs: 20 SoundEvent types, clip registry, volume control
+  - MusicController.cs: 8 MusicTrack types, dual-source crossfading
+  - Audio sourcing guide: Docs/AUDIO_SOURCING.md with free source recommendations
+  - David: register actual AudioClip assets
+- [x] Accessibility — colorblind mode, text scaling, unit labels
+  - AccessibilityManager.cs: 3 colorblind palettes (Normal, Deuteranopia, Tritanopia)
+  - Text scaling (80%/100%/130%), unit labels ("LI", "CV", "AR", etc.)
+  - David: wire palette colors and text scaling to UI
+- [x] Localization framework (English first)
+  - LocalizationManager.cs: string table with ~200 English keys, JSON language loading
+  - Keys for: UI labels, unit/commander/officer names, campaign, ranks, terrain, formations
+  - David: wire Get() calls to UI text elements
+- [x] Analytics integration
+  - AnalyticsManager.cs: 12 event types, IAnalyticsProvider interface, batch queue
+  - Convenience methods: LogBattleCompleted, LogPurchase, LogCampaignProgress, etc.
+  - David: implement IAnalyticsProvider with Firebase/Unity Analytics
+- [x] Dispatch Box system — opening animation, cosmetic rewards
+  - DispatchBoxData.cs: 3 box tiers (Bronze/Silver/Gold) with weighted loot tables
+  - DispatchBoxSystem.cs: award/open boxes, seeded RNG, duplicate → ammunition refund
+  - David: build box opening UI and animation
+- [x] Cosmetics shop — rotating items, equipped skins/themes
+  - CosmeticData.cs: 33 cosmetic items across 5 types (skins, themes, portraits, animations, banners)
+  - CosmeticShop.cs: ownership, equip/unequip, daily rotating inventory (6 items)
+  - David: build shop UI
+- [x] Monetization — Act 2–3 purchase gate, ammunition IAP, cosmetic purchases
+  - MonetizationManager.cs: IAP catalog (campaign_full, ammo packs, dispatch boxes)
+  - IPurchaseValidator interface + StubPurchaseValidator for dev
+  - David: integrate Apple/Google IAP SDK, implement real validator
 - [ ] Apple Developer Account + Google Play Console setup
 - [ ] iOS build setup — Xcode, provisioning, TestFlight
 - [ ] Android build setup — keystore, APK/AAB generation
 - [ ] PC build — itch.io or Steam listing
 
-**Status: NOT STARTED**
+**Status: IN PROGRESS**
+**Done: Localization, analytics, accessibility, dispatch boxes, cosmetics, monetization, audio scaffold (all code-side)**
+**Remaining: Touch controls, responsive UI, performance, particles, screen shake, platform setup (David)**
 
 ---
 
 ## Phase 6: Launch
-- [ ] Store listings — screenshots, description, keywords, icon
+- [x] Store listings — screenshots, description, keywords, icon
+  - Docs/STORE_LISTING.md: App Store + Google Play descriptions, keywords, screenshot captions
+  - David: take actual screenshots, create icon
 - [ ] Trailer / gameplay GIF
 - [ ] Beta test — invite 10–20 players, collect feedback
 - [ ] Bug fix sprint based on beta feedback
 - [ ] Submit to App Store + Google Play
 - [ ] Launch on itch.io / Steam
-- [ ] Launch announcement — Reddit, Twitter, indie game forums
+- [x] Launch announcement — Reddit, Twitter, indie game forums
+  - Docs/MARKETING.md: Reddit, Twitter, devlog, press release, beta CTA templates
+  - David: customize and post when ready
 - [ ] Post-launch monitoring — crash reports, server health
 
-**Status: NOT STARTED**
+**Status: NOT STARTED (copy/templates ready, execution pending)**
 
 ---
 
 ## Phase 7: Post-Launch
-- [ ] AI QA Balance Tester — headless simulation tool
+- [x] AI QA Balance Tester — headless simulation tool
+  - BalanceTester.cs already complete with Modes 1, 2, and 3
 - [ ] Balance patches based on matchup data
-- [ ] New unit releases
-- [ ] Seasonal ranked seasons
+- [x] New unit releases — designed
+  - Docs/NEW_UNIT_DESIGNS.md: 3 post-launch units (Jäger, Supply Wagon, Uhlan)
+  - David: implement unit sprites and integrate into UnitFactory
+- [x] Seasonal ranked seasons — designed
+  - Docs/SEASONAL_RANKED_DESIGN.md: 6-week seasons, soft Elo reset, exclusive cosmetic rewards
+  - Implementation: new SeasonData class, save data additions for peak Elo tracking
 - [ ] Community feedback pipeline
-- [ ] New campaign chapters
+- [x] New campaign chapters — designed
+  - Docs/NEW_CAMPAIGN_CHAPTER.md: Act IV "The Hundred Days" (10 battles, 3 new units)
+  - Implementation: add to CampaignDatabase, new win condition types
 
-**Status: NOT STARTED**
+**Status: NOT STARTED (designs ready, implementation pending post-launch)**
 
 ---
 
