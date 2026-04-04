@@ -140,18 +140,14 @@ namespace WarChess.Config
         );
 
         /// <summary>
-        /// Returns the canonical unit cost dictionary from GDD Section 3.2.
-        /// Single source of truth — all systems should use this instead of local copies.
+        /// Returns unit costs computed algorithmically from stats, abilities, formations,
+        /// and traits. Uses <see cref="UnitCostCalculator"/> with default config tuned to
+        /// match GDD Section 3.2 costs. Single source of truth — all systems should use
+        /// this instead of local copies.
         /// </summary>
         public static Dictionary<string, int> GetUnitCosts()
         {
-            return new Dictionary<string, int>
-            {
-                {"LineInfantry", 3}, {"Militia", 1}, {"Cavalry", 5}, {"Artillery", 6},
-                {"Grenadier", 7}, {"Rifleman", 5}, {"Hussar", 4}, {"Cuirassier", 8},
-                {"HorseArtillery", 6}, {"Sapper", 4}, {"OldGuard", 10}, {"RocketBattery", 6},
-                {"Lancer", 5}, {"Dragoon", 6}
-            };
+            return UnitCostCalculator.CalculateAllCosts(UnitCostConfig.Default);
         }
     }
 }

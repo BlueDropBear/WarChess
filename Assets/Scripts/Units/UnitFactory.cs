@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using WarChess.Config;
 using WarChess.Core;
 
 namespace WarChess.Units
@@ -6,12 +7,19 @@ namespace WarChess.Units
     /// <summary>
     /// Creates UnitInstance objects from hardcoded GDD stats. Used for prototype
     /// testing when ScriptableObject assets haven't been created in the editor yet.
+    /// Costs are computed algorithmically via <see cref="UnitCostCalculator"/>.
     /// Pure C# — no Unity dependencies.
     /// </summary>
     public static class UnitFactory
     {
         [System.ThreadStatic]
         private static int _nextId;
+
+        /// <summary>
+        /// Cached cost lookup computed from the cost algorithm. Initialized lazily
+        /// on first access. Call <see cref="InvalidateCostCache"/> if config changes.
+        /// </summary>
+        private static Dictionary<string, int> _costCache;
 
         /// <summary>
         /// Returns the next unique ID and increments the counter.
@@ -33,14 +41,34 @@ namespace WarChess.Units
         }
 
         /// <summary>
+        /// Clears the cached cost lookup, forcing recalculation on next unit creation.
+        /// Call this after changing UnitCostConfig values.
+        /// </summary>
+        public static void InvalidateCostCache()
+        {
+            _costCache = null;
+        }
+
+        /// <summary>
+        /// Returns the algorithmically computed cost for a unit type.
+        /// Uses a lazily-initialized cache for performance.
+        /// </summary>
+        private static int GetCost(string typeName)
+        {
+            if (_costCache == null)
+                _costCache = GameConfigData.GetUnitCosts();
+            return _costCache.TryGetValue(typeName, out int cost) ? cost : 1;
+        }
+
+        /// <summary>
         /// Creates a Line Infantry unit with GDD stats.
-        /// HP:30 ATK:8 DEF:6 SPD:3 RNG:1 MOV:2 COST:3
+        /// HP:30 ATK:8 DEF:6 SPD:3 RNG:1 MOV:2
         /// </summary>
         public static UnitInstance CreateLineInfantry(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Line Infantry", type: UnitType.LineInfantry, owner: owner,
-                hp: 30, atk: 8, def: 6, spd: 3, rng: 1, mov: 2, cost: 3,
+                hp: 30, atk: 8, def: 6, spd: 3, rng: 1, mov: 2, cost: GetCost("LineInfantry"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
                 ability: AbilityType.None,
@@ -52,13 +80,13 @@ namespace WarChess.Units
 
         /// <summary>
         /// Creates a Militia unit with GDD stats.
-        /// HP:18 ATK:5 DEF:3 SPD:4 RNG:1 MOV:2 COST:1
+        /// HP:18 ATK:5 DEF:3 SPD:4 RNG:1 MOV:2
         /// </summary>
         public static UnitInstance CreateMilitia(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Militia", type: UnitType.Militia, owner: owner,
-                hp: 18, atk: 5, def: 3, spd: 4, rng: 1, mov: 2, cost: 1,
+                hp: 18, atk: 5, def: 3, spd: 4, rng: 1, mov: 2, cost: GetCost("Militia"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
                 ability: AbilityType.StrengthInNumbers,
@@ -70,13 +98,13 @@ namespace WarChess.Units
 
         /// <summary>
         /// Creates a Cavalry unit with GDD stats.
-        /// HP:25 ATK:10 DEF:4 SPD:6 RNG:1 MOV:4 COST:5
+        /// HP:25 ATK:10 DEF:4 SPD:6 RNG:1 MOV:4
         /// </summary>
         public static UnitInstance CreateCavalry(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Cavalry", type: UnitType.Cavalry, owner: owner,
-                hp: 25, atk: 10, def: 4, spd: 6, rng: 1, mov: 4, cost: 5,
+                hp: 25, atk: 10, def: 4, spd: 6, rng: 1, mov: 4, cost: GetCost("Cavalry"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.HighestThreat,
                 ability: AbilityType.Charge,
@@ -88,13 +116,13 @@ namespace WarChess.Units
 
         /// <summary>
         /// Creates an Artillery unit with GDD stats.
-        /// HP:15 ATK:14 DEF:2 SPD:1 RNG:4 MOV:1 COST:6
+        /// HP:15 ATK:14 DEF:2 SPD:1 RNG:4 MOV:1
         /// </summary>
         public static UnitInstance CreateArtillery(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Artillery", type: UnitType.Artillery, owner: owner,
-                hp: 15, atk: 14, def: 2, spd: 1, rng: 4, mov: 1, cost: 6,
+                hp: 15, atk: 14, def: 2, spd: 1, rng: 4, mov: 1, cost: GetCost("Artillery"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
                 ability: AbilityType.Bombardment,
@@ -105,13 +133,13 @@ namespace WarChess.Units
         }
 
         /// <summary>
-        /// Creates a Grenadier unit. HP:40 ATK:12 DEF:8 SPD:2 RNG:1 MOV:2 COST:7
+        /// Creates a Grenadier unit. HP:40 ATK:12 DEF:8 SPD:2 RNG:1 MOV:2
         /// </summary>
         public static UnitInstance CreateGrenadier(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Grenadier", type: UnitType.Grenadier, owner: owner,
-                hp: 40, atk: 12, def: 8, spd: 2, rng: 1, mov: 2, cost: 7,
+                hp: 40, atk: 12, def: 8, spd: 2, rng: 1, mov: 2, cost: GetCost("Grenadier"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
                 ability: AbilityType.Grenade,
@@ -122,13 +150,13 @@ namespace WarChess.Units
         }
 
         /// <summary>
-        /// Creates a Rifleman unit. HP:20 ATK:11 DEF:3 SPD:5 RNG:3 MOV:2 COST:5
+        /// Creates a Rifleman unit. HP:20 ATK:11 DEF:3 SPD:5 RNG:3 MOV:2
         /// </summary>
         public static UnitInstance CreateRifleman(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Rifleman", type: UnitType.Rifleman, owner: owner,
-                hp: 20, atk: 11, def: 3, spd: 5, rng: 3, mov: 2, cost: 5,
+                hp: 20, atk: 11, def: 3, spd: 5, rng: 3, mov: 2, cost: GetCost("Rifleman"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Weakest,
                 ability: AbilityType.AimedShot,
@@ -139,13 +167,13 @@ namespace WarChess.Units
         }
 
         /// <summary>
-        /// Creates a Hussar unit. HP:20 ATK:7 DEF:3 SPD:8 RNG:1 MOV:5 COST:4
+        /// Creates a Hussar unit. HP:20 ATK:7 DEF:3 SPD:8 RNG:1 MOV:5
         /// </summary>
         public static UnitInstance CreateHussar(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Hussar", type: UnitType.Hussar, owner: owner,
-                hp: 20, atk: 7, def: 3, spd: 8, rng: 1, mov: 5, cost: 4,
+                hp: 20, atk: 7, def: 3, spd: 8, rng: 1, mov: 5, cost: GetCost("Hussar"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Weakest,
                 ability: AbilityType.HitAndRun,
@@ -156,13 +184,13 @@ namespace WarChess.Units
         }
 
         /// <summary>
-        /// Creates a Cuirassier unit. HP:35 ATK:13 DEF:7 SPD:4 RNG:1 MOV:3 COST:8
+        /// Creates a Cuirassier unit. HP:35 ATK:13 DEF:7 SPD:4 RNG:1 MOV:3
         /// </summary>
         public static UnitInstance CreateCuirassier(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Cuirassier", type: UnitType.Cuirassier, owner: owner,
-                hp: 35, atk: 13, def: 7, spd: 4, rng: 1, mov: 3, cost: 8,
+                hp: 35, atk: 13, def: 7, spd: 4, rng: 1, mov: 3, cost: GetCost("Cuirassier"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.HighestThreat,
                 ability: AbilityType.ArmoredCharge,
@@ -173,13 +201,13 @@ namespace WarChess.Units
         }
 
         /// <summary>
-        /// Creates a Horse Artillery unit. HP:12 ATK:10 DEF:2 SPD:5 RNG:3 MOV:3 COST:6
+        /// Creates a Horse Artillery unit. HP:12 ATK:10 DEF:2 SPD:5 RNG:3 MOV:3
         /// </summary>
         public static UnitInstance CreateHorseArtillery(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Horse Artillery", type: UnitType.HorseArtillery, owner: owner,
-                hp: 12, atk: 10, def: 2, spd: 5, rng: 3, mov: 3, cost: 6,
+                hp: 12, atk: 10, def: 2, spd: 5, rng: 3, mov: 3, cost: GetCost("HorseArtillery"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
                 ability: AbilityType.LimberedUp,
@@ -190,13 +218,13 @@ namespace WarChess.Units
         }
 
         /// <summary>
-        /// Creates a Sapper unit. HP:22 ATK:6 DEF:5 SPD:3 RNG:1 MOV:2 COST:4
+        /// Creates a Sapper unit. HP:22 ATK:6 DEF:5 SPD:3 RNG:1 MOV:2
         /// </summary>
         public static UnitInstance CreateSapper(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Sapper", type: UnitType.Sapper, owner: owner,
-                hp: 22, atk: 6, def: 5, spd: 3, rng: 1, mov: 2, cost: 4,
+                hp: 22, atk: 6, def: 5, spd: 3, rng: 1, mov: 2, cost: GetCost("Sapper"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
                 ability: AbilityType.Entrench,
@@ -207,13 +235,13 @@ namespace WarChess.Units
         }
 
         /// <summary>
-        /// Creates an Old Guard unit. HP:45 ATK:14 DEF:10 SPD:3 RNG:1 MOV:2 COST:10
+        /// Creates an Old Guard unit. HP:45 ATK:14 DEF:10 SPD:3 RNG:1 MOV:2
         /// </summary>
         public static UnitInstance CreateOldGuard(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Old Guard", type: UnitType.OldGuard, owner: owner,
-                hp: 45, atk: 14, def: 10, spd: 3, rng: 1, mov: 2, cost: 10,
+                hp: 45, atk: 14, def: 10, spd: 3, rng: 1, mov: 2, cost: GetCost("OldGuard"),
                 flankSideMultiplier: 130, flankRearMultiplier: 150, // Reduced rear vulnerability per GDD
                 targetingPriority: TargetingPriority.Nearest,
                 ability: AbilityType.Unbreakable,
@@ -224,13 +252,13 @@ namespace WarChess.Units
         }
 
         /// <summary>
-        /// Creates a Rocket Battery unit. HP:10 ATK:16 DEF:1 SPD:2 RNG:5 MOV:1 COST:6
+        /// Creates a Rocket Battery unit. HP:10 ATK:16 DEF:1 SPD:2 RNG:5 MOV:1
         /// </summary>
         public static UnitInstance CreateRocketBattery(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Rocket Battery", type: UnitType.RocketBattery, owner: owner,
-                hp: 10, atk: 16, def: 1, spd: 2, rng: 5, mov: 1, cost: 6,
+                hp: 10, atk: 16, def: 1, spd: 2, rng: 5, mov: 1, cost: GetCost("RocketBattery"),
                 flankSideMultiplier: 130, flankRearMultiplier: 250, // Extra fragile from behind per GDD
                 targetingPriority: TargetingPriority.Random,
                 ability: AbilityType.CongreveBarrage,
@@ -241,13 +269,13 @@ namespace WarChess.Units
         }
 
         /// <summary>
-        /// Creates a Lancer unit. HP:28 ATK:11 DEF:5 SPD:5 RNG:1 MOV:3 COST:5
+        /// Creates a Lancer unit. HP:28 ATK:11 DEF:5 SPD:5 RNG:1 MOV:3
         /// </summary>
         public static UnitInstance CreateLancer(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Lancer", type: UnitType.Lancer, owner: owner,
-                hp: 28, atk: 11, def: 5, spd: 5, rng: 1, mov: 3, cost: 5,
+                hp: 28, atk: 11, def: 5, spd: 5, rng: 1, mov: 3, cost: GetCost("Lancer"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.HighestThreat,
                 ability: AbilityType.Brace,
@@ -258,13 +286,13 @@ namespace WarChess.Units
         }
 
         /// <summary>
-        /// Creates a Dragoon unit. HP:28 ATK:9 DEF:5 SPD:5 RNG:1 MOV:4 COST:6
+        /// Creates a Dragoon unit. HP:28 ATK:9 DEF:5 SPD:5 RNG:1 MOV:4
         /// </summary>
         public static UnitInstance CreateDragoon(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: NextId(), name: "Dragoon", type: UnitType.Dragoon, owner: owner,
-                hp: 28, atk: 9, def: 5, spd: 5, rng: 1, mov: 4, cost: 6,
+                hp: 28, atk: 9, def: 5, spd: 5, rng: 1, mov: 4, cost: GetCost("Dragoon"),
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.ArtilleryFirst,
                 ability: AbilityType.Dismount,

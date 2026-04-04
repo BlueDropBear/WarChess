@@ -1190,6 +1190,204 @@ namespace WarChess.QA
             };
         }
 
+        // ======= MODE 11: Cost Validation & Suggestion =======
+
+        /// <summary>
+        /// Validates unit costs by comparing algorithmic cost vs empirical win-rate
+        /// efficiency. Measures "cost efficiency" = win contribution per army point
+        /// for each unit type. Suggests cost adjustments when a unit significantly
+        /// over- or under-performs relative to its cost.
+        ///
+        /// The algorithm:
+        /// 1. Build random armies, track which unit types appear
+        /// 2. Run battles, track wins per unit type per cost point
+        /// 3. Compare each unit's cost efficiency to the average
+        /// 4. Flag units >40% above/below average efficiency
+        /// 5. Suggest +/- 1 cost adjustments and report breakdowns
+        ///
+        /// This mode helps the QA tester understand the cost algorithm and
+        /// recommend specific config value changes based on simulation data.
+        /// </summary>
+        public CostValidationResult RunCostValidationTest(
+            int budget = 40, int armyCount = 300, int battlesPerArmy = 30,
+            UnitCostConfig costConfig = null)
+        {
+            if (costConfig == null) costConfig = UnitCostConfig.Default;
+            var result = new CostValidationResult();
+            var costs = UnitCostCalculator.CalculateAllCosts(costConfig);
+            var breakdowns = UnitCostCalculator.CalculateAllBreakdowns(costConfig);
+
+            // Track wins and appearances per unit type
+            var unitWins = new Dictionary<string, int>();
+            var unitAppearances = new Dictionary<string, int>();
+            foreach (var t in AllUnitTypes)
+            {
+                unitWins[t] = 0;
+                unitAppearances[t] = 0;
+            }
+
+            // Generate armies and battle them
+            var armies = new List<List<string>>();
+            for (int i = 0; i < armyCount; i++)
+                armies.Add(GenerateRandomArmy(budget, AllUnitTypes));
+
+            for (int i = 0; i < armyCount; i++)
+            {
+                for (int b = 0; b < battlesPerArmy; b++)
+                {
+                    int opponent = _seedGen.Next(armyCount);
+                    if (opponent == i) opponent = (opponent + 1) % armyCount;
+
+                    int seed = _seedGen.Next();
+                    var outcome = BattleArmies(armies[i], armies[opponent], seed);
+
+                    // Track appearances (count each type once per army per battle)
+                    var seenI = new HashSet<string>();
+                    foreach (var unit in armies[i])
+                        if (seenI.Add(unit)) unitAppearances[unit]++;
+
+                    var seenO = new HashSet<string>();
+                    foreach (var unit in armies[opponent])
+                        if (seenO.Add(unit)) unitAppearances[unit]++;
+
+                    // Track wins
+                    if (outcome == BattleOutcome.PlayerWin)
+                    {
+                        foreach (var unit in armies[i])
+                            if (seenI.Contains(unit)) { unitWins[unit]++; seenI.Remove(unit); }
+                    }
+                    else if (outcome == BattleOutcome.EnemyWin)
+                    {
+                        foreach (var unit in armies[opponent])
+                            if (seenO.Contains(unit)) { unitWins[unit]++; seenO.Remove(unit); }
+                    }
+                }
+            }
+
+            // Calculate cost efficiency for each unit
+            // Efficiency = (winRate * 100) / cost — higher means more value per point
+            int totalEfficiency = 0;
+            int unitCount = 0;
+
+            foreach (var unitType in AllUnitTypes)
+            {
+                int appearances = unitAppearances[unitType];
+                int wins = unitWins[unitType];
+                int cost = costs.TryGetValue(unitType, out int c) ? c : 1;
+                int winRate = appearances > 0 ? (wins * 100) / appearances : 0;
+                int efficiency = cost > 0 ? (winRate * 100) / cost : 0;
+
+                totalEfficiency += efficiency;
+                unitCount++;
+
+                var breakdown = breakdowns.TryGetValue(unitType, out var bd)
+                    ? bd : default;
+
+                result.Entries[unitType] = new CostValidationEntry
+                {
+                    UnitType = unitType,
+                    AlgorithmCost = cost,
+                    WinRate = winRate,
+                    CostEfficiency = efficiency,
+                    Appearances = appearances,
+                    Wins = wins,
+                    Breakdown = breakdown
+                };
+            }
+
+            int avgEfficiency = unitCount > 0 ? totalEfficiency / unitCount : 100;
+            result.AverageEfficiency = avgEfficiency;
+
+            // Generate suggestions
+            foreach (var kvp in result.Entries)
+            {
+                var entry = kvp.Value;
+                int cost = entry.AlgorithmCost;
+
+                if (avgEfficiency <= 0) continue;
+
+                int deviationPct = ((entry.CostEfficiency - avgEfficiency) * 100) / avgEfficiency;
+                entry.EfficiencyDeviation = deviationPct;
+
+                if (deviationPct > 40 && cost < 15)
+                {
+                    entry.SuggestedCost = cost + 1;
+                    entry.Suggestion = $"{entry.UnitType} is {deviationPct}% above average efficiency " +
+                                       $"(eff={entry.CostEfficiency}, avg={avgEfficiency}). " +
+                                       $"Consider increasing cost from {cost} to {cost + 1}, " +
+                                       $"or reducing AbilityFlatValue for {entry.Breakdown.AbilityMultiplier}x ability.";
+                    result.Suggestions.Add(entry.Suggestion);
+                }
+                else if (deviationPct < -40 && cost > 1)
+                {
+                    entry.SuggestedCost = cost - 1;
+                    entry.Suggestion = $"{entry.UnitType} is {-deviationPct}% below average efficiency " +
+                                       $"(eff={entry.CostEfficiency}, avg={avgEfficiency}). " +
+                                       $"Consider decreasing cost from {cost} to {cost - 1}, " +
+                                       $"or increasing AbilityFlatValue.";
+                    result.Suggestions.Add(entry.Suggestion);
+                }
+                else
+                {
+                    entry.SuggestedCost = cost;
+                    entry.Suggestion = null;
+                }
+            }
+
+            // Add algorithm report as reference
+            result.AlgorithmReport = UnitCostCalculator.GenerateCostReport(costConfig);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Generates a human-readable report from cost validation results,
+        /// including the algorithm breakdown and specific adjustment suggestions.
+        /// </summary>
+        public static string FormatCostValidationReport(CostValidationResult result)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("=== UNIT COST VALIDATION & SUGGESTIONS ===");
+            sb.AppendLine();
+
+            // Algorithm breakdown
+            sb.AppendLine(result.AlgorithmReport);
+            sb.AppendLine();
+
+            // Efficiency table
+            sb.AppendLine($"Average cost efficiency: {result.AverageEfficiency}");
+            sb.AppendLine();
+            sb.AppendLine($"{"Unit",-18} {"Cost",5} {"WinRate",8} {"Effic",6} {"Dev%",5} {"Suggest",8} {"Flag",4}");
+            sb.AppendLine(new string('-', 60));
+
+            foreach (var unitType in AllUnitTypes)
+            {
+                if (!result.Entries.TryGetValue(unitType, out var e)) continue;
+                string flag = e.SuggestedCost != e.AlgorithmCost ? " !" : "";
+                string suggest = e.SuggestedCost != e.AlgorithmCost
+                    ? e.SuggestedCost.ToString()
+                    : "-";
+                sb.AppendLine($"{e.UnitType,-18} {e.AlgorithmCost,5} {e.WinRate,7}% {e.CostEfficiency,6} {e.EfficiencyDeviation,+4}% {suggest,8}{flag}");
+            }
+
+            if (result.Suggestions.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine("=== SUGGESTED ADJUSTMENTS ===");
+                sb.AppendLine("To apply these, modify UnitCostConfig ability values or add overrides:");
+                sb.AppendLine();
+                foreach (var s in result.Suggestions)
+                    sb.AppendLine($"  -> {s}");
+            }
+            else
+            {
+                sb.AppendLine();
+                sb.AppendLine("All unit costs are within acceptable efficiency bounds. No adjustments needed.");
+            }
+
+            return sb.ToString();
+        }
+
         // ======= Full Report (GDD Section 12 Output) =======
 
         /// <summary>
@@ -1210,7 +1408,8 @@ namespace WarChess.QA
             int matchupBattles = 100, int compBudget = 40, int compArmies = 200,
             int compBattles = 50, int officerBattles = 200, int commanderBattles = 200,
             int tierBattles = 200, int terrainBattles = 200, int gridBattles = 200,
-            int formationBattles = 200, int strategyBattles = 100)
+            int formationBattles = 200, int strategyBattles = 100,
+            int costValidationArmies = 300, int costValidationBattles = 30)
         {
             var report = new FullQAReport();
 
@@ -1224,6 +1423,7 @@ namespace WarChess.QA
             report.GridSize = RunGridSizeTest(compBudget, gridBattles);
             report.FormationEffectiveness = RunFormationTest(formationBattles);
             report.StrategyTest = RunStrategyTest(compBudget, strategyBattles);
+            report.CostValidation = RunCostValidationTest(compBudget, costValidationArmies, costValidationBattles);
 
             // Aggregate anomalies
             report.AllAnomalies = new List<string>();
@@ -1236,6 +1436,7 @@ namespace WarChess.QA
             report.AllAnomalies.AddRange(report.TierBalance.Anomalies.Select(a => $"[Tier] {a}"));
             report.AllAnomalies.AddRange(report.TerrainImpact.Anomalies.Select(a => $"[Terrain] {a}"));
             report.AllAnomalies.AddRange(report.StrategyTest.Anomalies.Select(a => $"[Strategy] {a}"));
+            report.AllAnomalies.AddRange(report.CostValidation.Suggestions.Select(s => $"[CostValidation] {s}"));
 
             return report;
         }
@@ -1269,6 +1470,8 @@ namespace WarChess.QA
             sb.AppendLine(FormatFormationReport(report.FormationEffectiveness));
             sb.AppendLine();
             sb.AppendLine(FormatStrategyReport(report.StrategyTest));
+            sb.AppendLine();
+            sb.AppendLine(FormatCostValidationReport(report.CostValidation));
 
             if (report.AllAnomalies.Count > 0)
             {
@@ -1665,6 +1868,62 @@ namespace WarChess.QA
         public GridSizeResult GridSize;
         public FormationEffectivenessResult FormationEffectiveness;
         public StrategyTestResult StrategyTest;
+        public CostValidationResult CostValidation;
         public List<string> AllAnomalies;
+    }
+
+    /// <summary>
+    /// Result of cost validation testing. Contains per-unit efficiency data,
+    /// the algorithm breakdown report, and specific cost adjustment suggestions.
+    /// </summary>
+    public class CostValidationResult
+    {
+        /// <summary>Per-unit validation entries keyed by unit type name.</summary>
+        public Dictionary<string, CostValidationEntry> Entries = new Dictionary<string, CostValidationEntry>();
+
+        /// <summary>Average cost efficiency across all units (higher = more value per point).</summary>
+        public int AverageEfficiency;
+
+        /// <summary>Human-readable suggestions for cost adjustments.</summary>
+        public List<string> Suggestions = new List<string>();
+
+        /// <summary>Full algorithm breakdown report for reference.</summary>
+        public string AlgorithmReport;
+    }
+
+    /// <summary>
+    /// Per-unit cost validation data showing algorithmic cost vs empirical performance.
+    /// </summary>
+    public class CostValidationEntry
+    {
+        /// <summary>Unit type name (e.g., "Cavalry").</summary>
+        public string UnitType;
+
+        /// <summary>Cost computed by the algorithm.</summary>
+        public int AlgorithmCost;
+
+        /// <summary>Win rate when this unit appears in armies (0-100).</summary>
+        public int WinRate;
+
+        /// <summary>Cost efficiency = winRate * 100 / cost. Higher = more value per point.</summary>
+        public int CostEfficiency;
+
+        /// <summary>Deviation from average efficiency (%). Positive = overperforming.</summary>
+        public int EfficiencyDeviation;
+
+        /// <summary>Number of armies this unit appeared in.</summary>
+        public int Appearances;
+
+        /// <summary>Number of wins in armies containing this unit.</summary>
+        public int Wins;
+
+        /// <summary>Suggested cost based on empirical performance. Same as AlgorithmCost if no change needed.</summary>
+        public int SuggestedCost;
+
+        /// <summary>Human-readable suggestion string, or null if no adjustment needed.</summary>
+        public string Suggestion;
+
+        /// <summary>Algorithm breakdown for this unit.</summary>
+        public CostBreakdown Breakdown;
     }
 }
