@@ -11,6 +11,72 @@ namespace WarChess.Battle
     public static class DamageCalculator
     {
         /// <summary>
+        /// Returns a base-100 strength multiplier representing a unit's reduced combat
+        /// effectiveness as it takes casualties. Uses a square root curve so damage
+        /// degrades gracefully rather than linearly (which would stall battles).
+        ///
+        /// Artillery types (Artillery, HorseArtillery, RocketBattery) are exempt —
+        /// they represent a single gun piece, not a regiment of soldiers.
+        ///
+        /// Example values at different HP percentages:
+        ///   100% HP → 100,  75% → 86,  50% → 70,  25% → 50,  10% → 31
+        /// </summary>
+        /// <param name="attacker">The unit dealing damage.</param>
+        /// <param name="floorMultiplier">Minimum multiplier (base-100). Prevents damage
+        /// from becoming negligible. E.g., 25 means a unit always deals at least 25% damage.</param>
+        /// <returns>Base-100 multiplier (100 = full damage, 50 = half damage).</returns>
+        public static int GetStrengthMultiplier(UnitInstance attacker, int floorMultiplier)
+        {
+            // Artillery types are exempt — single gun piece, not a regiment
+            if (IsArtilleryType(attacker.Type))
+                return 100;
+
+            // Full health = no penalty
+            if (attacker.CurrentHp >= attacker.MaxHp)
+                return 100;
+
+            // Dead units deal no damage (caller should check IsAlive, but be safe)
+            if (attacker.CurrentHp <= 0)
+                return floorMultiplier;
+
+            // sqrt(currentHp / maxHp) using integer math:
+            // Scale to 10000 first so sqrt gives a base-100 result
+            int scaled = attacker.CurrentHp * 10000 / attacker.MaxHp;
+            int mult = IntSqrt(scaled);
+
+            return Math.Max(Math.Min(mult, 100), floorMultiplier);
+        }
+
+        /// <summary>
+        /// Returns true for unit types that represent a single artillery piece
+        /// rather than a regiment of soldiers. These are exempt from strength scaling.
+        /// </summary>
+        public static bool IsArtilleryType(UnitType type)
+        {
+            return type == UnitType.Artillery
+                || type == UnitType.HorseArtillery
+                || type == UnitType.RocketBattery;
+        }
+
+        /// <summary>
+        /// Integer square root using Newton's method. Returns floor(sqrt(n)).
+        /// Deterministic, no floating point.
+        /// </summary>
+        private static int IntSqrt(int n)
+        {
+            if (n <= 0) return 0;
+            if (n == 1) return 1;
+            int x = n;
+            int y = (x + 1) / 2;
+            while (y < x)
+            {
+                x = y;
+                y = (x + n / x) / 2;
+            }
+            return x;
+        }
+
+        /// <summary>
         /// Calculates final damage from attacker to defender with all applicable modifiers.
         /// Modifiers are applied in GDD order: charge, terrain defense, terrain attack,
         /// formation, flanking. Result is always >= minimumDamage (default 1).

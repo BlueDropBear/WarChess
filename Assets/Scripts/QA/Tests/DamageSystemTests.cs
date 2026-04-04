@@ -20,7 +20,9 @@ namespace WarChess.QA.Tests
                 TestDamageMinimum(config),
                 TestDamageFormula(config),
                 TestSplashDamage(config),
-                TestChargeDamage(config)
+                TestChargeDamage(config),
+                TestStrengthScaling(config),
+                TestStrengthScalingArtilleryExempt(config)
             };
         }
 
@@ -178,6 +180,98 @@ namespace WarChess.QA.Tests
 
                 return QATestResult.Pass(name,
                     $"Charge damage correct: normal={normalDmg}, charge={chargeDmg} ({config.ChargeMultiplier}%)");
+            }
+            catch (Exception ex)
+            {
+                return QATestResult.Fail(name, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Strength scaling: damaged units deal less damage following sqrt curve.
+        /// Full HP = 100%, half HP ≈ 70%, quarter HP = 50%.
+        /// </summary>
+        public static QATestResult TestStrengthScaling(GameConfigData config)
+        {
+            const string name = "DamageSystem.StrengthScaling";
+            try
+            {
+                UnitFactory.ResetIds();
+                var unit = UnitFactory.CreateLineInfantry(Owner.Player, new GridCoord(5, 2));
+
+                // Full HP: multiplier should be 100
+                int fullMult = DamageCalculator.GetStrengthMultiplier(unit, config.StrengthScalingFloor);
+                if (fullMult != 100)
+                    return QATestResult.Fail(name, $"Full HP multiplier should be 100, got {fullMult}");
+
+                // Half HP: sqrt(0.5) ≈ 0.707 → multiplier ~70
+                unit.TakeDamage(unit.MaxHp / 2);
+                int halfMult = DamageCalculator.GetStrengthMultiplier(unit, config.StrengthScalingFloor);
+                if (halfMult < 65 || halfMult > 75)
+                    return QATestResult.Fail(name,
+                        $"Half HP multiplier should be ~70, got {halfMult}");
+
+                // Quarter HP: sqrt(0.25) = 0.5 → multiplier = 50
+                unit.TakeDamage(unit.CurrentHp - unit.MaxHp / 4);
+                int quarterMult = DamageCalculator.GetStrengthMultiplier(unit, config.StrengthScalingFloor);
+                if (quarterMult != 50)
+                    return QATestResult.Fail(name,
+                        $"Quarter HP multiplier should be 50, got {quarterMult}");
+
+                // Very low HP: should be clamped to floor
+                unit.TakeDamage(unit.CurrentHp - 1); // 1 HP remaining
+                int lowMult = DamageCalculator.GetStrengthMultiplier(unit, config.StrengthScalingFloor);
+                if (lowMult < config.StrengthScalingFloor)
+                    return QATestResult.Fail(name,
+                        $"Low HP multiplier {lowMult} below floor {config.StrengthScalingFloor}");
+
+                // Multiplier should always decrease as HP decreases
+                if (halfMult > fullMult || quarterMult > halfMult || lowMult > quarterMult)
+                    return QATestResult.Fail(name,
+                        $"Multipliers not monotonically decreasing: full={fullMult}, half={halfMult}, quarter={quarterMult}, low={lowMult}");
+
+                return QATestResult.Pass(name,
+                    $"Strength scaling correct: full={fullMult}, half={halfMult}, quarter={quarterMult}, low={lowMult} (floor={config.StrengthScalingFloor})");
+            }
+            catch (Exception ex)
+            {
+                return QATestResult.Fail(name, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Artillery types must be exempt from strength scaling (always 100).
+        /// They represent a single gun piece, not a regiment.
+        /// </summary>
+        public static QATestResult TestStrengthScalingArtilleryExempt(GameConfigData config)
+        {
+            const string name = "DamageSystem.StrengthScaling.ArtilleryExempt";
+            try
+            {
+                UnitFactory.ResetIds();
+
+                // Test all three artillery types
+                var artillery = UnitFactory.CreateArtillery(Owner.Player, new GridCoord(3, 2));
+                var horseArt = UnitFactory.CreateHorseArtillery(Owner.Player, new GridCoord(5, 2));
+                var rocket = UnitFactory.CreateRocketBattery(Owner.Player, new GridCoord(7, 2));
+
+                var artilleryUnits = new[] { artillery, horseArt, rocket };
+                var names = new[] { "Artillery", "HorseArtillery", "RocketBattery" };
+
+                for (int i = 0; i < artilleryUnits.Length; i++)
+                {
+                    var unit = artilleryUnits[i];
+                    // Damage the unit to half HP
+                    unit.TakeDamage(unit.MaxHp / 2);
+
+                    int mult = DamageCalculator.GetStrengthMultiplier(unit, config.StrengthScalingFloor);
+                    if (mult != 100)
+                        return QATestResult.Fail(name,
+                            $"{names[i]} at {unit.CurrentHp}/{unit.MaxHp} HP should have multiplier 100 (exempt), got {mult}");
+                }
+
+                return QATestResult.Pass(name,
+                    "All artillery types exempt from strength scaling at half HP");
             }
             catch (Exception ex)
             {

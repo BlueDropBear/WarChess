@@ -200,6 +200,9 @@ namespace WarChess.Battle
                 if (isCharge && target.Ability == AbilityType.Brace && target.IsAlive)
                 {
                     int braceDmg = System.Math.Max(target.Atk - (unit.Def / 2), 1) * 150 / 100;
+                    // Apply strength scaling to Brace damage (Lancer's regiment strength)
+                    int braceStrength = DamageCalculator.GetStrengthMultiplier(target, _config.StrengthScalingFloor);
+                    braceDmg = System.Math.Max(braceDmg * braceStrength / 100, _config.MinimumDamage);
                     unit.TakeDamage(braceDmg);
                     _events.Add(new UnitAttackedEvent(
                         _currentRound, target.Id, unit.Id, braceDmg,
@@ -223,6 +226,11 @@ namespace WarChess.Battle
                     isCharge, _config.ChargeMultiplier, _config.MinimumDamage);
                 if (atkBonus != 100)
                     damage = damage * atkBonus / 100;
+
+                // Strength scaling: damaged units deal less damage (sqrt curve)
+                int strengthMult = DamageCalculator.GetStrengthMultiplier(unit, _config.StrengthScalingFloor);
+                if (strengthMult < 100)
+                    damage = System.Math.Max(damage * strengthMult / 100, _config.MinimumDamage);
 
                 // Apply damage
                 target.TakeDamage(damage);
