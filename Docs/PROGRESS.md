@@ -164,29 +164,47 @@ This file tracks what has been completed, what is in progress, and what is next.
   - Keys for: UI labels, unit/commander/officer names, campaign, ranks, terrain, formations
   - David: wire Get() calls to UI text elements
 - [x] Analytics integration
-  - AnalyticsManager.cs: 12 event types, IAnalyticsProvider interface, batch queue
+  - AnalyticsManager.cs: 18 event types, IAnalyticsProvider interface, batch queue
   - Convenience methods: LogBattleCompleted, LogPurchase, LogCampaignProgress, etc.
+  - New events: FieldManualPurchased, FieldManualRewardClaimed, SovereignsEarned, SovereignsSpent, BattleStarEarned, WeeklyChallengeCompleted
   - David: implement IAnalyticsProvider with Firebase/Unity Analytics
 - [x] Dispatch Box system — opening animation, cosmetic rewards
   - DispatchBoxData.cs: 3 box tiers (Bronze/Silver/Gold) with weighted loot tables
   - DispatchBoxSystem.cs: award/open boxes, seeded RNG, duplicate → ammunition refund
+  - Dispatch Boxes removed from direct sale; now earned through gameplay + Field Manual rewards
   - David: build box opening UI and animation
-- [x] Cosmetics shop — rotating items, equipped skins/themes
-  - CosmeticData.cs: 33 cosmetic items across 5 types (skins, themes, portraits, animations, banners)
-  - CosmeticShop.cs: ownership, equip/unequip, daily rotating inventory (6 items)
+- [x] Quartermaster's Shop — daily rotating items, Sovereign pricing, equipped cosmetics
+  - CosmeticData.cs: 61 cosmetic items across 6 types (skins, themes, portraits, animations, banners, portrait frames) — including 28 Field Manual exclusives
+  - CosmeticShop.cs: ownership, equip/unequip, daily rotating inventory (6 items), Sovereign pricing, Field Manual exclusivity filtering
   - David: build shop UI
-- [x] Monetization — Act 2–3 purchase gate, ammunition IAP, cosmetic purchases
-  - MonetizationManager.cs: IAP catalog (campaign_full, ammo packs, dispatch boxes)
+- [x] Monetization — Act 2–3 purchase gate, ammunition IAP, Sovereign IAP, Field Manuals
+  - MonetizationManager.cs: IAP catalog (campaign_full, ammo packs, sovereign packs). Dispatch Boxes removed from direct sale
   - IPurchaseValidator interface + StubPurchaseValidator for dev
   - David: integrate Apple/Google IAP SDK, implement real validator
+- [x] Field Manual system — Helldivers 2-inspired Warbond content packs
+  - FieldManualData.cs: 4 manuals (1 free + 3 premium at 1,000 Sovereigns each), 4 pages, free + premium tracks
+  - FieldManualSystem.cs: premium track purchases, sequential reward claiming, Battle Star spending, reward delivery
+  - David: build Field Manual browser UI, page navigation, reward claim animations
+- [x] Sovereign currency system — premium cosmetic economy
+  - SovereignSystem.cs (Economy/): earning (campaign/tier/act/login streak), spending, IAP purchasing
+  - Separate from Ammunition to prevent pay-to-win perception
+  - David: integrate Sovereign balance into UI, wire IAP
+- [x] Battle Star progression system — Field Manual unlock currency
+  - BattleStarSystem.cs (Economy/): earning (battles/wins/tiers/streaks/challenges), 2x boosters (24h)
+  - Cannot be purchased with real money — pure play-time investment
+  - David: display Battle Star balance and booster status in UI
+- [x] Weekly Challenge system — Battle Star earning engagement loop
+  - WeeklyChallengeSystem.cs: 12 templates, 3/week rotation, seeded RNG, 3 Battle Stars per completion
+  - Challenge types: WinBattles, DeployUnitType, AchieveFormation, CompleteCampaignBattles, WinWithCommander, WinInTier
+  - David: build challenge tracking UI, completion notifications
 - [ ] Apple Developer Account + Google Play Console setup
 - [ ] iOS build setup — Xcode, provisioning, TestFlight
 - [ ] Android build setup — keystore, APK/AAB generation
 - [ ] PC build — itch.io or Steam listing
 
 **Status: IN PROGRESS**
-**Done: Localization, analytics, accessibility, dispatch boxes, cosmetics, monetization, audio scaffold (all code-side)**
-**Remaining: Touch controls, responsive UI, performance, particles, screen shake, platform setup (David)**
+**Done: Localization, analytics, accessibility, dispatch boxes, Quartermaster's Shop, monetization, Field Manuals, Sovereign/Battle Star currencies, weekly challenges, audio scaffold (all code-side)**
+**Remaining: Touch controls, responsive UI, performance, particles, screen shake, platform setup, Field Manual UI, challenge UI (David)**
 
 ---
 

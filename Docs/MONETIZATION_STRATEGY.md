@@ -205,7 +205,7 @@ These are the **only** time-limited items in the game. They signal veteran statu
 ### Month 1: Launch + "The Opening Salvo"
 
 **Week 1 (Launch Day):**
-- Full base game: 14 units, 12 officers, 6 commanders, 30 campaign battles, 33 cosmetics
+- Full base game: 14 units, 12 officers, 6 commanders, 30 campaign battles, 33 base cosmetics (61 total with Field Manual exclusives)
 - **Free Field Manual: "Mustering the Troops"**
   - Entirely free, 13 items
   - Purpose: teach players the Field Manual system with zero barrier
