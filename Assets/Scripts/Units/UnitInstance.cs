@@ -51,6 +51,7 @@ namespace WarChess.Units
         public bool HasChargedThisBattle { get; set; }
         public bool HasGuaranteedCharge { get; set; }
         public bool IsDismounted { get; set; }
+        public bool HasUsedGrenadeThisBattle { get; set; }
 
         public bool IsAlive => CurrentHp > 0;
 

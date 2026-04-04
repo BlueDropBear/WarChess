@@ -10,10 +10,22 @@ namespace WarChess.Units
     /// </summary>
     public static class UnitFactory
     {
-        private static int _nextId = 1;
+        [System.ThreadStatic]
+        private static int _nextId;
+
+        /// <summary>
+        /// Returns the next unique ID and increments the counter.
+        /// Handles [ThreadStatic] initialization (defaults to 0 on new threads).
+        /// </summary>
+        private static int NextId()
+        {
+            if (_nextId < 1) _nextId = 1;
+            return _nextId++;
+        }
 
         /// <summary>
         /// Resets the ID counter. Call at the start of each battle.
+        /// Thread-safe: each thread has its own counter via [ThreadStatic].
         /// </summary>
         public static void ResetIds()
         {
@@ -27,7 +39,7 @@ namespace WarChess.Units
         public static UnitInstance CreateLineInfantry(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Line Infantry", type: UnitType.LineInfantry, owner: owner,
+                id: NextId(), name: "Line Infantry", type: UnitType.LineInfantry, owner: owner,
                 hp: 30, atk: 8, def: 6, spd: 3, rng: 1, mov: 2, cost: 3,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
@@ -45,7 +57,7 @@ namespace WarChess.Units
         public static UnitInstance CreateMilitia(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Militia", type: UnitType.Militia, owner: owner,
+                id: NextId(), name: "Militia", type: UnitType.Militia, owner: owner,
                 hp: 18, atk: 5, def: 3, spd: 4, rng: 1, mov: 2, cost: 1,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
@@ -63,7 +75,7 @@ namespace WarChess.Units
         public static UnitInstance CreateCavalry(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Cavalry", type: UnitType.Cavalry, owner: owner,
+                id: NextId(), name: "Cavalry", type: UnitType.Cavalry, owner: owner,
                 hp: 25, atk: 10, def: 4, spd: 6, rng: 1, mov: 4, cost: 5,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.HighestThreat,
@@ -81,7 +93,7 @@ namespace WarChess.Units
         public static UnitInstance CreateArtillery(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Artillery", type: UnitType.Artillery, owner: owner,
+                id: NextId(), name: "Artillery", type: UnitType.Artillery, owner: owner,
                 hp: 15, atk: 14, def: 2, spd: 1, rng: 4, mov: 1, cost: 6,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
@@ -98,7 +110,7 @@ namespace WarChess.Units
         public static UnitInstance CreateGrenadier(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Grenadier", type: UnitType.Grenadier, owner: owner,
+                id: NextId(), name: "Grenadier", type: UnitType.Grenadier, owner: owner,
                 hp: 40, atk: 12, def: 8, spd: 2, rng: 1, mov: 2, cost: 7,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
@@ -115,7 +127,7 @@ namespace WarChess.Units
         public static UnitInstance CreateRifleman(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Rifleman", type: UnitType.Rifleman, owner: owner,
+                id: NextId(), name: "Rifleman", type: UnitType.Rifleman, owner: owner,
                 hp: 20, atk: 11, def: 3, spd: 5, rng: 3, mov: 2, cost: 5,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Weakest,
@@ -132,7 +144,7 @@ namespace WarChess.Units
         public static UnitInstance CreateHussar(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Hussar", type: UnitType.Hussar, owner: owner,
+                id: NextId(), name: "Hussar", type: UnitType.Hussar, owner: owner,
                 hp: 20, atk: 7, def: 3, spd: 8, rng: 1, mov: 5, cost: 4,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Weakest,
@@ -149,7 +161,7 @@ namespace WarChess.Units
         public static UnitInstance CreateCuirassier(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Cuirassier", type: UnitType.Cuirassier, owner: owner,
+                id: NextId(), name: "Cuirassier", type: UnitType.Cuirassier, owner: owner,
                 hp: 35, atk: 13, def: 7, spd: 4, rng: 1, mov: 3, cost: 8,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.HighestThreat,
@@ -166,7 +178,7 @@ namespace WarChess.Units
         public static UnitInstance CreateHorseArtillery(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Horse Artillery", type: UnitType.HorseArtillery, owner: owner,
+                id: NextId(), name: "Horse Artillery", type: UnitType.HorseArtillery, owner: owner,
                 hp: 12, atk: 10, def: 2, spd: 5, rng: 3, mov: 3, cost: 6,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
@@ -183,7 +195,7 @@ namespace WarChess.Units
         public static UnitInstance CreateSapper(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Sapper", type: UnitType.Sapper, owner: owner,
+                id: NextId(), name: "Sapper", type: UnitType.Sapper, owner: owner,
                 hp: 22, atk: 6, def: 5, spd: 3, rng: 1, mov: 2, cost: 4,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.Nearest,
@@ -200,7 +212,7 @@ namespace WarChess.Units
         public static UnitInstance CreateOldGuard(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Old Guard", type: UnitType.OldGuard, owner: owner,
+                id: NextId(), name: "Old Guard", type: UnitType.OldGuard, owner: owner,
                 hp: 45, atk: 14, def: 10, spd: 3, rng: 1, mov: 2, cost: 10,
                 flankSideMultiplier: 130, flankRearMultiplier: 150, // Reduced rear vulnerability per GDD
                 targetingPriority: TargetingPriority.Nearest,
@@ -217,7 +229,7 @@ namespace WarChess.Units
         public static UnitInstance CreateRocketBattery(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Rocket Battery", type: UnitType.RocketBattery, owner: owner,
+                id: NextId(), name: "Rocket Battery", type: UnitType.RocketBattery, owner: owner,
                 hp: 10, atk: 16, def: 1, spd: 2, rng: 5, mov: 1, cost: 6,
                 flankSideMultiplier: 130, flankRearMultiplier: 250, // Extra fragile from behind per GDD
                 targetingPriority: TargetingPriority.Random,
@@ -234,7 +246,7 @@ namespace WarChess.Units
         public static UnitInstance CreateLancer(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Lancer", type: UnitType.Lancer, owner: owner,
+                id: NextId(), name: "Lancer", type: UnitType.Lancer, owner: owner,
                 hp: 28, atk: 11, def: 5, spd: 5, rng: 1, mov: 3, cost: 5,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.HighestThreat,
@@ -251,7 +263,7 @@ namespace WarChess.Units
         public static UnitInstance CreateDragoon(Owner owner, GridCoord position)
         {
             return new UnitInstance(
-                id: _nextId++, name: "Dragoon", type: UnitType.Dragoon, owner: owner,
+                id: NextId(), name: "Dragoon", type: UnitType.Dragoon, owner: owner,
                 hp: 28, atk: 9, def: 5, spd: 5, rng: 1, mov: 4, cost: 6,
                 flankSideMultiplier: 130, flankRearMultiplier: 200,
                 targetingPriority: TargetingPriority.ArtilleryFirst,

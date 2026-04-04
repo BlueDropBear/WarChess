@@ -171,6 +171,11 @@ namespace WarChess.Battle
             {
                 if (!unit.IsAlive) continue;
 
+                // Limbered Up: regular Artillery cannot attack after moving
+                if (unit.HasMovedThisRound && unit.Rng > 1
+                    && unit.Ability == AbilityType.Bombardment)
+                    continue;
+
                 var enemies = GetEnemies(unit);
                 if (enemies.Count == 0) continue;
 
@@ -191,10 +196,33 @@ namespace WarChess.Battle
                     && (unit.Ability == AbilityType.Charge || unit.Ability == AbilityType.ArmoredCharge)
                     && !unit.HasChargedThisRound;
 
+                // Brace: Lancer counter-charge
+                if (isCharge && target.Ability == AbilityType.Brace && target.IsAlive)
+                {
+                    int braceDmg = System.Math.Max(target.Atk - (unit.Def / 2), 1) * 150 / 100;
+                    unit.TakeDamage(braceDmg);
+                    _events.Add(new UnitAttackedEvent(
+                        _currentRound, target.Id, unit.Id, braceDmg,
+                        FlankDirection.Front, false, false));
+                    if (!unit.IsAlive)
+                    {
+                        _events.Add(new UnitDiedEvent(_currentRound, unit.Id, target.Id));
+                        if (_removedFromGrid.Add(unit.Id)) _grid.RemoveUnit(unit.Position);
+                        continue;
+                    }
+                }
+
+                // Unbreakable: Old Guard +25% ATK when below 25% HP
+                int atkBonus = 100;
+                if (unit.Ability == AbilityType.Unbreakable && unit.CurrentHp * 4 <= unit.MaxHp)
+                    atkBonus = 125;
+
                 // Calculate damage
                 int damage = DamageCalculator.Calculate(
                     unit, target, flankDir,
                     isCharge, _config.ChargeMultiplier, _config.MinimumDamage);
+                if (atkBonus != 100)
+                    damage = damage * atkBonus / 100;
 
                 // Apply damage
                 target.TakeDamage(damage);
@@ -213,12 +241,56 @@ namespace WarChess.Battle
                 if (!target.IsAlive)
                 {
                     _events.Add(new UnitDiedEvent(_currentRound, target.Id, unit.Id));
+                    if (_removedFromGrid.Add(target.Id)) _grid.RemoveUnit(target.Position);
                 }
 
                 // Handle Artillery Bombardment AoE
                 if (unit.Ability == AbilityType.Bombardment)
                 {
                     ApplyBombardmentAoE(unit, target.Position, damage);
+                }
+
+                // Grenade: first combat of battle, 5 damage to enemies within 2 tiles
+                if (unit.Ability == AbilityType.Grenade && !unit.HasUsedGrenadeThisBattle)
+                {
+                    unit.HasUsedGrenadeThisBattle = true;
+                    var grenadeCoords = _grid.GetCoordsInRange(unit.Position, 2);
+                    foreach (var coord in grenadeCoords)
+                    {
+                        if (coord == unit.Position) continue;
+                        var victim = _grid.GetUnitAt(coord);
+                        if (victim != null && victim.IsAlive && victim.Owner != unit.Owner)
+                        {
+                            victim.TakeDamage(5);
+                            _events.Add(new UnitAttackedEvent(
+                                _currentRound, unit.Id, victim.Id, 5,
+                                FlankDirection.Front, false, true));
+                            if (!victim.IsAlive)
+                            {
+                                _events.Add(new UnitDiedEvent(_currentRound, victim.Id, unit.Id));
+                                if (_removedFromGrid.Add(victim.Id)) _grid.RemoveUnit(victim.Position);
+                            }
+                        }
+                    }
+                }
+
+                // Hit and Run: Hussar moves 2 tiles away after attacking
+                if (unit.Ability == AbilityType.HitAndRun && unit.IsAlive)
+                {
+                    int hrdx = unit.Position.X - target.Position.X;
+                    int hrdy = unit.Position.Y - target.Position.Y;
+                    int hrsx = hrdx > 0 ? 1 : (hrdx < 0 ? -1 : 0);
+                    int hrsy = hrdy > 0 ? 1 : (hrdy < 0 ? -1 : 0);
+                    if (hrsx == 0 && hrsy == 0)
+                        hrsy = unit.Owner == Owner.Player ? -1 : 1;
+                    var hrPos = unit.Position;
+                    for (int s = 0; s < 2; s++)
+                    {
+                        var p = new GridCoord(hrPos.X + hrsx, hrPos.Y + hrsy);
+                        if (_grid.IsValidCoord(p) && _grid.IsTileEmpty(p))
+                        { _grid.MoveUnit(hrPos, p); hrPos = p; }
+                        else break;
+                    }
                 }
 
                 // Handle Dragoon dismount (triggers after any melee attack)
