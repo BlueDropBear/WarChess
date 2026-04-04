@@ -29,13 +29,47 @@ Players who enjoy tactical thinking but want shorter sessions — a single battl
 - **Battle resolution:** 30–60 seconds (watchable, skippable, replayable)
 - **Total session:** 2–5 minutes per battle, longer sessions for campaign progression
 
+### 1.6 Core Gameplay Loop
+
+WarChess has three nested loops that drive engagement:
+
+**Session Loop (2–5 minutes per cycle):**
+
+```
+Army Building → Deployment → Auto-Battle → Results → Repeat
+```
+
+1. **Build or select** a saved army (units, Officers, Commander)
+2. **Review** the battlefield terrain, adjust unit placement
+3. **Watch** the battle resolve automatically
+4. **Receive** star rating, unlocks, and rewards
+5. **Return** to army building with new knowledge
+
+**Battle Loop (per round, ~2 seconds each):**
+
+```
+Initiative → Movement → Combat → Cleanup → Next Round (up to 30 rounds)
+```
+
+Each round: units are sorted by Speed, move toward targets, attack if in range, dead units are removed, and formations are recalculated. This inner loop runs automatically with no player input.
+
+**Progression Loop (across sessions):**
+
+```
+Campaign:     Win battles → Unlock units/Commanders → Build stronger armies → Tackle harder battles
+Multiplayer:  Deploy armies → Earn Elo/tier promotions → Unlock specialist units → Compete at higher tiers
+Meta:         Earn rewards → Acquire Officers → Customize armies → Push higher difficulty/tiers
+```
+
+**The critical design insight:** All player decisions happen *before* battle begins. The battle itself is the payoff — watching your strategy succeed or fail. This makes army composition and placement the core skill expression, not reaction speed or micro-management.
+
 ---
 
 ## 2. Core Mechanics
 
 ### 2.1 The Grid
 
-The battlefield is a **square grid** (default 10×10, configurable via GameConfig for testing). Grid width and height are stored in GameConfig and can be adjusted independently. All deployment zones, movement ranges, and formation detection adapt to the configured grid size. Each tile can hold one unit or one terrain feature, not both (units occupy terrain tiles — they coexist).
+The battlefield is a **square grid** (default 10×10, configurable via GameConfig for testing). Grid width and height are stored in GameConfig and can be adjusted independently. All deployment zones, movement ranges, and formation detection adapt to the configured grid size. Each tile has one terrain type and can hold at most one unit. Units occupy terrain tiles and receive that terrain's combat effects.
 
 ```
      1   2   3   4   5   6   7   8   9   10
@@ -196,7 +230,7 @@ Officers are attachable modifiers that customize individual unit behavior. They 
 
 | Officer | Positive Trait | Negative Trait | Best On |
 |---------|---------------|----------------|---------|
-| **Veteran Sergeant** | +20% ATK | -1 MOV | Slow units (Infantry, Artillery) |
+| **Veteran Sergeant** | +20% ATK | -1 SPD | Slow units (Infantry, Artillery) |
 | **Young Lieutenant** | +2 MOV | -15% DEF | Fast units needing more reach |
 | **Drillmaster** | +25% DEF | -20% ATK | Tanks holding a position |
 | **Sharpshooter** | +1 RNG | -15% HP | Ranged units wanting more reach |
@@ -215,9 +249,23 @@ Officers are attachable modifiers that customize individual unit behavior. They 
 - Level 3 → 4: 30 battles participated (50 total)
 - Level 4 → 5 (max): 50 battles participated (100 total)
 
-At each level, both the positive and negative traits scale by +10% of their base value. A Level 5 Veteran Sergeant has +28% ATK but -1.4 MOV (rounded to -1 MOV, with the .4 reducing movement speed within a tile).
+At each level, both the positive and negative traits scale by +10% of their base value. A Level 5 Veteran Sergeant has +28% ATK but -1.4 SPD (rounded down, making the unit noticeably slower in initiative order).
 
 **Officers in Multiplayer:** Officers are available in multiplayer. Their assignment cost (deducted from army budget) prevents spamming high-level Officers on every unit. A Level 5 Officer costs 4 army points to assign — a meaningful investment from a 40-point budget.
+
+### 2.10 Morale
+
+When a unit is eliminated, all friendly units **adjacent to the dying unit** suffer a **morale penalty**: -10% ATK for 1 round. This simulates the psychological shock of seeing comrades fall in battle.
+
+**Key interactions:**
+- Morale penalties **do not stack** — a unit can only be shaken once per round, regardless of how many adjacent allies die
+- The **Fearless Major** officer grants immunity to morale penalties (this is the "immune to morale effects" trait)
+- AoE attacks (Artillery, Rocket Battery) that kill a unit can trigger morale on surviving neighbors caught in the blast
+- The **Old Guard's Unbreakable** ability also grants morale immunity (the elite do not waver)
+
+**Design tension:** Morale encourages spacing units apart (reducing AoE vulnerability and morale chain reactions), while formations encourage grouping for bonuses. This creates a meaningful placement puzzle — tight formations are strong but brittle, loose formations are resilient but miss formation bonuses.
+
+*All morale values are configurable via GameConfig for balance tuning.*
 
 ---
 
@@ -232,7 +280,7 @@ Every unit has these stats:
 | **HP** | Hit points. Unit dies at 0. |
 | **ATK** | Attack damage per hit. |
 | **DEF** | Damage reduction. Reduces incoming damage by DEF/2. |
-| **SPD** | Speed. Determines initiative order and movement per round. |
+| **SPD** | Speed. Determines initiative order (who acts first each round). |
 | **RNG** | Range. How many tiles away the unit can attack. 1 = melee. |
 | **MOV** | Movement. Tiles the unit can move per round. |
 | **COST** | Deployment cost in army points. |
@@ -262,7 +310,7 @@ Cheap and expendable. Deploy in numbers to screen your valuable units.
 
 - Targeting: Nearest
 - Ability: **Strength in Numbers** — +1 ATK for each adjacent Militia (max +3)
-- Formation: None
+- Formation: Square (counts as Infantry for Square formation only — citizen soldiers could form a defensive square)
 - Historical basis: Citizen soldiers, levied conscripts
 
 #### Tier 2 — Early Unlocks (Battles 3–8)
@@ -384,15 +432,15 @@ Unpredictable but terrifying area denial.
 
 | HP | ATK | DEF | SPD | RNG | MOV | COST |
 |----|-----|-----|-----|-----|-----|------|
-| 10 | 16  | 1   | 2   | 5   | 1   | 7    |
+| 10 | 16  | 1   | 2   | 5   | 1   | 6    |
 
 - Targeting: Random
-- Ability: **Congreve Barrage** — Hits a random 3×3 area near the target. High damage but inaccurate — may hit friendly units in the blast zone. The targeting AI does not account for friendly fire; the 3×3 zone is selected randomly within range of the intended target.
+- Ability: **Congreve Barrage** — Hits a random 3×3 area near the target. High damage but inaccurate — may hit friendly units in the blast zone. The targeting AI does not account for friendly fire; the 3×3 zone is selected randomly within range of the intended target. Rockets arc over defenses — **ignores Fortification defense bonus**.
 - Formation: None
 - Historical basis: Congreve rocket system, famously inaccurate
 
-**Lancer** (Unlocked: Battle 26)
-Anti-cavalry specialist with reach.
+**Lancer** (Unlocked: Battle 20)
+Anti-cavalry specialist that punishes charges.
 
 | HP | ATK | DEF | SPD | RNG | MOV | COST |
 |----|-----|-----|-----|-----|-----|------|
@@ -500,6 +548,8 @@ Players choose one Commander before each battle.
 - Effect: All infantry gain +30% DEF for 2 rounds
 - Strategy: Survive an artillery bombardment or cavalry charge
 
+> *Design note: Wellington's trigger window is restricted to rounds 1–5 to reinforce his defensive identity — you must commit to a defensive stance early, before the enemy closes. This prevents using him as a late-game panic button.*
+
 **Napoleon — "Vive l'Empereur"**
 - Trigger: Manual
 - Effect: All units gain +20% ATK and +1 MOV for 2 rounds
@@ -516,9 +566,11 @@ Players choose one Commander before each battle.
 - Strategy: Cavalry rush — break their line before they set up
 
 **Moore — "Rearguard Action"**
-- Trigger: Automatic (activates when you lose 50% of your units)
+- Trigger: Automatic (activates when 50% of your army's **point budget worth** of units are eliminated)
 - Effect: All remaining units gain +40% ATK and +20% DEF for the rest of the battle
 - Strategy: Comeback mechanic — get stronger as you lose
+
+> *Design note: The trigger is based on army points lost, not unit count. This prevents the degenerate strategy of fielding cheap Militia as sacrificial fodder to trigger the buff for expensive remaining units.*
 
 **Ney — "The Bravest of the Brave"**
 - Trigger: Manual
@@ -592,7 +644,7 @@ Setting: The height of Napoleon's empire. Larger battles, more complex terrain, 
 | 17 | Running Battle | 30 | Varied | Horse Artillery | Mobile artillery repositioning |
 | 18 | Rearguard | 24 | River + Bridge + Forest | Moore | Comeback mechanic, fighting outnumbered (budget reduced from 32 to 24) |
 | 19 | Dig In | 32 | Open + River | Sapper | Creating fortifications mid-battle |
-| 20 | The Grand Battery | 35 | Hill + Open | — | Massive artillery duel, counter-battery |
+| 20 | The Grand Battery | 35 | Hill + Open | Lancer | Anti-cavalry tactics, artillery duel |
 
 ### 6.5 Act 3 — The Final Act (Battles 21–30)
 
@@ -605,7 +657,7 @@ Setting: The decline and last campaigns. The player faces the toughest challenge
 | 23 | Desperate Defense | 38 | Fortification | — | Outnumbered survival |
 | 24 | Rockets' Red Glare | 40 | Open field | Rocket Battery, Ney | Unpredictable AoE, surgical strikes |
 | 25 | The Hornet's Nest | 40 | Dense Forest + Town | — | Complex terrain puzzle |
-| 26 | Lancer's Charge | 42 | Open + Mud | Lancer | Anti-cavalry tactics |
+| 26 | Lancer's Charge | 42 | Open + Mud | — | Advanced cavalry counter-play |
 | 27 | All Guns Blazing | 42 | Hill + Fortification | — | Full roster mastery |
 | 28 | The Versatile Reserve | 45 | Varied | Dragoon | Multi-role units, adaptability |
 | 29 | Eve of Battle | 48 | Campaign's most complex map | — | Everything combined |
@@ -727,6 +779,8 @@ Ranked play uses a pool of ~20 balanced map templates. **3 maps are active per w
 ### 8.2 Ammunition System
 
 **Ammunition** is the currency spent to deploy armies into the multiplayer pool (see Section 7.3).
+
+**Starting Ammunition:** New players receive **10 Ammunition** when first accessing multiplayer — enough for several days of play before the earn/spend loop matters.
 
 **Earning Ammunition for free:**
 - 3 free Ammunition per day (daily login reward)
@@ -967,4 +1021,4 @@ Ideas for post-launch updates, not in scope for v1:
 
 ---
 
-*This document is version 2.0. Updated to include: Officers system, Star General tier progression, army pool multiplayer, ammunition monetization, separated army builder/deployment, configurable deployment zones, AI QA balance tester, and revised screen flow.*
+*This document is version 2.1. Updated from v2.0 to include: core gameplay loop section (1.6), morale system (2.10), Moore trigger rework (budget-based), Veteran Sergeant rebalance (-1 SPD), Rocket Battery cost reduction and fortification bypass, Lancer unlock moved to Battle 20, starter Ammunition for new players, Wellington design note, Lancer flavor text fix, SPD/terrain description corrections, and Militia Square formation.*

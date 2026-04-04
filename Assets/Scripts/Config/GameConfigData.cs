@@ -136,7 +136,7 @@ namespace WarChess.Config
             {
                 {"LineInfantry", 3}, {"Militia", 1}, {"Cavalry", 5}, {"Artillery", 6},
                 {"Grenadier", 7}, {"Rifleman", 5}, {"Hussar", 4}, {"Cuirassier", 8},
-                {"HorseArtillery", 6}, {"Sapper", 4}, {"OldGuard", 10}, {"RocketBattery", 7},
+                {"HorseArtillery", 6}, {"Sapper", 4}, {"OldGuard", 10}, {"RocketBattery", 6},
                 {"Lancer", 5}, {"Dragoon", 6}
             };
         }

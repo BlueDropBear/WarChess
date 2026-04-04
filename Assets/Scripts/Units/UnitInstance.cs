@@ -46,8 +46,9 @@ namespace WarChess.Units
         public int TilesMovedThisRound { get; set; }
         public bool HasChargedThisRound { get; set; }
 
-        // Persistent battle tracking (kept for backwards compat, no longer used for charge)
+        // Persistent battle tracking
         public bool HasChargedThisBattle { get; set; }
+        public bool HasGuaranteedCharge { get; set; }
         public bool IsDismounted { get; set; }
 
         public bool IsAlive => CurrentHp > 0;
@@ -145,6 +146,7 @@ namespace WarChess.Units
             Mov = dismountMov;
             Def += dismountDefBonus;
             Atk += dismountAtkBonus;
+            CountsAsType = UnitType.LineInfantry;
         }
 
         /// <summary>

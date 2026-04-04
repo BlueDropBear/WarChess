@@ -187,8 +187,8 @@ namespace WarChess.Battle
                 var flankDir = FlankingCalculator.GetFlankDirection(
                     unit.Position, target.Position, target.Facing);
 
-                // Check for charge (moved 3+ tiles this round, has Charge ability, hasn't charged yet this round)
-                bool isCharge = unit.TilesMovedThisRound >= _config.ChargeMinTilesMoved
+                // Check for charge (moved 3+ tiles OR has guaranteed charge from Blücher, has Charge ability, hasn't charged yet this round)
+                bool isCharge = (unit.HasGuaranteedCharge || unit.TilesMovedThisRound >= _config.ChargeMinTilesMoved)
                     && (unit.Ability == AbilityType.Charge || unit.Ability == AbilityType.ArmoredCharge)
                     && !unit.HasChargedThisRound;
 
@@ -202,7 +202,10 @@ namespace WarChess.Battle
                 unit.HasAttackedThisRound = true;
 
                 if (isCharge)
+                {
                     unit.HasChargedThisRound = true;
+                    unit.HasGuaranteedCharge = false;
+                }
 
                 _events.Add(new UnitAttackedEvent(
                     _currentRound, unit.Id, target.Id,
@@ -219,8 +222,8 @@ namespace WarChess.Battle
                     ApplyBombardmentAoE(unit, target.Position, damage);
                 }
 
-                // Handle Dragoon dismount
-                if (unit.Ability == AbilityType.Dismount && !unit.IsDismounted && unit.Rng == 1)
+                // Handle Dragoon dismount (triggers after any melee attack)
+                if (unit.Ability == AbilityType.Dismount && !unit.IsDismounted)
                 {
                     unit.ApplyDismount(_config.DismountMov, _config.DismountDefBonus, _config.DismountAtkBonus);
                 }

@@ -126,10 +126,10 @@ namespace WarChess.Officers
                         Id = OfficerId.VeteranSergeant,
                         Name = "Veteran Sergeant",
                         PositiveTrait = "+20% ATK",
-                        NegativeTrait = "-1 MOV",
+                        NegativeTrait = "-1 SPD",
                         BestOn = "Slow units (Infantry, Artillery)",
                         PositiveMod = new OfficerStatMod { Type = OfficerModType.AtkMultiplier, Value = 120 },
-                        NegativeMod = new OfficerStatMod { Type = OfficerModType.MovFlat, Value = -1 }
+                        NegativeMod = new OfficerStatMod { Type = OfficerModType.SpdFlat, Value = -1 }
                     }
                 },
                 {
