@@ -146,8 +146,8 @@ namespace WarChess.Commanders
                         if (unit.CountsAsType == UnitType.Cavalry)
                         {
                             _activeBuffs.Add(new ActiveBuff(unit.Id, BuffType.MovBonus, 2, -1));
-                            // Guaranteed charge is handled by resetting HasChargedThisBattle
-                            unit.HasChargedThisBattle = false;
+                            // Guaranteed charge on first attack regardless of tiles moved
+                            unit.HasGuaranteedCharge = true;
                         }
                     }
                     break;

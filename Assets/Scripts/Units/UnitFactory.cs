@@ -212,13 +212,13 @@ namespace WarChess.Units
         }
 
         /// <summary>
-        /// Creates a Rocket Battery unit. HP:10 ATK:16 DEF:1 SPD:2 RNG:5 MOV:1 COST:7
+        /// Creates a Rocket Battery unit. HP:10 ATK:16 DEF:1 SPD:2 RNG:5 MOV:1 COST:6
         /// </summary>
         public static UnitInstance CreateRocketBattery(Owner owner, GridCoord position)
         {
             return new UnitInstance(
                 id: _nextId++, name: "Rocket Battery", type: UnitType.RocketBattery, owner: owner,
-                hp: 10, atk: 16, def: 1, spd: 2, rng: 5, mov: 1, cost: 7,
+                hp: 10, atk: 16, def: 1, spd: 2, rng: 5, mov: 1, cost: 6,
                 flankSideMultiplier: 130, flankRearMultiplier: 250, // Extra fragile from behind per GDD
                 targetingPriority: TargetingPriority.Random,
                 ability: AbilityType.CongreveBarrage,

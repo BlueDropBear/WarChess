@@ -31,7 +31,7 @@ namespace WarChess.Multiplayer
         private const int TierPromotionBonus = 10;
         private const int DeployCost = 1;
 
-        public AmmunitionSystem(int initialBalance = 5)
+        public AmmunitionSystem(int initialBalance = 10)
         {
             Balance = initialBalance;
         }
