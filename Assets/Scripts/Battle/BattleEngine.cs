@@ -22,6 +22,8 @@ namespace WarChess.Battle
         private readonly List<BattleEvent> _events;
         private readonly Dictionary<int, ITargetingStrategy> _targetingStrategies;
 
+        private readonly HashSet<int> _removedFromGrid;
+
         private int _currentRound;
         private bool _battleEnded;
         private BattleOutcome _outcome;
@@ -51,6 +53,7 @@ namespace WarChess.Battle
             _playerUnits = new List<UnitInstance>(playerUnits);
             _enemyUnits = new List<UnitInstance>(enemyUnits);
             _events = new List<BattleEvent>();
+            _removedFromGrid = new HashSet<int>();
             _currentRound = 0;
             _battleEnded = false;
 
@@ -259,7 +262,7 @@ namespace WarChess.Battle
         {
             foreach (var unit in units)
             {
-                if (!unit.IsAlive)
+                if (!unit.IsAlive && _removedFromGrid.Add(unit.Id))
                 {
                     _grid.RemoveUnit(unit.Position);
                 }

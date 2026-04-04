@@ -3,8 +3,9 @@ using System;
 namespace WarChess.Core
 {
     /// <summary>
-    /// Immutable grid coordinate on the 10x10 battlefield.
-    /// X = column (1-10), Y = row (1 = player back, 10 = enemy back).
+    /// Immutable grid coordinate on the battlefield.
+    /// X = column, Y = row (1 = player back, max = enemy back).
+    /// Grid dimensions are configurable via GameConfig (default 10x10).
     /// </summary>
     public readonly struct GridCoord : IEquatable<GridCoord>
     {
@@ -18,9 +19,13 @@ namespace WarChess.Core
         }
 
         /// <summary>
-        /// Returns true if this coordinate is within the 10x10 grid bounds.
+        /// Returns true if this coordinate is within the given grid bounds.
+        /// Prefer GridMap.IsValidCoord() when a GridMap is available.
         /// </summary>
-        public bool IsValid => X >= 1 && X <= 10 && Y >= 1 && Y <= 10;
+        public bool IsWithinBounds(int gridWidth, int gridHeight)
+        {
+            return X >= 1 && X <= gridWidth && Y >= 1 && Y <= gridHeight;
+        }
 
         /// <summary>
         /// Manhattan distance to another coordinate.

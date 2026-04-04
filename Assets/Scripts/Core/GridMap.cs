@@ -6,8 +6,8 @@ using WarChess.Units;
 namespace WarChess.Core
 {
     /// <summary>
-    /// Logical 10x10 grid managing unit positions. Pure C# — no Unity dependencies.
-    /// Coordinates are 1-based: X=1-10 (columns), Y=1-10 (rows).
+    /// Logical grid managing unit positions. Dimensions are configurable (default 10x10).
+    /// Pure C# — no Unity dependencies. Coordinates are 1-based.
     /// </summary>
     public class GridMap
     {

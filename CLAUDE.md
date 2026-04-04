@@ -85,7 +85,7 @@ Assets/
 
 These are settled decisions from the GDD. Do not change without explicit instruction:
 
-- Grid is 10×10, always
+- Grid defaults to 10×10 but dimensions are configurable via GameConfig for testing and balance tuning
 - Player deploys on rows 1–3 (configurable via GameConfig)
 - Campaign enemies can use rows 5–10 (configurable)
 - Multiplayer enemies use rows 8–10 (configurable)
