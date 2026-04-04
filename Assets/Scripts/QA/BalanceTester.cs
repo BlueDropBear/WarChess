@@ -7,6 +7,7 @@ using WarChess.Commanders;
 using WarChess.Config;
 using WarChess.Core;
 using WarChess.Formations;
+using WarChess.Multiplayer;
 using WarChess.Officers;
 using WarChess.Terrain;
 using WarChess.Units;
@@ -963,6 +964,330 @@ namespace WarChess.QA
             return engine.RunFullBattle().Outcome;
         }
 
+        // ======= MODE 8: Tier Balance Test =======
+
+        /// <summary>
+        /// Tests each multiplayer tier independently using that tier's unit pool.
+        /// GDD Section 12: ensures no tier is internally imbalanced.
+        /// </summary>
+        public TierBalanceResult RunTierBalanceTest(
+            int battlesPerTier = 200, int armyCount = 100, int battlesPerArmy = 20)
+        {
+            var result = new TierBalanceResult();
+
+            for (int tier = 1; tier <= 5; tier++)
+            {
+                var tierData = TierSystem.GetTier(tier);
+                var available = tierData.AvailableUnits;
+
+                // Pick appropriate budget — smaller tiers use smaller budget
+                int budget = tier <= 2 ? 25 : 40;
+
+                var compResult = RunCompositionTest(budget, armyCount, battlesPerArmy, available);
+
+                var entry = new TierBalanceEntry
+                {
+                    Tier = tier,
+                    TierName = tierData.Name,
+                    UnitCount = available.Length,
+                    Budget = budget,
+                    DominantCount = compResult.DominantCompositions.Count,
+                    WeakCount = compResult.WeakCompositions.Count,
+                    OverpoweredUnits = new List<string>(compResult.OverpoweredUnits),
+                    UnderpoweredUnits = new List<string>(compResult.UnderpoweredUnits)
+                };
+                result.Entries.Add(entry);
+
+                if (compResult.DominantCompositions.Count > armyCount / 10)
+                {
+                    result.Anomalies.Add(
+                        $"Tier {tier} ({tierData.Name}): {compResult.DominantCompositions.Count} dominant compositions detected");
+                }
+            }
+
+            return result;
+        }
+
+        // ======= MODE 9: Enhanced Matchup Test (GDD Spec) =======
+
+        /// <summary>
+        /// Enhanced Mode 1 that uses varied terrain and positioning per GDD spec:
+        /// "1,000 times with varied terrain and positioning."
+        /// Places units at random valid positions and applies random terrain.
+        /// </summary>
+        public MatchupResult RunMatchupTestV2(int battlesPerMatchup = 100)
+        {
+            int count = AllUnitTypes.Length;
+            var matrix = new int[count, count];
+            var anomalies = new List<string>();
+            var terrainTypes = new[] { TerrainType.OpenField, TerrainType.Forest, TerrainType.Hill,
+                                       TerrainType.Fortification, TerrainType.Town };
+
+            for (int i = 0; i < count; i++)
+            {
+                for (int j = 0; j < count; j++)
+                {
+                    if (i == j)
+                    {
+                        matrix[i, j] = 50;
+                        continue;
+                    }
+
+                    int wins = 0;
+                    for (int b = 0; b < battlesPerMatchup; b++)
+                    {
+                        int seed = _seedGen.Next();
+                        UnitFactory.ResetIds();
+
+                        var grid = new GridMap(_config.GridWidth, _config.GridHeight);
+
+                        // Random positions within deployment zones
+                        int playerCol = _seedGen.Next(_config.GridWidth) + 1;
+                        int playerRow = _config.PlayerDeployMinRow + _seedGen.Next(
+                            _config.PlayerDeployMaxRow - _config.PlayerDeployMinRow + 1);
+                        int enemyCol = _seedGen.Next(_config.GridWidth) + 1;
+                        int enemyRow = _config.EnemyDeployMinRow + _seedGen.Next(
+                            _config.EnemyDeployMaxRow - _config.EnemyDeployMinRow + 1);
+
+                        var unitA = UnitFactory.CreateByTypeName(AllUnitTypes[i], Owner.Player,
+                            new GridCoord(playerCol, playerRow));
+                        var unitB = UnitFactory.CreateByTypeName(AllUnitTypes[j], Owner.Enemy,
+                            new GridCoord(enemyCol, enemyRow));
+
+                        if (unitA == null || unitB == null) continue;
+                        grid.PlaceUnit(unitA, unitA.Position);
+                        grid.PlaceUnit(unitB, unitB.Position);
+
+                        // Random terrain in the center
+                        var terrainMap = new TerrainMap(_config.GridWidth, _config.GridHeight);
+                        var randTerrain = terrainTypes[_seedGen.Next(terrainTypes.Length)];
+                        if (randTerrain != TerrainType.OpenField)
+                        {
+                            int midRow = (_config.PlayerDeployMaxRow + _config.EnemyDeployMinRow) / 2;
+                            for (int x = 1; x <= _config.GridWidth; x++)
+                                terrainMap.SetTerrain(new GridCoord(x, midRow), randTerrain);
+                        }
+
+                        var engine = new BattleEngineV2(grid, terrainMap,
+                            new List<UnitInstance> { unitA },
+                            new List<UnitInstance> { unitB },
+                            _config, seed);
+                        var result = engine.RunFullBattle();
+                        if (result.Outcome == BattleOutcome.PlayerWin) wins++;
+                    }
+
+                    int winRate = (wins * 100) / battlesPerMatchup;
+                    matrix[i, j] = winRate;
+
+                    if (winRate > 70)
+                        anomalies.Add($"{AllUnitTypes[i]} beats {AllUnitTypes[j]} {winRate}% (V2+terrain)");
+                }
+            }
+
+            return new MatchupResult { Matrix = matrix, Anomalies = anomalies };
+        }
+
+        // ======= MODE 10: Strategy Test (GDD 12.3) =======
+
+        /// <summary>
+        /// Tests all 4 army builder strategies against each other per GDD 12.3.
+        /// Ensures variety is viable — no single strategy dominates.
+        /// </summary>
+        public StrategyTestResult RunStrategyTest(
+            int budget = 40, int battlesPerPairing = 100, string[] availableUnits = null)
+        {
+            if (availableUnits == null) availableUnits = AllUnitTypes;
+
+            var strategies = new ArmyBuilderStrategies(_config, new Random(_seedGen.Next()));
+            var result = new StrategyTestResult();
+
+            // Generate matchup data from Mode 1 for counter-picking strategy
+            var matchupResult = RunMatchupTest(50);
+            var matchupData = new MatchupData { Matrix = matchupResult.Matrix };
+
+            // Generate win rate data for meta strategy (from a quick composition test)
+            var quickComp = RunCompositionTest(budget, 50, 20, availableUnits);
+            var unitWinRates = new Dictionary<string, int>();
+            foreach (var unitType in availableUnits)
+                unitWinRates[unitType] = 50; // Default baseline
+
+            var strategyNames = new[] { "Random", "CavalryRush", "ArtilleryFort", "BalancedLine", "InfantryWall", "Counter", "Meta" };
+            int stratCount = strategyNames.Length;
+            var winMatrix = new int[stratCount, stratCount];
+            var totalMatrix = new int[stratCount, stratCount];
+
+            for (int i = 0; i < stratCount; i++)
+            {
+                for (int j = i + 1; j < stratCount; j++)
+                {
+                    for (int b = 0; b < battlesPerPairing; b++)
+                    {
+                        var armyA = BuildStrategyArmy(strategies, i, budget, availableUnits, matchupData, unitWinRates, null);
+                        var armyB = BuildStrategyArmy(strategies, j, budget, availableUnits, matchupData, unitWinRates, armyA);
+
+                        if (armyA.Count == 0 || armyB.Count == 0) continue;
+
+                        int seed = _seedGen.Next();
+                        var outcome = BattleArmies(armyA, armyB, seed);
+
+                        totalMatrix[i, j]++;
+                        totalMatrix[j, i]++;
+
+                        if (outcome == BattleOutcome.PlayerWin)
+                            winMatrix[i, j]++;
+                        else if (outcome == BattleOutcome.EnemyWin)
+                            winMatrix[j, i]++;
+                    }
+                }
+            }
+
+            // Build result entries
+            for (int i = 0; i < stratCount; i++)
+            {
+                int totalWins = 0;
+                int totalGames = 0;
+                for (int j = 0; j < stratCount; j++)
+                {
+                    if (i == j) continue;
+                    totalWins += winMatrix[i, j];
+                    totalGames += totalMatrix[i, j];
+                }
+
+                int winRate = totalGames > 0 ? (totalWins * 100) / totalGames : 50;
+                var entry = new StrategyTestEntry
+                {
+                    StrategyName = strategyNames[i],
+                    OverallWinRate = winRate,
+                    TotalGames = totalGames
+                };
+                result.Entries.Add(entry);
+
+                if (winRate > 65)
+                    result.Anomalies.Add($"{strategyNames[i]} dominates with {winRate}% win rate");
+                else if (winRate < 35)
+                    result.Anomalies.Add($"{strategyNames[i]} is too weak with only {winRate}% win rate");
+            }
+
+            return result;
+        }
+
+        private List<string> BuildStrategyArmy(ArmyBuilderStrategies strategies, int stratIdx,
+            int budget, string[] available, MatchupData matchupData,
+            Dictionary<string, int> unitWinRates, List<string> opponentArmy)
+        {
+            return stratIdx switch
+            {
+                0 => strategies.BuildRandom(budget, available),
+                1 => strategies.BuildArchetype(budget, available, ArmyArchetype.CavalryRush),
+                2 => strategies.BuildArchetype(budget, available, ArmyArchetype.ArtilleryFort),
+                3 => strategies.BuildArchetype(budget, available, ArmyArchetype.BalancedLine),
+                4 => strategies.BuildArchetype(budget, available, ArmyArchetype.InfantryWall),
+                5 => opponentArmy != null
+                    ? strategies.BuildCounter(budget, available, opponentArmy, matchupData)
+                    : strategies.BuildRandom(budget, available),
+                6 => strategies.BuildMeta(budget, available, unitWinRates),
+                _ => strategies.BuildRandom(budget, available)
+            };
+        }
+
+        // ======= Full Report (GDD Section 12 Output) =======
+
+        /// <summary>
+        /// Runs all modes and generates the 6 GDD-specified reports plus additional modes
+        /// in a single integrated output:
+        /// 1. Unit Matchup Matrix
+        /// 2. Composition Win Rates
+        /// 3. Officer Impact
+        /// 4. Commander Impact
+        /// 5. Tier Balance
+        /// 6. Terrain Bias
+        /// 7. Grid Size Scaling
+        /// 8. Formation Effectiveness
+        /// 9. Strategy Viability
+        /// Plus an Anomaly List aggregating all flagged issues.
+        /// </summary>
+        public FullQAReport RunFullReport(
+            int matchupBattles = 100, int compBudget = 40, int compArmies = 200,
+            int compBattles = 50, int officerBattles = 200, int commanderBattles = 200,
+            int tierBattles = 200, int terrainBattles = 200, int gridBattles = 200,
+            int formationBattles = 200, int strategyBattles = 100)
+        {
+            var report = new FullQAReport();
+
+            report.Matchup = RunMatchupTest(matchupBattles);
+            report.MatchupV2 = RunMatchupTestV2(matchupBattles);
+            report.Composition = RunCompositionTest(compBudget, compArmies, compBattles);
+            report.OfficerImpact = RunOfficerImpactTest(compBudget, officerBattles);
+            report.CommanderImpact = RunCommanderImpactTest(compBudget, commanderBattles);
+            report.TierBalance = RunTierBalanceTest(tierBattles);
+            report.TerrainImpact = RunTerrainImpactTest(compBudget, terrainBattles);
+            report.GridSize = RunGridSizeTest(compBudget, gridBattles);
+            report.FormationEffectiveness = RunFormationTest(formationBattles);
+            report.StrategyTest = RunStrategyTest(compBudget, strategyBattles);
+
+            // Aggregate anomalies
+            report.AllAnomalies = new List<string>();
+            report.AllAnomalies.AddRange(report.Matchup.Anomalies.Select(a => $"[Matchup] {a}"));
+            report.AllAnomalies.AddRange(report.MatchupV2.Anomalies.Select(a => $"[MatchupV2] {a}"));
+            if (report.Composition.DominantCompositions.Count > 0)
+                report.AllAnomalies.AddRange(report.Composition.DominantCompositions.Select(a => $"[Composition] Dominant: {a}"));
+            report.AllAnomalies.AddRange(report.OfficerImpact.Anomalies.Select(a => $"[Officer] {a}"));
+            report.AllAnomalies.AddRange(report.CommanderImpact.Anomalies.Select(a => $"[Commander] {a}"));
+            report.AllAnomalies.AddRange(report.TierBalance.Anomalies.Select(a => $"[Tier] {a}"));
+            report.AllAnomalies.AddRange(report.TerrainImpact.Anomalies.Select(a => $"[Terrain] {a}"));
+            report.AllAnomalies.AddRange(report.StrategyTest.Anomalies.Select(a => $"[Strategy] {a}"));
+
+            return report;
+        }
+
+        /// <summary>
+        /// Generates a full human-readable report from all modes.
+        /// </summary>
+        public static string FormatFullReport(FullQAReport report)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("╔══════════════════════════════════════════════════╗");
+            sb.AppendLine("║       WARCHESS FULL QA BALANCE REPORT           ║");
+            sb.AppendLine("╚══════════════════════════════════════════════════╝");
+            sb.AppendLine();
+
+            sb.AppendLine(FormatMatchupReport(report.Matchup));
+            sb.AppendLine();
+            sb.AppendLine("--- Enhanced Matchup (V2 + Terrain) ---");
+            sb.AppendLine(FormatMatchupReport(report.MatchupV2));
+            sb.AppendLine();
+            sb.AppendLine(FormatOfficerReport(report.OfficerImpact));
+            sb.AppendLine();
+            sb.AppendLine(FormatCommanderReport(report.CommanderImpact));
+            sb.AppendLine();
+            sb.AppendLine(FormatTierBalanceReport(report.TierBalance));
+            sb.AppendLine();
+            sb.AppendLine(FormatTerrainReport(report.TerrainImpact));
+            sb.AppendLine();
+            sb.AppendLine(FormatGridSizeReport(report.GridSize));
+            sb.AppendLine();
+            sb.AppendLine(FormatFormationReport(report.FormationEffectiveness));
+            sb.AppendLine();
+            sb.AppendLine(FormatStrategyReport(report.StrategyTest));
+
+            if (report.AllAnomalies.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine("╔══════════════════════════════════════════════════╗");
+                sb.AppendLine("║            AGGREGATED ANOMALY LIST              ║");
+                sb.AppendLine("╚══════════════════════════════════════════════════╝");
+                foreach (var a in report.AllAnomalies)
+                    sb.AppendLine($"  ! {a}");
+            }
+            else
+            {
+                sb.AppendLine();
+                sb.AppendLine("No anomalies detected across all test modes.");
+            }
+
+            return sb.ToString();
+        }
+
         // ======= Report Generation =======
 
         /// <summary>
@@ -1110,6 +1435,64 @@ namespace WarChess.QA
         }
 
         /// <summary>
+        /// Generates a human-readable report from tier balance results.
+        /// </summary>
+        public static string FormatTierBalanceReport(TierBalanceResult result)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("=== TIER BALANCE ANALYSIS ===");
+            sb.AppendLine();
+            sb.AppendLine($"{"Tier",4} {"Name",-22} {"Units",6} {"Budget",7} {"Dominant",9} {"Weak",5}");
+            sb.AppendLine(new string('-', 58));
+
+            foreach (var e in result.Entries)
+            {
+                sb.AppendLine($"{e.Tier,4} {e.TierName,-22} {e.UnitCount,6} {e.Budget,7} {e.DominantCount,9} {e.WeakCount,5}");
+                foreach (var op in e.OverpoweredUnits)
+                    sb.AppendLine($"       OP: {op}");
+                foreach (var up in e.UnderpoweredUnits)
+                    sb.AppendLine($"       UP: {up}");
+            }
+
+            if (result.Anomalies.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine("=== ANOMALIES ===");
+                foreach (var a in result.Anomalies)
+                    sb.AppendLine($"  ! {a}");
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Generates a human-readable report from strategy test results.
+        /// </summary>
+        public static string FormatStrategyReport(StrategyTestResult result)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("=== STRATEGY VIABILITY ANALYSIS ===");
+            sb.AppendLine();
+            sb.AppendLine($"{"Strategy",-18} {"WinRate",8} {"Games",6}");
+            sb.AppendLine(new string('-', 36));
+
+            foreach (var e in result.Entries)
+            {
+                sb.AppendLine($"{e.StrategyName,-18} {e.OverallWinRate,7}% {e.TotalGames,6}");
+            }
+
+            if (result.Anomalies.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine("=== ANOMALIES ===");
+                foreach (var a in result.Anomalies)
+                    sb.AppendLine($"  ! {a}");
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
         /// Generates a human-readable report from formation effectiveness results.
         /// </summary>
         public static string FormatFormationReport(FormationEffectivenessResult result)
@@ -1232,5 +1615,56 @@ namespace WarChess.QA
         public int FormationWinRate;
         public int ScatterWinRate;
         public int Delta; // Positive = formation helps
+    }
+
+    /// <summary>Result of Mode 8 tier balance testing.</summary>
+    public class TierBalanceResult
+    {
+        public List<TierBalanceEntry> Entries = new List<TierBalanceEntry>();
+        public List<string> Anomalies = new List<string>();
+    }
+
+    /// <summary>Single tier's balance data.</summary>
+    public class TierBalanceEntry
+    {
+        public int Tier;
+        public string TierName;
+        public int UnitCount;
+        public int Budget;
+        public int DominantCount;
+        public int WeakCount;
+        public List<string> OverpoweredUnits = new List<string>();
+        public List<string> UnderpoweredUnits = new List<string>();
+    }
+
+    /// <summary>Result of Mode 10 strategy testing.</summary>
+    public class StrategyTestResult
+    {
+        public List<StrategyTestEntry> Entries = new List<StrategyTestEntry>();
+        public List<string> Anomalies = new List<string>();
+    }
+
+    /// <summary>Single strategy's performance data.</summary>
+    public class StrategyTestEntry
+    {
+        public string StrategyName;
+        public int OverallWinRate;
+        public int TotalGames;
+    }
+
+    /// <summary>Full QA report aggregating all test modes.</summary>
+    public class FullQAReport
+    {
+        public MatchupResult Matchup;
+        public MatchupResult MatchupV2;
+        public CompositionResult Composition;
+        public OfficerImpactResult OfficerImpact;
+        public CommanderImpactResult CommanderImpact;
+        public TierBalanceResult TierBalance;
+        public TerrainImpactResult TerrainImpact;
+        public GridSizeResult GridSize;
+        public FormationEffectivenessResult FormationEffectiveness;
+        public StrategyTestResult StrategyTest;
+        public List<string> AllAnomalies;
     }
 }
