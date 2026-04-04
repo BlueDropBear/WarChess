@@ -106,6 +106,9 @@ namespace WarChess.Battle
             // Movement
             RunMovement(order);
 
+            // Recalculate formations after movement — pre-movement bonuses are stale
+            RecalculateFormations();
+
             // Combat
             RunCombat(order);
 
@@ -170,15 +173,20 @@ namespace WarChess.Battle
                 int effectiveMov = unit.Mov + _commanders.GetMovBonus(unit.Id);
 
                 var from = unit.Position;
-                var to = MovementResolverV2.ResolveMovement(unit, target, _grid, _terrainMap, effectiveMov);
+                var to = MovementResolverV2.ResolveMovementWithSteps(
+                    unit, target, _grid, _terrainMap, effectiveMov, out int stepsTaken);
 
                 if (to != from)
                 {
-                    int tilesMoved = MovementResolver.GetTilesMoved(from, to);
+                    // Track if the unit crossed a river tile during movement
+                    if (_terrainMap.GetTerrain(to) == Terrain.TerrainType.River ||
+                        _terrainMap.GetTerrain(from) == Terrain.TerrainType.River)
+                        unit.CrossedRiverThisRound = true;
+
                     _grid.MoveUnit(from, to);
-                    unit.TilesMovedThisRound = tilesMoved;
+                    unit.TilesMovedThisRound = stepsTaken;
                     unit.HasMovedThisRound = true;
-                    _events.Add(new UnitMovedEvent(_currentRound, unit.Id, from, to, tilesMoved));
+                    _events.Add(new UnitMovedEvent(_currentRound, unit.Id, from, to, stepsTaken));
                 }
             }
         }
@@ -203,6 +211,12 @@ namespace WarChess.Battle
             var enemies = GetEnemies(unit);
             if (CountAlive(enemies) == 0) return;
 
+            // Limbered Up: regular Artillery (Bombardment) cannot attack if it moved this round.
+            // Horse Artillery (LimberedUp ability) is exempt from this restriction.
+            if (unit.HasMovedThisRound && unit.Rng > 1
+                && unit.Ability == AbilityType.Bombardment)
+                return;
+
             var strategy = _targetingStrategies[unit.Id];
             var target = strategy.SelectTarget(unit, enemies, _grid);
             if (target == null || !target.IsAlive) return;
@@ -224,9 +238,8 @@ namespace WarChess.Battle
                     return;
             }
 
-            // River crossing prevents attack
-            if (unit.HasMovedThisRound &&
-                TerrainData.PreventsAttackOnCross(_terrainMap.GetTerrain(unit.Position)))
+            // River crossing prevents attack on the same round
+            if (unit.CrossedRiverThisRound)
                 return;
 
             // Flanking
@@ -244,11 +257,31 @@ namespace WarChess.Battle
                 && !unit.HasChargedThisRound
                 && !TerrainData.BlocksCharge(_terrainMap.GetTerrain(target.Position));
 
+            // Brace: Lancer counter-charge — when charged by cavalry, Lancer attacks first
+            // and deals x1.5 damage. We model this by applying Brace damage to the charger
+            // before the charger's attack resolves.
+            if (isCharge && target.Ability == AbilityType.Brace && target.IsAlive)
+            {
+                int braceDamage = target.Atk - (unit.Def / 2);
+                braceDamage = System.Math.Max(braceDamage, 1);
+                braceDamage = braceDamage * 150 / 100; // x1.5 damage
+                unit.TakeDamage(braceDamage);
+                _events.Add(new UnitAttackedEvent(
+                    _currentRound, target.Id, unit.Id, braceDamage,
+                    FlankDirection.Front, false, false));
+                if (!unit.IsAlive)
+                {
+                    _events.Add(new UnitDiedEvent(_currentRound, unit.Id, target.Id));
+                    RemoveFromGrid(unit);
+                    return; // Charger died to Brace, attack does not proceed
+                }
+            }
+
             // Terrain modifiers
             int terrainDef = _terrainMap.GetDefenseMultiplier(target.Position);
             int terrainAtk = _terrainMap.GetAttackMultiplier(unit.Position);
 
-            // Formation modifier
+            // Formation modifiers
             var unitFormation = GetFormationBonus(unit);
             int formationMult = unitFormation.AtkMultiplier;
             int chargeMultiplier = isCharge
@@ -264,24 +297,33 @@ namespace WarChess.Battle
             if (unit.Ability == AbilityType.AimedShot && !unit.HasMovedThisRound)
                 aimedShotBonus = 150;
 
-            // Calculate damage
+            // Unbreakable: Old Guard gains +25% ATK when HP below 25%
+            int unbreakableBonus = 100;
+            if (unit.Ability == AbilityType.Unbreakable && unit.CurrentHp * 4 <= unit.MaxHp)
+                unbreakableBonus = 125;
+
+            // Fold all ATK-side multipliers (formation ATK, commander ATK, aimed shot, unbreakable) into
+            // one base-100 value for the formationMultiplier slot
+            int atkFormation = (int)((long)formationMult * cmdAtk * aimedShotBonus * unbreakableBonus / (100L * 100L * 100L));
+
+            // Fold target's DEF modifiers (commander DEF, formation DEF) into terrainDef so
+            // they are batched with other multipliers BEFORE flanking inside DamageCalculator.
+            int targetDefFormation = targetFormation.DefMultiplier;
+
+            // Congreve Barrage ignores Fortification defense bonus per GDD
+            if (unit.Ability == AbilityType.CongreveBarrage
+                && _terrainMap.GetTerrain(target.Position) == TerrainType.Fortification)
+                terrainDef = 100;
+
+            int adjustedTerrainDef = (int)((long)terrainDef * cmdDef * targetDefFormation / (100L * 100L));
+
+            // Calculate damage with all modifiers batched in correct GDD order
             int damage = DamageCalculator.Calculate(
                 unit, target, flankDir,
-                terrainDef, terrainAtk,
-                (formationMult * cmdAtk * aimedShotBonus) / (100 * 100), // 3 base-100 values → 1 base-100: divide by 100^2
+                adjustedTerrainDef, terrainAtk,
+                atkFormation,
                 isCharge, chargeMultiplier > 100 ? chargeMultiplier : (isCharge ? _config.ChargeMultiplier : 100),
                 _config.MinimumDamage);
-
-            // Apply commander DEF buff to target
-            if (cmdDef != 100)
-                damage = (damage * 100) / cmdDef;
-
-            // Apply formation DEF bonus
-            int targetDefFormation = targetFormation.DefMultiplier;
-            if (targetDefFormation != 100)
-                damage = (damage * 100) / targetDefFormation;
-
-            damage = System.Math.Max(damage, _config.MinimumDamage);
 
             target.TakeDamage(damage);
             unit.HasAttackedThisRound = true;
@@ -295,11 +337,28 @@ namespace WarChess.Battle
                 _currentRound, unit.Id, target.Id, damage, flankDir, isCharge, false));
 
             if (!target.IsAlive)
+            {
                 _events.Add(new UnitDiedEvent(_currentRound, target.Id, unit.Id));
+                RemoveFromGrid(target);
+            }
 
-            // AoE: Bombardment
+            // AoE abilities
             if (unit.Ability == AbilityType.Bombardment)
                 ApplyBombardmentAoE(unit, target.Position, damage);
+            else if (unit.Ability == AbilityType.CongreveBarrage)
+                ApplyCongreveBarrage(unit, target.Position, damage);
+
+            // Grenade: first combat round of the battle, Grenadier deals 5 flat damage
+            // to all enemies within 2 tiles
+            if (unit.Ability == AbilityType.Grenade && !unit.HasUsedGrenadeThisBattle)
+            {
+                unit.HasUsedGrenadeThisBattle = true;
+                ApplyGrenadeAoE(unit);
+            }
+
+            // Hit and Run: Hussar moves 2 tiles away from target after attacking
+            if (unit.Ability == AbilityType.HitAndRun && unit.IsAlive)
+                ApplyHitAndRun(unit, target);
 
             // Dragoon dismount (triggers after any melee attack, switches to LineInfantry for formations)
             if (unit.Ability == AbilityType.Dismount && !unit.IsDismounted)
@@ -322,9 +381,128 @@ namespace WarChess.Battle
                         _currentRound, attacker.Id, victim.Id, splash,
                         FlankDirection.Front, false, true));
                     if (!victim.IsAlive)
+                    {
                         _events.Add(new UnitDiedEvent(_currentRound, victim.Id, attacker.Id));
+                        RemoveFromGrid(victim);
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Congreve Barrage: hits a random 3x3 area near the target. May hit friendly units.
+        /// Ignores Fortification defense. Per GDD, targeting does not account for friendly fire.
+        /// </summary>
+        private void ApplyCongreveBarrage(UnitInstance attacker, GridCoord targetPos, int primaryDmg)
+        {
+            int splash = DamageCalculator.CalculateSplashDamage(primaryDmg, _config.BombardmentSplashPercentage);
+
+            // Select a random center within 1 tile of the target for the 3x3 blast
+            var possibleCenters = new System.Collections.Generic.List<GridCoord>();
+            possibleCenters.Add(targetPos);
+            foreach (var adj in _grid.GetAdjacentCoords(targetPos))
+                possibleCenters.Add(adj);
+            var blastCenter = possibleCenters[_rng.Next(possibleCenters.Count)];
+
+            // Hit all units in 3x3 area around blast center (includes friendlies per GDD)
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    var coord = new GridCoord(blastCenter.X + dx, blastCenter.Y + dy);
+                    if (!_grid.IsValidCoord(coord)) continue;
+                    if (coord == attacker.Position) continue; // Don't hit self
+
+                    var victim = _grid.GetUnitAt(coord);
+                    if (victim == null || !victim.IsAlive) continue;
+                    if (coord == targetPos) continue; // Primary target already hit
+
+                    victim.TakeDamage(splash);
+                    _events.Add(new UnitAttackedEvent(
+                        _currentRound, attacker.Id, victim.Id, splash,
+                        FlankDirection.Front, false, true));
+                    if (!victim.IsAlive)
+                    {
+                        _events.Add(new UnitDiedEvent(_currentRound, victim.Id, attacker.Id));
+                        RemoveFromGrid(victim);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Grenade: Grenadier deals 5 flat damage to all enemies within 2 tiles on first combat.
+        /// </summary>
+        private void ApplyGrenadeAoE(UnitInstance attacker)
+        {
+            const int grenadeDamage = 5;
+            var coordsInRange = _grid.GetCoordsInRange(attacker.Position, 2);
+
+            foreach (var coord in coordsInRange)
+            {
+                if (coord == attacker.Position) continue;
+                var victim = _grid.GetUnitAt(coord);
+                if (victim == null || !victim.IsAlive || victim.Owner == attacker.Owner) continue;
+
+                victim.TakeDamage(grenadeDamage);
+                _events.Add(new UnitAttackedEvent(
+                    _currentRound, attacker.Id, victim.Id, grenadeDamage,
+                    FlankDirection.Front, false, true));
+                if (!victim.IsAlive)
+                {
+                    _events.Add(new UnitDiedEvent(_currentRound, victim.Id, attacker.Id));
+                    RemoveFromGrid(victim);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Hit and Run: after attacking, Hussar moves 2 tiles away from the target.
+        /// </summary>
+        private void ApplyHitAndRun(UnitInstance unit, UnitInstance target)
+        {
+            int dx = unit.Position.X - target.Position.X;
+            int dy = unit.Position.Y - target.Position.Y;
+
+            // Normalize direction away from target
+            int sx = dx > 0 ? 1 : (dx < 0 ? -1 : 0);
+            int sy = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
+
+            // If on same tile as target (shouldn't happen), retreat toward own deployment
+            if (sx == 0 && sy == 0)
+                sy = unit.Owner == Owner.Player ? -1 : 1;
+
+            var startPos = unit.Position;
+
+            for (int step = 0; step < 2; step++)
+            {
+                var pos = unit.Position;
+                // Try primary direction, then fallback
+                var primary = new GridCoord(pos.X + sx, pos.Y + sy);
+                var fallbackX = new GridCoord(pos.X + sx, pos.Y);
+                var fallbackY = new GridCoord(pos.X, pos.Y + sy);
+
+                if (_grid.IsValidCoord(primary) && _grid.IsTileEmpty(primary))
+                    _grid.MoveUnit(pos, primary);
+                else if (sx != 0 && _grid.IsValidCoord(fallbackX) && _grid.IsTileEmpty(fallbackX))
+                    _grid.MoveUnit(pos, fallbackX);
+                else if (sy != 0 && _grid.IsValidCoord(fallbackY) && _grid.IsTileEmpty(fallbackY))
+                    _grid.MoveUnit(pos, fallbackY);
+                else
+                    break; // No valid retreat tile
+            }
+
+            if (unit.Position != startPos)
+                _events.Add(new UnitMovedEvent(_currentRound, unit.Id, startPos, unit.Position, 0));
+        }
+
+        /// <summary>
+        /// Immediately removes a dead unit from the grid so it doesn't block tiles mid-round.
+        /// </summary>
+        private void RemoveFromGrid(UnitInstance unit)
+        {
+            if (_removedFromGrid.Add(unit.Id))
+                _grid.RemoveUnit(unit.Position);
         }
 
         private void CleanupDead()

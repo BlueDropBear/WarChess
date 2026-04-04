@@ -20,9 +20,18 @@ namespace WarChess.Battle
         /// </summary>
         public static GridCoord ResolveMovement(UnitInstance unit, UnitInstance target, GridMap grid)
         {
+            return ResolveMovementWithSteps(unit, target, grid, out _);
+        }
+
+        /// <summary>
+        /// Resolves movement and also outputs the actual number of steps taken (for charge detection).
+        /// </summary>
+        public static GridCoord ResolveMovementWithSteps(UnitInstance unit, UnitInstance target, GridMap grid, out int stepsTaken)
+        {
             var current = unit.Position;
             var goal = target.Position;
             int movRemaining = unit.Mov;
+            stepsTaken = 0;
 
             // Don't move if already adjacent and melee, or in range for ranged
             int distToTarget = current.ManhattanDistance(goal);
@@ -39,6 +48,7 @@ namespace WarChess.Battle
 
                 // Check if we're now in range — stop moving
                 position = nextStep;
+                stepsTaken++;
                 if (position.ManhattanDistance(goal) <= unit.Rng)
                     break;
             }
@@ -47,8 +57,9 @@ namespace WarChess.Battle
         }
 
         /// <summary>
-        /// Returns the number of tiles between from and the result of ResolveMovement.
-        /// Used to determine if a charge occurred (3+ tiles moved).
+        /// Returns the number of tiles between two positions using Manhattan distance.
+        /// NOTE: For charge detection, prefer the stepsTaken output from ResolveMovementWithSteps
+        /// which tracks actual path length including obstacle detours.
         /// </summary>
         public static int GetTilesMoved(GridCoord from, GridCoord to)
         {
