@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using WarChess.Account;
 using WarChess.Army;
 using WarChess.Audio;
 using WarChess.Campaign;
@@ -36,6 +37,9 @@ namespace WarChess.Core
         public SaveManager SaveManager { get; private set; }
         public CampaignManager CampaignManager { get; private set; }
         public ArmyManager ArmyManager { get; private set; }
+
+        // Account
+        public AccountManager Account { get; private set; }
 
         // Phase 5 managers
         public LocalizationManager Localization { get; private set; }
@@ -76,6 +80,16 @@ namespace WarChess.Core
 
             ArmyManager = new ArmyManager(GameConfigData.GetUnitCosts());
             ArmyManager.LoadArmies(SaveManager.Data.Armies);
+
+            // Account system
+            var authProvider = CreatePlatformAuthProvider();
+            var accountBackend = new StubAccountBackend();
+            Account = new AccountManager(authProvider, accountBackend, SaveManager.Data.Account);
+            Account.OnAccountResolved += identity =>
+            {
+                SaveManager.Data.Account = identity;
+            };
+            Account.Authenticate();
 
             // Localization
             Localization = new LocalizationManager();
@@ -131,6 +145,10 @@ namespace WarChess.Core
         /// </summary>
         public void SaveGame()
         {
+            // Persist account identity
+            if (Account?.Identity != null)
+                SaveManager.Data.Account = Account.Identity;
+
             // Persist dispatch box and analytics state back to save data
             SaveManager.Data.PendingDispatchBoxes = DispatchBoxSystem.GetPendingBoxesAsInts();
             SaveManager.Data.PendingAnalyticsEvents = new List<AnalyticsEvent>(Analytics.PendingEvents);
@@ -155,6 +173,22 @@ namespace WarChess.Core
             SelectedArmy = army;
             BattleSeed = GenerateDeterministicSeed(battleNumber);
             GoToScene("Battle");
+        }
+
+        /// <summary>
+        /// Creates the appropriate auth provider for the current platform.
+        /// </summary>
+        private IAuthProvider CreatePlatformAuthProvider()
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            return new AppleAuthProvider();
+#elif UNITY_ANDROID && !UNITY_EDITOR
+            return new GoogleAuthProvider();
+#elif UNITY_STANDALONE && !UNITY_EDITOR
+            return new SteamAuthProvider();
+#else
+            return new StubAuthProvider();
+#endif
         }
 
         public void GoToMainMenu() => GoToScene("MainMenu");

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using WarChess.Account;
 using WarChess.Army;
 using WarChess.Config;
 
@@ -58,15 +59,19 @@ namespace WarChess.Save
         /// <summary>Offline analytics events waiting to be sent.</summary>
         public List<AnalyticsEvent> PendingAnalyticsEvents;
 
+        /// <summary>Cached account identity for offline access.</summary>
+        public AccountIdentity Account;
+
         public SaveData()
         {
-            Version = 3;
+            Version = 4;
             Campaign = new CampaignSaveData();
             Armies = new List<SavedArmy>();
             Settings = new PlayerSettings();
             Cosmetics = new CosmeticSaveData();
             PendingDispatchBoxes = new List<int>();
             PendingAnalyticsEvents = new List<AnalyticsEvent>();
+            Account = new AccountIdentity();
             LastSavedTicks = DateTime.UtcNow.Ticks;
         }
 
@@ -91,6 +96,11 @@ namespace WarChess.Save
                 if (Campaign != null && Campaign.BattleAttemptCountsList == null)
                     Campaign.BattleAttemptCountsList = new List<SerializableIntPair>();
                 Version = 3;
+            }
+            if (Version < 4)
+            {
+                if (Account == null) Account = new AccountIdentity();
+                Version = 4;
             }
         }
     }
