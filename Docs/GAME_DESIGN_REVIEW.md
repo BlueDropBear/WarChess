@@ -7,11 +7,38 @@
 
 ---
 
+## Resolution Status (2026-04-04)
+
+All issues below have been addressed. Changes are in GDD v2.1 and corresponding code commits.
+
+| ID | Status | Resolution |
+|----|--------|------------|
+| BUG-1 | **FIXED** | Added `HasGuaranteedCharge` flag; Blücher now correctly grants charge without 3-tile movement |
+| BUG-2 | **FALSE POSITIVE** | Grenadier/Old Guard CAN form Square — `CountsAsType = LineInfantry` works correctly. Original analysis was wrong. |
+| BUG-3 | **FIXED** | `ApplyDismount()` now sets `CountsAsType = LineInfantry` for Battle Line formation. Redundant `Rng == 1` check removed. |
+| DESIGN-1 | **NOTED** | Added Rocket Battery fortification bypass as soft artillery counter. Further tuning via configurable values. |
+| DESIGN-2 | **FIXED** | Moore's trigger changed from "50% of units" to "50% of army budget points worth" |
+| DESIGN-3 | **FIXED** | Starter Ammunition increased to 10. Added to GDD Section 8.2. |
+| DESIGN-4 | **FIXED** | Veteran Sergeant changed from -1 MOV to -1 SPD in both code and GDD |
+| DESIGN-5 | **FIXED** | Lancer moved from Battle 26 to Battle 20 (end of Act 2) |
+| DESIGN-6 | **FIXED** | Rocket Battery cost reduced from 7 to 6; gains fortification bypass |
+| DESIGN-7 | **NOTED** | Deferred to multiplayer implementation phase |
+| DESIGN-8 | **FIXED** | Morale system defined as new GDD Section 2.10 |
+| ERR-1 | **NOTED** | 12 officers confirmed as intended |
+| ERR-2 | **FIXED** | SPD description corrected |
+| ERR-3 | **FIXED** | Terrain coexistence text clarified |
+| ERR-4 | **FIXED** | Wellington trigger range design note added |
+| ERR-5 | **FIXED** | Lancer flavor text changed to "punishes charges" |
+
+Additionally: Core Gameplay Loop section (1.6) added to GDD, Militia given Square formation in GDD.
+
+---
+
 ## Executive Summary
 
 WarChess has a strong foundation — the core loop (build army → deploy → watch battle) is clean, the Napoleonic theme is well-integrated, and the separation between army building and deployment is a smart design choice. The GDD is thorough and internally consistent for the most part.
 
-This review identifies **3 code bugs**, **6 design concerns**, and **8 improvement opportunities**. Nothing is fundamentally broken at the design level, but several systems would benefit from refinement before they reach players.
+This review identified **2 confirmed code bugs** (1 false positive), **6 design concerns**, and **8 improvement opportunities**. All have been addressed in GDD v2.1 and corresponding code changes.
 
 ---
 
