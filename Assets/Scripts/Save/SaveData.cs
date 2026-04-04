@@ -4,6 +4,7 @@ using UnityEngine;
 using WarChess.Account;
 using WarChess.Army;
 using WarChess.Config;
+using WarChess.Economy;
 
 namespace WarChess.Save
 {
@@ -62,9 +63,21 @@ namespace WarChess.Save
         /// <summary>Cached account identity for offline access.</summary>
         public AccountIdentity Account;
 
+        /// <summary>Sovereign premium currency state.</summary>
+        public SovereignSaveData Sovereigns;
+
+        /// <summary>Battle Star progression currency state.</summary>
+        public BattleStarSaveData BattleStars;
+
+        /// <summary>Field Manual progress per manual.</summary>
+        public List<FieldManualSaveData> FieldManuals;
+
+        /// <summary>Weekly challenge progress.</summary>
+        public WeeklyChallengeSaveData WeeklyChallenges;
+
         public SaveData()
         {
-            Version = 4;
+            Version = 5;
             Campaign = new CampaignSaveData();
             Armies = new List<SavedArmy>();
             Settings = new PlayerSettings();
@@ -72,6 +85,10 @@ namespace WarChess.Save
             PendingDispatchBoxes = new List<int>();
             PendingAnalyticsEvents = new List<AnalyticsEvent>();
             Account = new AccountIdentity();
+            Sovereigns = new SovereignSaveData();
+            BattleStars = new BattleStarSaveData();
+            FieldManuals = new List<FieldManualSaveData>();
+            WeeklyChallenges = new WeeklyChallengeSaveData();
             LastSavedTicks = DateTime.UtcNow.Ticks;
         }
 
@@ -101,6 +118,14 @@ namespace WarChess.Save
             {
                 if (Account == null) Account = new AccountIdentity();
                 Version = 4;
+            }
+            if (Version < 5)
+            {
+                if (Sovereigns == null) Sovereigns = new SovereignSaveData();
+                if (BattleStars == null) BattleStars = new BattleStarSaveData();
+                if (FieldManuals == null) FieldManuals = new List<FieldManualSaveData>();
+                if (WeeklyChallenges == null) WeeklyChallenges = new WeeklyChallengeSaveData();
+                Version = 5;
             }
         }
     }
@@ -292,5 +317,109 @@ namespace WarChess.Save
                     EquippedByTypeList.Add(new SerializableIntStringPair { Key = kvp.Key, Value = kvp.Value });
             }
         }
+    }
+
+    /// <summary>
+    /// Sovereign premium currency save data.
+    /// </summary>
+    [Serializable]
+    public class SovereignSaveData
+    {
+        public int Balance;
+        public int TotalEarned;
+        public int TotalSpent;
+        public int ConsecutiveLoginDays;
+        public int LastLoginDate;
+
+        public SovereignSaveData()
+        {
+            Balance = 0;
+            TotalEarned = 0;
+            TotalSpent = 0;
+            ConsecutiveLoginDays = 0;
+            LastLoginDate = 0;
+        }
+    }
+
+    /// <summary>
+    /// Battle Star progression currency save data.
+    /// </summary>
+    [Serializable]
+    public class BattleStarSaveData
+    {
+        public int Balance;
+        public int TotalEarned;
+        public int TotalSpent;
+        public bool BoosterActive;
+        public long BoosterExpiresTicks;
+
+        public BattleStarSaveData()
+        {
+            Balance = 0;
+            TotalEarned = 0;
+            TotalSpent = 0;
+            BoosterActive = false;
+            BoosterExpiresTicks = 0;
+        }
+    }
+
+    /// <summary>
+    /// Save data for a single Field Manual's progress.
+    /// </summary>
+    [Serializable]
+    public class FieldManualSaveData
+    {
+        /// <summary>Field Manual ID.</summary>
+        public string ManualId;
+
+        /// <summary>Whether the premium track is unlocked.</summary>
+        public bool PremiumUnlocked;
+
+        /// <summary>Claimed rewards. Each entry is "pageIndex:rewardIndex".</summary>
+        public List<string> ClaimedRewardKeys;
+
+        public FieldManualSaveData()
+        {
+            ManualId = "";
+            PremiumUnlocked = false;
+            ClaimedRewardKeys = new List<string>();
+        }
+
+        public FieldManualSaveData(string manualId, bool premiumUnlocked, List<string> claimedKeys)
+        {
+            ManualId = manualId;
+            PremiumUnlocked = premiumUnlocked;
+            ClaimedRewardKeys = claimedKeys ?? new List<string>();
+        }
+    }
+
+    /// <summary>
+    /// Weekly challenge progress save data.
+    /// </summary>
+    [Serializable]
+    public class WeeklyChallengeSaveData
+    {
+        /// <summary>Current week number for challenge rotation.</summary>
+        public int CurrentWeekNumber;
+
+        /// <summary>Active challenge states.</summary>
+        public List<ActiveChallengeSaveData> ActiveChallenges;
+
+        public WeeklyChallengeSaveData()
+        {
+            CurrentWeekNumber = 0;
+            ActiveChallenges = new List<ActiveChallengeSaveData>();
+        }
+    }
+
+    /// <summary>
+    /// Save data for a single active weekly challenge.
+    /// </summary>
+    [Serializable]
+    public class ActiveChallengeSaveData
+    {
+        public string ChallengeId;
+        public int CurrentCount;
+        public bool Completed;
     }
 }

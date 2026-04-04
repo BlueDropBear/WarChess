@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using WarChess.Economy;
 using WarChess.Multiplayer;
 
 namespace WarChess.Config
@@ -87,7 +88,7 @@ namespace WarChess.Config
         }
 
         /// <summary>
-        /// Purchases a cosmetic with soft currency (ammunition).
+        /// Purchases a cosmetic with soft currency (ammunition). Legacy method.
         /// Returns false if insufficient funds, already owned, or not purchasable.
         /// </summary>
         public bool PurchaseWithSoftCurrency(string cosmeticId, AmmunitionSystem wallet)
@@ -104,6 +105,26 @@ namespace WarChess.Config
         }
 
         /// <summary>
+        /// Purchases a cosmetic with Sovereigns (premium cosmetic currency).
+        /// Returns false if insufficient funds, already owned, not purchasable, or Field Manual exclusive.
+        /// </summary>
+        public bool PurchaseWithSovereigns(string cosmeticId, SovereignSystem sovereigns)
+        {
+            if (Owns(cosmeticId)) return false;
+
+            var data = CosmeticDatabase.Get(cosmeticId);
+            if (data == null || data.SovereignPrice <= 0) return false;
+
+            // Field Manual exclusives cannot be purchased in the shop
+            if (!string.IsNullOrEmpty(data.FieldManualExclusiveId)) return false;
+
+            if (!sovereigns.Spend(data.SovereignPrice)) return false;
+
+            _ownedCosmeticIds.Add(cosmeticId);
+            return true;
+        }
+
+        /// <summary>
         /// Generates the daily rotating inventory using seeded RNG from date.
         /// Returns 6 items: mix of rarities, excludes already-owned.
         /// </summary>
@@ -114,8 +135,12 @@ namespace WarChess.Config
 
             foreach (var kvp in CosmeticDatabase.All)
             {
-                // Only show purchasable items (soft currency > 0 or real money > 0)
-                if (kvp.Value.SoftCurrencyPrice > 0 || kvp.Value.RealMoneyTier > 0)
+                // Exclude Field Manual exclusives from the Quartermaster's Shop
+                if (!string.IsNullOrEmpty(kvp.Value.FieldManualExclusiveId))
+                    continue;
+
+                // Only show purchasable items (Sovereign price > 0, or legacy soft currency/real money)
+                if (kvp.Value.SovereignPrice > 0 || kvp.Value.SoftCurrencyPrice > 0 || kvp.Value.RealMoneyTier > 0)
                     candidates.Add(kvp.Value);
             }
 
