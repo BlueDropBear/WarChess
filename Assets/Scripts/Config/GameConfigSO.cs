@@ -52,6 +52,12 @@ namespace WarChess.Config
         [Header("AoE")]
         public int bombardmentSplashPercentage = 50;
 
+        [Header("Strength Scaling (base 100)")]
+        [Tooltip("Minimum damage multiplier for damaged units. 100 = disabled, 25 = units always deal at least 25% damage. Artillery types are always exempt.")]
+        public int strengthScalingFloor = 25;
+        [Tooltip("Old Guard (Unbreakable) uses a gentle linear curve instead of sqrt. This is their minimum damage % at 0 HP. 75 = never below 75% damage.")]
+        public int unbreakableStrengthFloor = 75;
+
         /// <summary>
         /// Converts this SO into a plain C# struct for the Logic Layer.
         /// Call with isMultiplayer to select the correct enemy deployment zone.
@@ -81,7 +87,9 @@ namespace WarChess.Config
                 skirmishRangeBonus: skirmishRangeBonus,
                 chargeMinTilesMoved: chargeMinTilesMoved,
                 chargeMultiplier: chargeMultiplier,
-                bombardmentSplashPercentage: bombardmentSplashPercentage
+                bombardmentSplashPercentage: bombardmentSplashPercentage,
+                strengthScalingFloor: strengthScalingFloor,
+                unbreakableStrengthFloor: unbreakableStrengthFloor
             );
         }
     }
