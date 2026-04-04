@@ -33,7 +33,7 @@ namespace WarChess.Units
         public TargetingPriority TargetingPriority { get; }
         public AbilityType Ability { get; }
         public FormationType FormationType { get; }
-        public UnitType CountsAsType { get; }
+        public UnitType CountsAsType { get; private set; }
 
         // Mutable battle state
         public int CurrentHp { get; private set; }
@@ -45,6 +45,7 @@ namespace WarChess.Units
         public bool HasAttackedThisRound { get; set; }
         public int TilesMovedThisRound { get; set; }
         public bool HasChargedThisRound { get; set; }
+        public bool CrossedRiverThisRound { get; set; }
 
         // Persistent battle tracking
         public bool HasChargedThisBattle { get; set; }
@@ -108,6 +109,7 @@ namespace WarChess.Units
             HasAttackedThisRound = false;
             TilesMovedThisRound = 0;
             HasChargedThisRound = false;
+            CrossedRiverThisRound = false;
         }
 
         /// <summary>

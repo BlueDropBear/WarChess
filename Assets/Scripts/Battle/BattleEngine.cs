@@ -152,16 +152,15 @@ namespace WarChess.Battle
                 if (target == null) continue;
 
                 var from = unit.Position;
-                var to = MovementResolver.ResolveMovement(unit, target, _grid);
+                var to = MovementResolver.ResolveMovementWithSteps(unit, target, _grid, out int stepsTaken);
 
                 if (to != from)
                 {
-                    int tilesMoved = MovementResolver.GetTilesMoved(from, to);
                     _grid.MoveUnit(from, to);
-                    unit.TilesMovedThisRound = tilesMoved;
+                    unit.TilesMovedThisRound = stepsTaken;
                     unit.HasMovedThisRound = true;
 
-                    _events.Add(new UnitMovedEvent(_currentRound, unit.Id, from, to, tilesMoved));
+                    _events.Add(new UnitMovedEvent(_currentRound, unit.Id, from, to, stepsTaken));
                 }
             }
         }

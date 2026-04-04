@@ -20,8 +20,19 @@ namespace WarChess.Battle
             UnitInstance unit, UnitInstance target, GridMap grid,
             TerrainMap terrainMap, int effectiveMov)
         {
+            return ResolveMovementWithSteps(unit, target, grid, terrainMap, effectiveMov, out _);
+        }
+
+        /// <summary>
+        /// Resolves terrain-aware movement and also outputs the actual number of steps taken.
+        /// </summary>
+        public static GridCoord ResolveMovementWithSteps(
+            UnitInstance unit, UnitInstance target, GridMap grid,
+            TerrainMap terrainMap, int effectiveMov, out int stepsTaken)
+        {
             var current = unit.Position;
             var goal = target.Position;
+            stepsTaken = 0;
 
             if (current.ManhattanDistance(goal) <= unit.Rng)
                 return current;
@@ -41,6 +52,7 @@ namespace WarChess.Battle
 
                 movBudget -= cost;
                 position = nextStep;
+                stepsTaken++;
 
                 if (position.ManhattanDistance(goal) <= unit.Rng)
                     break;

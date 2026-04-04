@@ -118,7 +118,7 @@ namespace WarChess.Config
             maxRounds: 30, minimumDamage: 1,
             defaultFlankSideMultiplier: 130, defaultFlankRearMultiplier: 200,
             forestDefenseMultiplier: 75, hillAttackMultiplier: 125,
-            fortificationDefenseMultiplier: 70, townDefenseMultiplier: 80,
+            fortificationDefenseMultiplier: 75, townDefenseMultiplier: 80,
             battleLineDefBonus: 115, batteryAtkBonus: 120,
             cavalryWedgeChargeBonus: 125, squareDefVsCavalryBonus: 130,
             skirmishAtkBonus: 120, skirmishRangeBonus: 1,

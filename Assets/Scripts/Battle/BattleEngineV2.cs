@@ -106,6 +106,9 @@ namespace WarChess.Battle
             // Movement
             RunMovement(order);
 
+            // Recalculate formations after movement — pre-movement bonuses are stale
+            RecalculateFormations();
+
             // Combat
             RunCombat(order);
 
@@ -170,15 +173,20 @@ namespace WarChess.Battle
                 int effectiveMov = unit.Mov + _commanders.GetMovBonus(unit.Id);
 
                 var from = unit.Position;
-                var to = MovementResolverV2.ResolveMovement(unit, target, _grid, _terrainMap, effectiveMov);
+                var to = MovementResolverV2.ResolveMovementWithSteps(
+                    unit, target, _grid, _terrainMap, effectiveMov, out int stepsTaken);
 
                 if (to != from)
                 {
-                    int tilesMoved = MovementResolver.GetTilesMoved(from, to);
+                    // Track if the unit crossed a river tile during movement
+                    if (_terrainMap.GetTerrain(to) == Terrain.TerrainType.River ||
+                        _terrainMap.GetTerrain(from) == Terrain.TerrainType.River)
+                        unit.CrossedRiverThisRound = true;
+
                     _grid.MoveUnit(from, to);
-                    unit.TilesMovedThisRound = tilesMoved;
+                    unit.TilesMovedThisRound = stepsTaken;
                     unit.HasMovedThisRound = true;
-                    _events.Add(new UnitMovedEvent(_currentRound, unit.Id, from, to, tilesMoved));
+                    _events.Add(new UnitMovedEvent(_currentRound, unit.Id, from, to, stepsTaken));
                 }
             }
         }
@@ -224,9 +232,8 @@ namespace WarChess.Battle
                     return;
             }
 
-            // River crossing prevents attack
-            if (unit.HasMovedThisRound &&
-                TerrainData.PreventsAttackOnCross(_terrainMap.GetTerrain(unit.Position)))
+            // River crossing prevents attack on the same round
+            if (unit.CrossedRiverThisRound)
                 return;
 
             // Flanking
@@ -248,7 +255,7 @@ namespace WarChess.Battle
             int terrainDef = _terrainMap.GetDefenseMultiplier(target.Position);
             int terrainAtk = _terrainMap.GetAttackMultiplier(unit.Position);
 
-            // Formation modifier
+            // Formation modifiers
             var unitFormation = GetFormationBonus(unit);
             int formationMult = unitFormation.AtkMultiplier;
             int chargeMultiplier = isCharge
@@ -264,24 +271,24 @@ namespace WarChess.Battle
             if (unit.Ability == AbilityType.AimedShot && !unit.HasMovedThisRound)
                 aimedShotBonus = 150;
 
-            // Calculate damage
+            // Fold all ATK-side multipliers (formation ATK, commander ATK, aimed shot) into
+            // one base-100 value for the formationMultiplier slot
+            int atkFormation = (int)((long)formationMult * cmdAtk * aimedShotBonus / (100L * 100L));
+
+            // Fold target's DEF modifiers (commander DEF, formation DEF) into terrainDef so
+            // they are batched with other multipliers BEFORE flanking inside DamageCalculator.
+            // Previously these were applied post-hoc with sequential division, which changed
+            // rounding and violated GDD modifier order (formation before flanking).
+            int targetDefFormation = targetFormation.DefMultiplier;
+            int adjustedTerrainDef = (int)((long)terrainDef * cmdDef * targetDefFormation / (100L * 100L));
+
+            // Calculate damage with all modifiers batched in correct GDD order
             int damage = DamageCalculator.Calculate(
                 unit, target, flankDir,
-                terrainDef, terrainAtk,
-                (formationMult * cmdAtk * aimedShotBonus) / (100 * 100), // 3 base-100 values → 1 base-100: divide by 100^2
+                adjustedTerrainDef, terrainAtk,
+                atkFormation,
                 isCharge, chargeMultiplier > 100 ? chargeMultiplier : (isCharge ? _config.ChargeMultiplier : 100),
                 _config.MinimumDamage);
-
-            // Apply commander DEF buff to target
-            if (cmdDef != 100)
-                damage = (damage * 100) / cmdDef;
-
-            // Apply formation DEF bonus
-            int targetDefFormation = targetFormation.DefMultiplier;
-            if (targetDefFormation != 100)
-                damage = (damage * 100) / targetDefFormation;
-
-            damage = System.Math.Max(damage, _config.MinimumDamage);
 
             target.TakeDamage(damage);
             unit.HasAttackedThisRound = true;
