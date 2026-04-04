@@ -18,9 +18,13 @@ namespace WarChess.Core
         }
 
         /// <summary>
-        /// Returns true if this coordinate is within the 10x10 grid bounds.
+        /// Returns true if this coordinate is within the given grid bounds.
+        /// Prefer GridMap.IsValidCoord() when a GridMap is available.
         /// </summary>
-        public bool IsValid => X >= 1 && X <= 10 && Y >= 1 && Y <= 10;
+        public bool IsWithinBounds(int gridWidth, int gridHeight)
+        {
+            return X >= 1 && X <= gridWidth && Y >= 1 && Y <= gridHeight;
+        }
 
         /// <summary>
         /// Manhattan distance to another coordinate.

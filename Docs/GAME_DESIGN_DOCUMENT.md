@@ -7,7 +7,7 @@
 
 ### 1.1 Elevator Pitch
 
-WarChess is a Napoleonic-era auto-battler where players command armies of historically inspired units on a 10×10 grid. Build your formation, deploy your troops, and watch the battle unfold. Master terrain, exploit unit synergies, and outthink your opponent — not outclick them.
+WarChess is a Napoleonic-era auto-battler where players command armies of historically inspired units on a configurable grid (default 10×10). Build your formation, deploy your troops, and watch the battle unfold. Master terrain, exploit unit synergies, and outthink your opponent — not outclick them.
 
 ### 1.2 Genre & Influences
 
@@ -35,7 +35,7 @@ Players who enjoy tactical thinking but want shorter sessions — a single battl
 
 ### 2.1 The Grid
 
-The battlefield is a **10×10 square grid** (100 tiles). Each tile can hold one unit or one terrain feature, not both (units occupy terrain tiles — they coexist).
+The battlefield is a **square grid** (default 10×10, configurable via GameConfig for testing). Grid width and height are stored in GameConfig and can be adjusted independently. All deployment zones, movement ranges, and formation detection adapt to the configured grid size. Each tile can hold one unit or one terrain feature, not both (units occupy terrain tiles — they coexist).
 
 ```
      1   2   3   4   5   6   7   8   9   10
