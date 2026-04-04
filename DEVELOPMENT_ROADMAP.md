@@ -214,7 +214,7 @@ Elo updated, leaderboard refreshed
 | 7.2 | New unit releases (2–3 per content update) | 🤖 Claude | Unit designs + balance testing |
 | 7.3 | Seasonal ranked seasons with reset + rewards | 🤖 Claude | Season structure design |
 | 7.4 | Community feedback pipeline | 🧑 David | Discord / Reddit monitoring |
-| 7.5 | Optional monetization — cosmetic skins, alternative pixel art themes | 🤖 Claude | Monetization design (ethical, cosmetic-only) |
+| 7.5 | Monetization system — Field Manuals (Warbond-style content packs), Sovereign/Battle Star currencies, Quartermaster's Shop, Weekly Challenges. **Code complete**; David to build UI | 🤖 Claude + 🧑 David | Monetization design + implementation (ethical, cosmetic-only). See Docs/MONETIZATION_STRATEGY.md |
 | 7.6 | New campaign chapters | 🤖 Claude | Additional story + battles |
 
 ---

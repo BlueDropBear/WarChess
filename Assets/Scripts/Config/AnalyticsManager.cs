@@ -19,7 +19,13 @@ namespace WarChess.Config
         OfficerLevelUp,
         DispatchBoxOpened,
         CosmeticEquipped,
-        SettingsChanged
+        SettingsChanged,
+        FieldManualPurchased,
+        FieldManualRewardClaimed,
+        SovereignsEarned,
+        SovereignsSpent,
+        BattleStarEarned,
+        WeeklyChallengeCompleted
     }
 
     /// <summary>

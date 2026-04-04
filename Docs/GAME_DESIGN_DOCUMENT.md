@@ -762,23 +762,29 @@ Ranked play uses a pool of ~20 balanced map templates. **3 maps are active per w
 
 ## 8. Monetization
 
-**Core principle: No pay-to-win. No paying to unlock units faster.** Units are earned through play. Monetization funds the game without giving paying players a competitive advantage.
+**Core principle: No pay-to-win. No paying to unlock units faster.** Units are earned through play. Monetization funds the game without giving paying players a competitive advantage. The monetization model is inspired by Helldivers 2's Warbond system — permanent content packs with generous free earning, no FOMO timers, and a clean separation between gameplay and cosmetic economies.
 
 ### 8.1 Game Purchase Model
 
 **Campaign:**
 - **Act 1 (Battles 1–10) is free** — serves as a demo and tutorial
-- **Full Campaign (Acts 2–3, Battles 11–30) is a one-time purchase** — this is the primary revenue source
-- Price: $4.99–$9.99 (TBD based on market research)
+- **Full Campaign (Acts 2–3, Battles 11–30) is a one-time purchase** — this is the primary revenue source at launch
+- Price: $4.99
 - Purchasing the campaign does NOT unlock multiplayer units faster — tier progression is play-based only
 
 **Multiplayer:**
 - Free to play at all tiers
-- Monetization through Ammunition and cosmetics (see below)
+- Monetization through Ammunition (deployment convenience) and Sovereigns (cosmetic currency) — see below
+
+**Two dedicated currencies** keep the economy clean:
+- **Ammunition** — gameplay convenience (army deployments only)
+- **Sovereigns** — cosmetic purchases only (Field Manuals, Quartermaster's Shop)
+
+These currencies are never convertible between each other. This prevents any pay-to-win pathway.
 
 ### 8.2 Ammunition System
 
-**Ammunition** is the currency spent to deploy armies into the multiplayer pool (see Section 7.3).
+**Ammunition** is the currency spent to deploy armies into the multiplayer pool (see Section 7.3). It is exclusively for army deployment — NOT used for cosmetic purchases.
 
 **Starting Ammunition:** New players receive **10 Ammunition** when first accessing multiplayer — enough for several days of play before the earn/spend loop matters.
 
@@ -795,7 +801,104 @@ Ranked play uses a pool of ~20 balanced map templates. **3 maps are active per w
 
 **Why this works:** Casual players who deploy 1–3 armies per day never need to spend money — the free daily Ammunition covers them. Heavy players who want to run many armies simultaneously across multiple tiers may choose to buy more. Crucially, Ammunition does not affect battle outcomes — it only controls how many armies you have in the pool at once. A free player's army is exactly as powerful as a paying player's army.
 
-### 8.3 Reward Boxes
+### 8.3 Sovereigns (Premium Cosmetic Currency)
+
+**Sovereigns** are gold sovereign coins — the dedicated premium currency for cosmetic purchases. They are completely separate from Ammunition to prevent any pay-to-win perception.
+
+**Earning Sovereigns for free:**
+- 5 Sovereigns per campaign battle first-clear (30 battles = 150 total)
+- 2 Sovereigns per multiplayer tier promotion (5 tiers = 10 total)
+- 10 Sovereigns for 3-starring all battles in a Campaign Act (3 acts = 30 total)
+- 5 Sovereigns on day 7 of consecutive daily login (weekly cycle)
+- 1–3 Sovereigns as random drops from Gold Dispatch Boxes
+
+**Active player monthly earning:** ~60–80 Sovereigns through normal play. A premium Field Manual costs 1,000 Sovereigns, so a free player can earn one every ~3–4 months through dedicated play. This mirrors Helldivers 2's generous-but-slow free earning pace.
+
+**Purchasing Sovereigns:**
+
+| Pack | Price | Bonus |
+|------|-------|-------|
+| 100 Sovereigns | $0.99 | — |
+| 500 Sovereigns | $3.99 | — |
+| 1,200 Sovereigns | $7.99 | 20% bonus |
+| 2,500 Sovereigns | $14.99 | 25% bonus |
+
+**Used for:** Unlocking Field Manual premium tracks (1,000 Sovereigns each), purchasing cosmetics from the Quartermaster's Shop (50–500 Sovereigns per item by rarity).
+
+### 8.4 Battle Stars (Progression Currency)
+
+**Battle Stars** are the non-purchasable progression currency used to unlock items within Field Manuals. They represent pure play-time investment — they cannot be bought with real money or Sovereigns.
+
+**Earning Battle Stars:**
+- 1 Battle Star per campaign battle completed (repeatable daily)
+- 1 Battle Star per multiplayer win
+- 2 Battle Stars per tier promotion
+- 1 Battle Star per 3-day consecutive login streak
+- 3 Battle Stars per weekly challenge completed (see Section 8.6)
+
+**Battle Star Boosters:** A premium Field Manual reward that doubles Battle Star earning for 24 hours. Convenience only — does not affect gameplay.
+
+### 8.5 Field Manuals (Warbond System)
+
+**Field Manuals** are permanent, themed content packs inspired by Helldivers 2's Warbond system. Each manual is themed around a Napoleonic campaign or theater of war and contains cosmetic rewards on two parallel tracks.
+
+**Structure:**
+- **4 pages** (unlock tiers) per manual, with rewards unlocked sequentially by spending Battle Stars
+- **Free track:** 6–8 items available to all players at no cost
+- **Premium track:** 8–10 additional exclusive items, unlocked by purchasing the premium track for **1,000 Sovereigns** (~$7.99)
+- **~23 total items** per manual
+
+**Page breakdown:**
+
+| Page | Items | Stars per Item | Total Stars | Content Tier |
+|------|-------|----------------|-------------|--------------|
+| 1 | 3 | 5 | 15 | Common/Uncommon cosmetics |
+| 2 | 3 | 8 | 24 | Uncommon + Ammunition grants |
+| 3 | 4 | 12 | 48 | Rare + Sovereigns + Dispatch Box |
+| 4 | 3 | 15 | 45 | Epic capstone cosmetics |
+| **Total** | **13** | | **132** | ~26 days at 5 Stars/day |
+
+**Premium track value:** Premium tracks return ~150–200 Sovereigns through embedded rewards, reducing the effective cost to ~800 Sovereigns. This rewards engagement.
+
+**Field Manuals NEVER expire.** Once released, a Field Manual remains permanently available. Players can purchase and progress through any manual at any time. No FOMO. This is a core design pillar.
+
+**Reward types within Field Manuals:**
+- Cosmetic items (unit skins, grid themes, portraits, animations, banners, portrait frames)
+- Ammunition grants (small amounts)
+- Sovereign grants (partially offset premium cost)
+- Dispatch Boxes (Bronze in free track, Silver/Gold in premium)
+- Battle Star Boosters (24h 2x earning, premium track only)
+
+**NEVER in Field Manuals:** Officers, Commanders, unit types, formations, terrain, or anything gameplay-affecting.
+
+**Launch Field Manuals:**
+
+| Manual | Theme | Cost | Release |
+|--------|-------|------|---------|
+| Mustering the Troops | Tutorial / introductory | Free | Launch |
+| The Egyptian Expedition | Napoleon's 1798 Egyptian Campaign | 1,000 Sovereigns | Month 1 |
+| The Peninsular War | Wellington's 1807–1814 Iberian Campaign | 1,000 Sovereigns | Month 2 |
+| The Grande Armee | Napoleon's 1812 Russian Campaign | 1,000 Sovereigns | Month 3 |
+
+**Field Manual-exclusive cosmetics** (28 items across the 3 premium manuals) cannot appear in the Quartermaster's Shop — they preserve the value proposition of Field Manuals.
+
+### 8.6 Weekly Challenges
+
+**Weekly Challenges** provide a steady source of Battle Stars and encourage variety in play.
+
+- **3 challenges active per week**, rotating from a pool of 12 templates
+- Each challenge awards **3 Battle Stars** on completion (up to 9 Stars/week)
+- Challenge selection uses seeded RNG from the week number (deterministic, same for all players)
+
+**Challenge types:**
+- **Win Battles** — Win 5 or 10 multiplayer battles
+- **Deploy Unit Type** — Deploy a specific unit type in N battles (e.g., "Deploy Cavalry in 10 battles")
+- **Achieve Formation** — Trigger formation bonuses in 5 battles
+- **Complete Campaign** — Complete 3 or 5 campaign battles
+- **Win with Commander** — Win 3 battles using a specific commander (e.g., Napoleon, Wellington)
+- **Win in Tier** — Win 5 battles in Tier 2 or higher
+
+### 8.7 Dispatch Boxes
 
 When a player earns a new rank (Elo milestone) or achievement, they receive a **Dispatch Box** — a symbolic container they tap to open, revealing their reward with a satisfying animation.
 
@@ -806,27 +909,71 @@ When a player earns a new rank (Elo milestone) or achievement, they receive a **
 
 **The box opening is ceremonial** — there's no randomness in what you get for rank/tier promotions (always the badge + known reward). Achievement boxes can contain one item from a small pool of themed cosmetics.
 
-### 8.4 Cosmetic Items
+**Dispatch Boxes are earned only — never sold for real money.** They are awarded through gameplay (rank-ups, achievements, tier promotions) and as rewards within Field Manual tracks. This is more transparent than direct loot box sales — players can see exactly where boxes appear in Field Manual progression.
 
-All cosmetics are visual only and never affect gameplay:
+### 8.8 Cosmetic Items
 
-- **Unit skins** — Alternative pixel art (Austrian uniforms, Prussian blue, Russian green, Ottoman gold)
-- **Grid themes** — Alternative board visuals (winter snow, Egyptian desert, Mediterranean coast)
-- **Commander portraits** — Stylized pixel art commander images
-- **Victory animations** — Custom battle-end celebrations (fireworks, cavalry parade, cannon salute)
-- **Army banners** — Custom flag displayed on your deployment zone
+All cosmetics are visual only and never affect gameplay. There are **6 cosmetic types** and **61 total cosmetic items** (33 base + 28 Field Manual exclusives):
 
-**Acquisition:** Cosmetics are earned through Dispatch Boxes (free) or purchased individually from a rotating shop ($0.99–$2.99 per item). No loot boxes with real money — you always know what you're buying.
+- **Unit skins** — Alternative pixel art (Austrian uniforms, Prussian blue, Russian green, Ottoman gold, Mameluke, Cossack, etc.)
+- **Grid themes** — Alternative board visuals (winter snow, Egyptian desert, burning Moscow, Iberian sun, etc.)
+- **Commander portraits** — Stylized pixel art commander images (Napoleon in Egypt, Wellington at Salamanca, Kutuzov in winter furs, etc.)
+- **Victory animations** — Custom battle-end celebrations (fireworks, cavalry parade, cannon salute, Sphinx's Gaze, Russian Retreat, etc.)
+- **Army banners** — Custom flag displayed on your deployment zone (Union Jack, Tricolour, Ottoman Crescent, Borodino Standard, etc.)
+- **Officer portrait frames** — Decorative frames around officer icons in the army builder (Shako Frame, Bearskin Frame, etc.)
 
-### 8.5 Revenue Summary
+**4 rarity tiers:** Common, Uncommon, Rare, Epic — affecting Dispatch Box drop rates and Quartermaster's Shop pricing.
 
-| Source | Type | Expected Share |
-|--------|------|---------------|
-| Campaign unlock (Acts 2–3) | One-time purchase | Primary |
-| Ammunition packs | Consumable | Secondary |
-| Cosmetic shop | One-time per item | Tertiary |
+**Acquisition methods:**
+- **Quartermaster's Shop** — Daily rotating selection priced in Sovereigns (see Section 8.9)
+- **Dispatch Boxes** — Earned through gameplay (see Section 8.7)
+- **Field Manual rewards** — 28 exclusive cosmetics across premium manuals (see Section 8.5)
+- **Ranked season rewards** — Season-exclusive banners, titles, and badges (the only time-limited items in the game)
 
-This model respects players: the full single-player experience has a clear price, multiplayer is free to enjoy casually, and spending money never makes your army stronger.
+### 8.9 Quartermaster's Shop
+
+The **Quartermaster's Shop** is a daily rotating cosmetic storefront priced in Sovereigns.
+
+- **6 items per day**, selected using seeded RNG from the date (deterministic)
+- Ensures at least one item from each rarity tier when stock allows
+- **Sovereign pricing by rarity:**
+
+| Rarity | Sovereign Price |
+|--------|----------------|
+| Common | 50 |
+| Uncommon | 100 |
+| Rare | 250 |
+| Epic | 500 |
+
+- **Field Manual-exclusive cosmetics** never appear in the shop rotation — they can only be earned through their respective Field Manual
+- Items already owned are excluded from shop suggestions
+
+### 8.10 Revenue Summary
+
+| Source | Type | Currency | Expected Share |
+|--------|------|----------|---------------|
+| Campaign unlock (Acts 2–3) | One-time purchase | Real money ($4.99) | Primary (launch) |
+| Field Manual premium tracks | One-time per manual | Sovereigns (via IAP) | Primary (month 3+, ~40%) |
+| Sovereign packs | Consumable | Real money ($0.99–$14.99) | Secondary |
+| Ammunition packs | Consumable | Real money ($0.99–$4.99) | Tertiary |
+| Quartermaster's Shop | Indirect (via Sovereigns) | Sovereigns | Included in Sovereign revenue |
+
+**Anti-pay-to-win guarantees:**
+1. Units unlock only through campaign progression or multiplayer tier wins
+2. Tier progression requires actual wins (cannot be purchased)
+3. Sovereigns cannot buy gameplay advantages (only cosmetics)
+4. Ammunition does not improve armies (only deployment count)
+5. Officers and Commanders are earned through play, never sold
+6. Field Manuals contain zero gameplay-affecting content
+7. Battle Stars cannot be purchased with real money
+8. Free earning is generous enough that casual players never need to spend
+
+**FOMO policy:**
+- Field Manuals: **Permanent** (never expire)
+- Weekly Challenges: **Reset weekly** (no penalty for missing a week)
+- Ranked season rewards: **Season-exclusive** (banners, titles, badges as prestige items — the only time-limited content)
+
+This model respects players: the full single-player experience has a clear price, multiplayer is free to enjoy casually, cosmetic purchases are optional and never gameplay-affecting, and generous free earning ensures no player is left behind.
 
 ---
 
@@ -895,9 +1042,16 @@ Main Menu
   │
   ├── Dispatch Boxes (pending unopened boxes, opening animation)
   │
-  ├── Cosmetics Shop (rotating items, equipped skins/themes)
+  ├── Quartermaster's Shop (daily rotating items, Sovereign pricing, equipped cosmetics)
   │
-  ├── Profile (rank badges, achievements, stats)
+  ├── Field Manuals (browse manuals, claim rewards, purchase premium tracks)
+  │     ├── Manual Selection (all available manuals, completion %)
+  │     ├── Page Browser (free + premium tracks, Battle Star costs)
+  │     └── Reward Claim (spend stars, reward animation)
+  │
+  ├── Weekly Challenges (3 active challenges, progress tracking, Battle Star rewards)
+  │
+  ├── Profile (rank badges, achievements, stats, Sovereign/Battle Star balances)
   │
   └── Settings
         ├── Audio (music/SFX volume)
@@ -1009,16 +1163,26 @@ The AI QA Tester reuses the same battle engine code as the game — it's not a s
 
 ## 13. Future Content (Post-Launch)
 
-Ideas for post-launch updates, not in scope for v1:
-- **Additional campaigns** (Egyptian campaign, Peninsular War, Russian campaign) — sold as expansion packs
+**Already implemented for months 1–3 (see Section 8.5 and Docs/MONETIZATION_STRATEGY.md):**
+- Field Manual: The Egyptian Expedition (Month 1)
+- Field Manual: The Peninsular War (Month 2)
+- Field Manual: The Grande Armee (Month 3)
+- Act IV: The Hundred Days (10 new battles, 3 new units — free for campaign purchasers)
+
+**Ideas for months 4+ and beyond:**
+- **New Field Manual themes** — Trafalgar (naval), Austerlitz, Leipzig (Battle of Nations), Marengo, The Continental System
+- **Campaign expansion packs** — Act V+, sold as additional one-time purchases or included for campaign purchasers
 - **Challenge modes** (win with only cavalry, survive 50 rounds, etc.)
-- **Weekly tournaments** with unique rules and cosmetic prizes
+- **Weekly tournaments** with unique rules and cosmetic prizes (builds on existing Weekly Challenge system)
+- **Battle Star Booster events** — limited-time 2x earning periods during holidays or milestones
 - **Map editor** for community-created maps
 - **2v2 async multiplayer** (four-player battles)
 - **Historical scenarios** with fixed armies recreating real battles
 - **New Officers** — expand the Officer roster with seasonal additions
-- **6-Star tier** — ultimate prestige rank with unique cosmetic rewards
+- **New Commanders** — additional historical commanders (Soult, Davout, etc.)
+- **6-Star prestige tier** — ultimate prestige rank with unique cosmetic rewards
+- **Ranked season evolution** — new season-exclusive reward types as the cosmetic economy matures
 
 ---
 
-*This document is version 2.1. Updated from v2.0 to include: core gameplay loop section (1.6), morale system (2.10), Moore trigger rework (budget-based), Veteran Sergeant rebalance (-1 SPD), Rocket Battery cost reduction and fortification bypass, Lancer unlock moved to Battle 20, starter Ammunition for new players, Wellington design note, Lancer flavor text fix, SPD/terrain description corrections, and Militia Square formation.*
+*This document is version 3.0. Updated from v2.1 to include: Helldivers 2-inspired Field Manual monetization system (Warbond-style permanent content packs with free and premium tracks), Sovereign premium cosmetic currency, Battle Star progression currency, Quartermaster's Shop (renamed from Cosmetics Shop with Sovereign pricing), Weekly Challenges (Battle Star earning), OfficerPortraitFrame cosmetic type (6th type), Dispatch Boxes no longer sold for real money, revised revenue model with 4 Field Manuals and 3-month content calendar, expanded anti-pay-to-win guarantees, and FOMO policy.*

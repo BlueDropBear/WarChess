@@ -50,6 +50,7 @@ Assets/
 │   ├── Audio/             # Sound manager, music controller
 │   ├── Save/              # Save/load system, serialization
 │   ├── Config/            # GameConfig, balance constants, tunable values
+│   ├── Economy/           # Sovereign and Battle Star currency systems
 │   └── QA/                # AI balance tester (editor-only)
 ├── Data/
 │   ├── Units/             # Unit ScriptableObjects
@@ -97,7 +98,12 @@ These are settled decisions from the GDD. Do not change without explicit instruc
 - 5 Star General tiers gate multiplayer units
 - Act 1 is free, Acts 2–3 are a one-time purchase
 - No pay-to-win, no paying to unlock units faster
-- Dispatch Boxes are symbolic/cosmetic only
+- Dispatch Boxes are symbolic/cosmetic only — earned through gameplay, never sold for real money
+- Sovereigns are the premium cosmetic currency; Ammunition is only for army deployment — never convertible
+- Battle Stars (Field Manual progression currency) cannot be purchased with real money
+- Field Manuals never expire — no FOMO mechanics (Helldivers 2 philosophy)
+- The Quartermaster's Shop prices cosmetics in Sovereigns, not real money or Ammunition
+- Field Manual-exclusive cosmetics do not appear in the Quartermaster's Shop
 
 ---
 
