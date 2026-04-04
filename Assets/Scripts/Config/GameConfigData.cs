@@ -52,6 +52,10 @@ namespace WarChess.Config
         // Artillery types are always exempt (single gun piece, not a regiment).
         public readonly int StrengthScalingFloor;
 
+        // Unbreakable (Old Guard) — uses a gentler linear curve instead of sqrt.
+        // This is the minimum damage multiplier at 0 HP (base 100). Default 75 = never below 75%.
+        public readonly int UnbreakableStrengthFloor;
+
         // Dragoon dismount
         public readonly int DismountMov;
         public readonly int DismountDefBonus;
@@ -77,6 +81,7 @@ namespace WarChess.Config
             int chargeMinTilesMoved, int chargeMultiplier,
             int bombardmentSplashPercentage = 50,
             int strengthScalingFloor = 25,
+            int unbreakableStrengthFloor = 75,
             int dismountMov = 2, int dismountDefBonus = 3, int dismountAtkBonus = 2,
             int battleLineMinUnits = 3, int squareMinUnits = 4,
             int cavalryWedgeMinUnits = 3, int cavalryWedgeMaxStep = 2)
@@ -105,6 +110,7 @@ namespace WarChess.Config
             ChargeMultiplier = chargeMultiplier;
             BombardmentSplashPercentage = bombardmentSplashPercentage;
             StrengthScalingFloor = strengthScalingFloor;
+            UnbreakableStrengthFloor = unbreakableStrengthFloor;
             DismountMov = dismountMov;
             DismountDefBonus = dismountDefBonus;
             DismountAtkBonus = dismountAtkBonus;

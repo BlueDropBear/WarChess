@@ -215,20 +215,15 @@ namespace WarChess.Battle
                     }
                 }
 
-                // Unbreakable: Old Guard +25% ATK when below 25% HP
-                int atkBonus = 100;
-                if (unit.Ability == AbilityType.Unbreakable && unit.CurrentHp * 4 <= unit.MaxHp)
-                    atkBonus = 125;
-
                 // Calculate damage
                 int damage = DamageCalculator.Calculate(
                     unit, target, flankDir,
                     isCharge, _config.ChargeMultiplier, _config.MinimumDamage);
-                if (atkBonus != 100)
-                    damage = damage * atkBonus / 100;
 
-                // Strength scaling: damaged units deal less damage (sqrt curve)
-                int strengthMult = DamageCalculator.GetStrengthMultiplier(unit, _config.StrengthScalingFloor);
+                // Strength scaling: damaged units deal less damage (sqrt curve).
+                // Unbreakable (Old Guard) uses a gentler linear curve instead.
+                int strengthMult = DamageCalculator.GetStrengthMultiplier(
+                    unit, _config.StrengthScalingFloor, _config.UnbreakableStrengthFloor);
                 if (strengthMult < 100)
                     damage = System.Math.Max(damage * strengthMult / 100, _config.MinimumDamage);
 

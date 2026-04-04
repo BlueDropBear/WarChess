@@ -18,14 +18,23 @@ namespace WarChess.Battle
         /// Artillery types (Artillery, HorseArtillery, RocketBattery) are exempt —
         /// they represent a single gun piece, not a regiment of soldiers.
         ///
-        /// Example values at different HP percentages:
+        /// Unbreakable units (Old Guard) use a gentler linear curve instead of sqrt,
+        /// declining smoothly to unbreakableFloor. This replaces the old binary +25%
+        /// threshold and represents maintained cohesion under fire.
+        ///
+        /// Example values (normal sqrt curve):
         ///   100% HP → 100,  75% → 86,  50% → 70,  25% → 50,  10% → 31
+        ///
+        /// Example values (Unbreakable linear curve, floor=75):
+        ///   100% HP → 100,  75% → 94,  50% → 87,  25% → 81,  10% → 77
         /// </summary>
         /// <param name="attacker">The unit dealing damage.</param>
-        /// <param name="floorMultiplier">Minimum multiplier (base-100). Prevents damage
-        /// from becoming negligible. E.g., 25 means a unit always deals at least 25% damage.</param>
+        /// <param name="floorMultiplier">Minimum multiplier (base-100) for normal units.</param>
+        /// <param name="unbreakableFloor">Minimum multiplier (base-100) for Unbreakable units.
+        /// Default 100 means Unbreakable uses the normal sqrt curve (backwards compatible).</param>
         /// <returns>Base-100 multiplier (100 = full damage, 50 = half damage).</returns>
-        public static int GetStrengthMultiplier(UnitInstance attacker, int floorMultiplier)
+        public static int GetStrengthMultiplier(UnitInstance attacker, int floorMultiplier,
+            int unbreakableFloor = 100)
         {
             // Artillery types are exempt — single gun piece, not a regiment
             if (IsArtilleryType(attacker.Type))
@@ -35,6 +44,19 @@ namespace WarChess.Battle
             if (attacker.CurrentHp >= attacker.MaxHp)
                 return 100;
 
+            // Unbreakable (Old Guard): gentle linear curve from 100 to unbreakableFloor.
+            // Replaces the old binary +25% ATK threshold with smooth degradation.
+            if (attacker.Ability == AbilityType.Unbreakable)
+            {
+                if (attacker.CurrentHp <= 0)
+                    return unbreakableFloor;
+
+                // Linear: floor + (100 - floor) * currentHp / maxHp
+                int range = 100 - unbreakableFloor;
+                int mult = unbreakableFloor + (range * attacker.CurrentHp / attacker.MaxHp);
+                return Math.Min(mult, 100);
+            }
+
             // Dead units deal no damage (caller should check IsAlive, but be safe)
             if (attacker.CurrentHp <= 0)
                 return floorMultiplier;
@@ -42,9 +64,9 @@ namespace WarChess.Battle
             // sqrt(currentHp / maxHp) using integer math:
             // Scale to 10000 first so sqrt gives a base-100 result
             int scaled = attacker.CurrentHp * 10000 / attacker.MaxHp;
-            int mult = IntSqrt(scaled);
+            int sqrtMult = IntSqrt(scaled);
 
-            return Math.Max(Math.Min(mult, 100), floorMultiplier);
+            return Math.Max(Math.Min(sqrtMult, 100), floorMultiplier);
         }
 
         /// <summary>

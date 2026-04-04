@@ -301,14 +301,11 @@ namespace WarChess.Battle
             if (unit.Ability == AbilityType.AimedShot && !unit.HasMovedThisRound)
                 aimedShotBonus = 150;
 
-            // Unbreakable: Old Guard gains +25% ATK when HP below 25%
-            int unbreakableBonus = 100;
-            if (unit.Ability == AbilityType.Unbreakable && unit.CurrentHp * 4 <= unit.MaxHp)
-                unbreakableBonus = 125;
-
-            // Fold all ATK-side multipliers (formation ATK, commander ATK, aimed shot, unbreakable) into
-            // one base-100 value for the formationMultiplier slot
-            int atkFormation = (int)((long)formationMult * cmdAtk * aimedShotBonus * unbreakableBonus / (100L * 100L * 100L));
+            // Fold all ATK-side multipliers (formation ATK, commander ATK, aimed shot) into
+            // one base-100 value for the formationMultiplier slot.
+            // Note: Unbreakable (Old Guard) is now handled via strength scaling curve,
+            // not a binary threshold — see GetStrengthMultiplier.
+            int atkFormation = (int)((long)formationMult * cmdAtk * aimedShotBonus / (100L * 100L));
 
             // Fold target's DEF modifiers (commander DEF, formation DEF) into terrainDef so
             // they are batched with other multipliers BEFORE flanking inside DamageCalculator.
@@ -329,8 +326,10 @@ namespace WarChess.Battle
                 isCharge, chargeMultiplier > 100 ? chargeMultiplier : (isCharge ? _config.ChargeMultiplier : 100),
                 _config.MinimumDamage);
 
-            // Strength scaling: damaged units deal less damage (sqrt curve)
-            int strengthMult = DamageCalculator.GetStrengthMultiplier(unit, _config.StrengthScalingFloor);
+            // Strength scaling: damaged units deal less damage (sqrt curve).
+            // Unbreakable (Old Guard) uses a gentler linear curve instead.
+            int strengthMult = DamageCalculator.GetStrengthMultiplier(
+                unit, _config.StrengthScalingFloor, _config.UnbreakableStrengthFloor);
             if (strengthMult < 100)
                 damage = System.Math.Max(damage * strengthMult / 100, _config.MinimumDamage);
 

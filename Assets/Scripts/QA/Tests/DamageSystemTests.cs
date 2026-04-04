@@ -22,7 +22,8 @@ namespace WarChess.QA.Tests
                 TestSplashDamage(config),
                 TestChargeDamage(config),
                 TestStrengthScaling(config),
-                TestStrengthScalingArtilleryExempt(config)
+                TestStrengthScalingArtilleryExempt(config),
+                TestUnbreakableSmooth(config)
             };
         }
 
@@ -272,6 +273,76 @@ namespace WarChess.QA.Tests
 
                 return QATestResult.Pass(name,
                     "All artillery types exempt from strength scaling at half HP");
+            }
+            catch (Exception ex)
+            {
+                return QATestResult.Fail(name, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Unbreakable (Old Guard) uses a smooth linear curve instead of sqrt.
+        /// Damage should decrease gently with no threshold jumps.
+        /// </summary>
+        public static QATestResult TestUnbreakableSmooth(GameConfigData config)
+        {
+            const string name = "DamageSystem.UnbreakableSmooth";
+            try
+            {
+                UnitFactory.ResetIds();
+                var guard = UnitFactory.CreateOldGuard(Owner.Player, new GridCoord(5, 2));
+                int floor = config.UnbreakableStrengthFloor;
+
+                // Full HP: should be 100
+                int fullMult = DamageCalculator.GetStrengthMultiplier(guard, config.StrengthScalingFloor, floor);
+                if (fullMult != 100)
+                    return QATestResult.Fail(name, $"Full HP multiplier should be 100, got {fullMult}");
+
+                // Collect multipliers at every 10% HP to verify smooth decline
+                int prevMult = fullMult;
+                bool monotonic = true;
+                var values = new System.Text.StringBuilder("100%=100");
+
+                for (int pct = 90; pct >= 10; pct -= 10)
+                {
+                    // Reset unit to exact HP percentage
+                    int targetHp = guard.MaxHp * pct / 100;
+                    // Heal to full first, then damage to target
+                    guard.Heal(guard.MaxHp);
+                    guard.TakeDamage(guard.MaxHp - targetHp);
+
+                    int mult = DamageCalculator.GetStrengthMultiplier(guard, config.StrengthScalingFloor, floor);
+                    values.Append($", {pct}%={mult}");
+
+                    // Must be strictly non-increasing (no jumps upward)
+                    if (mult > prevMult)
+                    {
+                        monotonic = false;
+                        return QATestResult.Fail(name,
+                            $"Damage jumped UP from {prevMult} to {mult} at {pct}% HP — not smooth");
+                    }
+
+                    // Must never drop below the Unbreakable floor
+                    if (mult < floor)
+                        return QATestResult.Fail(name,
+                            $"Multiplier {mult} below Unbreakable floor {floor} at {pct}% HP");
+
+                    // Unbreakable should degrade much less than sqrt curve
+                    // At 25% HP: sqrt gives 50, Unbreakable (floor=75) gives 81
+                    // Verify Unbreakable stays above the sqrt value
+                    if (pct <= 50)
+                    {
+                        int sqrtValue = pct == 50 ? 70 : (pct == 40 ? 63 : (pct == 30 ? 54 : (pct == 20 ? 44 : 31)));
+                        if (pct <= 50 && mult <= sqrtValue)
+                            return QATestResult.Fail(name,
+                                $"Unbreakable mult {mult} not better than sqrt {sqrtValue} at {pct}% HP");
+                    }
+
+                    prevMult = mult;
+                }
+
+                return QATestResult.Pass(name,
+                    $"Unbreakable smooth curve (floor={floor}): {values}");
             }
             catch (Exception ex)
             {
