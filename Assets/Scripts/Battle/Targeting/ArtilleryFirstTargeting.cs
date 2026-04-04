@@ -32,7 +32,7 @@ namespace WarChess.Battle.Targeting
                     int dist = attacker.Position.ManhattanDistance(enemy.Position);
 
                     if (enemy.Rng > bestRng || (enemy.Rng == bestRng && dist < bestDist)
-                        || (enemy.Rng == bestRng && dist == bestDist && enemy.Id < best.Id))
+                        || (enemy.Rng == bestRng && dist == bestDist && (best == null || enemy.Id < best.Id)))
                     {
                         best = enemy;
                         bestRng = enemy.Rng;

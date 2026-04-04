@@ -30,6 +30,7 @@ namespace WarChess.Battle
 
         // Per-round formation bonuses (recalculated each round)
         private readonly Dictionary<int, FormationBonus> _formationBonuses;
+        private readonly HashSet<int> _removedFromGrid;
 
         private int _currentRound;
         private bool _battleEnded;
@@ -59,6 +60,7 @@ namespace WarChess.Battle
             _enemyUnits = new List<UnitInstance>(enemyUnits);
             _events = new List<BattleEvent>();
             _formationBonuses = new Dictionary<int, FormationBonus>();
+            _removedFromGrid = new HashSet<int>();
             _currentRound = 0;
             _battleEnded = false;
             _initialPlayerCount = playerUnits.Count;
@@ -324,9 +326,9 @@ namespace WarChess.Battle
         private void CleanupDead()
         {
             foreach (var u in _playerUnits)
-                if (!u.IsAlive) _grid.RemoveUnit(u.Position);
+                if (!u.IsAlive && _removedFromGrid.Add(u.Id)) _grid.RemoveUnit(u.Position);
             foreach (var u in _enemyUnits)
-                if (!u.IsAlive) _grid.RemoveUnit(u.Position);
+                if (!u.IsAlive && _removedFromGrid.Add(u.Id)) _grid.RemoveUnit(u.Position);
         }
 
         private void CheckWinConditions()
