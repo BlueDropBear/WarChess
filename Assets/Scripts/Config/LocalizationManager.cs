@@ -381,6 +381,34 @@ namespace WarChess.Config
             s["mp.ammo.daily"] = "+{0} daily ammunition claimed!";
             s["mp.ammo.insufficient"] = "Not enough ammunition to deploy.";
 
+            // === Deployment Rounds ===
+            s["mp.round.title"] = "Deployment Round";
+            s["mp.round.battle"] = "Battle {0} of {1}";
+            s["mp.round.bonus"] = "Bonus Round";
+            s["mp.round.perfectrun"] = "Perfect Run! 10 Stars!";
+            s["mp.round.stars"] = "{0} Stars Earned";
+            s["mp.round.opponent.live"] = "Live Opponent";
+            s["mp.round.opponent.ghost"] = "Ghost Army";
+            s["mp.round.opponent.house"] = "War Office Army";
+            s["mp.round.champion_challenge"] = "Champion Challenge";
+            s["mp.round.champions_only"] = "Challenge the Champions";
+            s["mp.round.champions_only.desc"] = "Only face top-ranked ghost armies. Harder, but more prestigious.";
+
+            // === Champion Titles ===
+            s["champion.title.None"] = "";
+            s["champion.title.FormerChampion"] = "Former Champion";
+            s["champion.title.TierChampion"] = "Tier Champion";
+            s["champion.title.MultiTierChampion"] = "Multi-Tier Champion";
+            s["champion.title.GrandChampion"] = "Grand Champion";
+            s["champion.promoted"] = "Your army reached the top! You are now a {0}!";
+            s["champion.demoted"] = "Your army has been overtaken. Title: {0}";
+
+            // === Star Rating ===
+            s["stars.flawless"] = "Flawless Victory";
+            s["stars.decisive"] = "Decisive Victory";
+            s["stars.victory"] = "Victory";
+            s["stars.defeat"] = "Defeat";
+
             // === Dispatch Boxes ===
             s["dispatch.bronze.name"] = "Bronze Dispatch Box";
             s["dispatch.silver.name"] = "Silver Dispatch Box";

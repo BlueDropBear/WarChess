@@ -25,7 +25,11 @@ namespace WarChess.Config
         SovereignsEarned,
         SovereignsSpent,
         BattleStarEarned,
-        WeeklyChallengeCompleted
+        WeeklyChallengeCompleted,
+        DeploymentRoundCompleted,
+        GhostArmyUsed,
+        BonusRoundTriggered,
+        ChampionTitleChanged
     }
 
     /// <summary>
@@ -205,6 +209,52 @@ namespace WarChess.Config
                 .With("session_id", _sessionId)
                 .With("box_type", boxType)
                 .With("items_awarded", itemsAwarded.ToString());
+            EnqueueAndMaybeSend(evt);
+        }
+
+        /// <summary>Logs a deployment round completion.</summary>
+        public void LogDeploymentRoundCompleted(int tier, int totalStars, bool isPerfectRun,
+            int ghostBattles, int houseBattles, int liveBattles)
+        {
+            var evt = new AnalyticsEvent(AnalyticsEventType.DeploymentRoundCompleted)
+                .With("session_id", _sessionId)
+                .With("tier", tier.ToString())
+                .With("total_stars", totalStars.ToString())
+                .With("perfect_run", isPerfectRun.ToString())
+                .With("ghost_battles", ghostBattles.ToString())
+                .With("house_battles", houseBattles.ToString())
+                .With("live_battles", liveBattles.ToString());
+            EnqueueAndMaybeSend(evt);
+        }
+
+        /// <summary>Logs when a ghost army is used as an opponent.</summary>
+        public void LogGhostArmyUsed(int tier, bool isChampion)
+        {
+            var evt = new AnalyticsEvent(AnalyticsEventType.GhostArmyUsed)
+                .With("session_id", _sessionId)
+                .With("tier", tier.ToString())
+                .With("is_champion", isChampion.ToString());
+            EnqueueAndMaybeSend(evt);
+        }
+
+        /// <summary>Logs when a bonus round is triggered.</summary>
+        public void LogBonusRoundTriggered(int tier, int standardStars)
+        {
+            var evt = new AnalyticsEvent(AnalyticsEventType.BonusRoundTriggered)
+                .With("session_id", _sessionId)
+                .With("tier", tier.ToString())
+                .With("standard_stars", standardStars.ToString());
+            EnqueueAndMaybeSend(evt);
+        }
+
+        /// <summary>Logs a champion title change.</summary>
+        public void LogChampionTitleChanged(string playerId, string oldTitle, string newTitle)
+        {
+            var evt = new AnalyticsEvent(AnalyticsEventType.ChampionTitleChanged)
+                .With("session_id", _sessionId)
+                .With("player_id", playerId)
+                .With("old_title", oldTitle)
+                .With("new_title", newTitle);
             EnqueueAndMaybeSend(evt);
         }
 
