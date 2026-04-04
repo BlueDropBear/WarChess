@@ -32,6 +32,24 @@ namespace WarChess.Multiplayer
         /// <summary>Total multiplayer matches played.</summary>
         public int TotalMatches;
 
+        /// <summary>Total deployment rounds completed.</summary>
+        public int TotalDeploymentRounds;
+
+        /// <summary>Total stars earned across all deployment rounds.</summary>
+        public int TotalStarsEarned;
+
+        /// <summary>Number of perfect 10-star runs.</summary>
+        public int PerfectRuns;
+
+        /// <summary>Number of bonus rounds played.</summary>
+        public int BonusRoundsPlayed;
+
+        /// <summary>Wins against champion ghost armies.</summary>
+        public int ChampionWins;
+
+        /// <summary>Champion title status.</summary>
+        public ChampionStatus ChampionStatus;
+
         public PlayerProfile(string playerId, string displayName)
         {
             PlayerId = playerId;
@@ -42,6 +60,12 @@ namespace WarChess.Multiplayer
             HighestTier = 1;
             Ammunition = new AmmunitionSystem();
             TotalMatches = 0;
+            TotalDeploymentRounds = 0;
+            TotalStarsEarned = 0;
+            PerfectRuns = 0;
+            BonusRoundsPlayed = 0;
+            ChampionWins = 0;
+            ChampionStatus = new ChampionStatus(playerId);
 
             // Initialize tier 1 with default Elo
             EloPerTier[1] = EloSystem.GetDefaultRating();
@@ -109,6 +133,34 @@ namespace WarChess.Multiplayer
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Records a completed deployment round. Updates stats and champion wins.
+        /// Note: individual match Elo updates happen during RunDeploymentRound via RecordMatch.
+        /// </summary>
+        public void RecordDeploymentRound(DeploymentRound round)
+        {
+            TotalDeploymentRounds++;
+            TotalStarsEarned += round.TotalStars;
+
+            if (round.IsPerfectRun)
+                PerfectRuns++;
+
+            if (round.BonusBattle != null)
+                BonusRoundsPlayed++;
+
+            // Count champion wins
+            foreach (var battle in round.Battles)
+            {
+                if (battle.IsChampionChallenge
+                    && battle.Result.Outcome == Battle.BattleOutcome.PlayerWin)
+                    ChampionWins++;
+            }
+
+            if (round.BonusBattle != null && round.BonusBattle.IsChampionChallenge
+                && round.BonusBattle.Result.Outcome == Battle.BattleOutcome.PlayerWin)
+                ChampionWins++;
         }
     }
 }

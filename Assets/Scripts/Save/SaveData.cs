@@ -75,9 +75,12 @@ namespace WarChess.Save
         /// <summary>Weekly challenge progress.</summary>
         public WeeklyChallengeSaveData WeeklyChallenges;
 
+        /// <summary>Multiplayer deployment round data.</summary>
+        public MultiplayerSaveData Multiplayer;
+
         public SaveData()
         {
-            Version = 5;
+            Version = 6;
             Campaign = new CampaignSaveData();
             Armies = new List<SavedArmy>();
             Settings = new PlayerSettings();
@@ -89,6 +92,7 @@ namespace WarChess.Save
             BattleStars = new BattleStarSaveData();
             FieldManuals = new List<FieldManualSaveData>();
             WeeklyChallenges = new WeeklyChallengeSaveData();
+            Multiplayer = new MultiplayerSaveData();
             LastSavedTicks = DateTime.UtcNow.Ticks;
         }
 
@@ -126,6 +130,11 @@ namespace WarChess.Save
                 if (FieldManuals == null) FieldManuals = new List<FieldManualSaveData>();
                 if (WeeklyChallenges == null) WeeklyChallenges = new WeeklyChallengeSaveData();
                 Version = 5;
+            }
+            if (Version < 6)
+            {
+                if (Multiplayer == null) Multiplayer = new MultiplayerSaveData();
+                Version = 6;
             }
         }
     }
@@ -421,5 +430,56 @@ namespace WarChess.Save
         public string ChallengeId;
         public int CurrentCount;
         public bool Completed;
+    }
+
+    /// <summary>
+    /// Multiplayer deployment round and ghost pool save data.
+    /// </summary>
+    [Serializable]
+    public class MultiplayerSaveData
+    {
+        /// <summary>Total deployment rounds completed.</summary>
+        public int TotalDeploymentRounds;
+
+        /// <summary>Total stars earned across all rounds.</summary>
+        public int TotalStarsEarned;
+
+        /// <summary>Perfect 10-star run count.</summary>
+        public int PerfectRuns;
+
+        /// <summary>Bonus rounds played.</summary>
+        public int BonusRoundsPlayed;
+
+        /// <summary>Wins against champion ghost armies.</summary>
+        public int ChampionWins;
+
+        /// <summary>Champion title state (serialized as int).</summary>
+        public int ActiveChampionTitle;
+
+        /// <summary>Tiers where currently a champion.</summary>
+        public List<int> ActiveChampionTiers;
+
+        /// <summary>Tiers where formerly a champion.</summary>
+        public List<int> FormerChampionTiers;
+
+        /// <summary>When champion title was earned (UTC ticks).</summary>
+        public long ChampionTitleEarnedAtTicks;
+
+        /// <summary>Total days as champion.</summary>
+        public int TotalDaysAsChampion;
+
+        public MultiplayerSaveData()
+        {
+            TotalDeploymentRounds = 0;
+            TotalStarsEarned = 0;
+            PerfectRuns = 0;
+            BonusRoundsPlayed = 0;
+            ChampionWins = 0;
+            ActiveChampionTitle = 0;
+            ActiveChampionTiers = new List<int>();
+            FormerChampionTiers = new List<int>();
+            ChampionTitleEarnedAtTicks = 0;
+            TotalDaysAsChampion = 0;
+        }
     }
 }

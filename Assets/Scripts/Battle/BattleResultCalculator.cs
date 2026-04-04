@@ -10,20 +10,30 @@ namespace WarChess.Battle
         /// Calculates star rating (0-3) per GDD Section 6.2:
         /// 0 stars = loss
         /// 1 star  = victory (any win)
-        /// 2 stars = decisive victory (50%+ units surviving)
-        /// 3 stars = flawless (all units surviving)
+        /// 2 stars = decisive victory (thresholdDecisive% units surviving)
+        /// 3 stars = flawless (thresholdFlawless% units surviving)
+        /// Thresholds are configurable via GameConfigData for balance tuning.
         /// </summary>
-        public static int CalculateStars(BattleResult result, int totalPlayerUnits)
+        /// <param name="result">The battle result.</param>
+        /// <param name="totalPlayerUnits">Total player units at battle start.</param>
+        /// <param name="thresholdFlawless">% of units surviving for 3 stars (0-100, default 100).</param>
+        /// <param name="thresholdDecisive">% of units surviving for 2 stars (0-100, default 50).</param>
+        public static int CalculateStars(BattleResult result, int totalPlayerUnits,
+            int thresholdFlawless = 100, int thresholdDecisive = 50)
         {
             if (result.Outcome != BattleOutcome.PlayerWin)
                 return 0;
 
-            if (result.PlayerUnitsRemaining >= totalPlayerUnits)
+            if (totalPlayerUnits <= 0)
+                return 1;
+
+            // Calculate survival percentage (integer math, base 100)
+            int survivalPercent = result.PlayerUnitsRemaining * 100 / totalPlayerUnits;
+
+            if (survivalPercent >= thresholdFlawless)
                 return 3; // Flawless
 
-            // 50%+ surviving = decisive (integer division, rounds down)
-            int halfUnits = (totalPlayerUnits + 1) / 2; // Ceiling division
-            if (result.PlayerUnitsRemaining >= halfUnits)
+            if (survivalPercent >= thresholdDecisive)
                 return 2; // Decisive
 
             return 1; // Victory

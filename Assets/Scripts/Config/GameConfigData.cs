@@ -67,6 +67,21 @@ namespace WarChess.Config
         public readonly int CavalryWedgeMinUnits;
         public readonly int CavalryWedgeMaxStep;
 
+        // Star rating thresholds (percentage of units surviving, 0-100)
+        public readonly int StarThresholdFlawless;
+        public readonly int StarThresholdDecisive;
+
+        // Ghost army pool settings
+        public readonly int GhostPoolChampionPercentile;
+        public readonly int GhostPoolMaxAgeDays;
+        public readonly int GhostPoolMinMatchesForRank;
+        public readonly int GhostPoolRerankInterval;
+        public readonly int GhostPoolEarlyMinWinRate;
+
+        // Deployment round settings
+        public readonly int DeploymentRoundBattleCount;
+        public readonly int BonusRoundStarThreshold;
+
         public GameConfigData(
             int gridWidth, int gridHeight,
             int playerDeployMinRow, int playerDeployMaxRow,
@@ -84,7 +99,12 @@ namespace WarChess.Config
             int unbreakableStrengthFloor = 75,
             int dismountMov = 2, int dismountDefBonus = 3, int dismountAtkBonus = 2,
             int battleLineMinUnits = 3, int squareMinUnits = 4,
-            int cavalryWedgeMinUnits = 3, int cavalryWedgeMaxStep = 2)
+            int cavalryWedgeMinUnits = 3, int cavalryWedgeMaxStep = 2,
+            int starThresholdFlawless = 100, int starThresholdDecisive = 50,
+            int ghostPoolChampionPercentile = 10, int ghostPoolMaxAgeDays = 30,
+            int ghostPoolMinMatchesForRank = 5, int ghostPoolRerankInterval = 10,
+            int ghostPoolEarlyMinWinRate = 40,
+            int deploymentRoundBattleCount = 3, int bonusRoundStarThreshold = 9)
         {
             GridWidth = gridWidth;
             GridHeight = gridHeight;
@@ -118,6 +138,15 @@ namespace WarChess.Config
             SquareMinUnits = squareMinUnits;
             CavalryWedgeMinUnits = cavalryWedgeMinUnits;
             CavalryWedgeMaxStep = cavalryWedgeMaxStep;
+            StarThresholdFlawless = starThresholdFlawless;
+            StarThresholdDecisive = starThresholdDecisive;
+            GhostPoolChampionPercentile = ghostPoolChampionPercentile;
+            GhostPoolMaxAgeDays = ghostPoolMaxAgeDays;
+            GhostPoolMinMatchesForRank = ghostPoolMinMatchesForRank;
+            GhostPoolRerankInterval = ghostPoolRerankInterval;
+            GhostPoolEarlyMinWinRate = ghostPoolEarlyMinWinRate;
+            DeploymentRoundBattleCount = deploymentRoundBattleCount;
+            BonusRoundStarThreshold = bonusRoundStarThreshold;
         }
 
         /// <summary>
