@@ -3,8 +3,9 @@ using System;
 namespace WarChess.Core
 {
     /// <summary>
-    /// Immutable grid coordinate on the 10x10 battlefield.
-    /// X = column (1-10), Y = row (1 = player back, 10 = enemy back).
+    /// Immutable grid coordinate on the battlefield.
+    /// X = column, Y = row (1 = player back, max = enemy back).
+    /// Grid dimensions are configurable via GameConfig (default 10x10).
     /// </summary>
     public readonly struct GridCoord : IEquatable<GridCoord>
     {

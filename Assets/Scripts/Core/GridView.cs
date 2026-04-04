@@ -5,7 +5,7 @@ using WarChess.Units;
 namespace WarChess.Core
 {
     /// <summary>
-    /// Unity MonoBehaviour that renders the 10x10 grid and converts between
+    /// Unity MonoBehaviour that renders the grid and converts between
     /// screen/world positions and grid coordinates. Reads from GridMap for state.
     /// </summary>
     public class GridView : MonoBehaviour
